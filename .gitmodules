@@ -1,0 +1,3 @@
+[submodule "ai-translate"]
+	path = ai-translate
+	url = https://github.com/mozumidesu/ai-translate

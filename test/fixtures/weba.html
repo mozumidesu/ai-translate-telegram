@@ -1,0 +1,64 @@
+<!doctype html>
+<!--
+  Web A's markup as far as the script touches it, from Ajaxy/telegram-tt
+  6002824: a .Message with data-message-id and its .text-content
+  (components/middle/message/Message.tsx), the chat bar's .AttachMenu in
+  .message-input-wrapper and #editable-message-text (components/common/
+  Composer.tsx), and the message menu, .Menu.MessageContextMenu with
+  .MessageContextMenu_items, drawn into #portals (components/ui/Menu.tsx,
+  Portal.ts) and shut by a press outside it (hooks/useVirtualBackdrop.ts).
+  The worker is a real one, created after the userscript, that answers what
+  it is sent so the test can read what crossed the line.
+-->
+<html lang="en">
+<head><meta charset="utf-8"><title>Telegram Web A (fixture)</title></head>
+<body>
+<div id="portals"></div>
+<div class="messages-layout"><div class="Transition"><div class="Transition_slide-active">
+  <div class="MessageList">
+    <div class="Message message-list-item" data-message-id="4401">
+      <div class="message-content"><div class="content-inner"><div class="text-content clearfix with-meta">кто идёт в субботу?<span class="MessageMeta">12:00</span></div></div></div>
+    </div>
+    <div class="Message message-list-item own" data-message-id="4998">
+      <div class="message-content"><div class="content-inner"><div class="text-content clearfix with-meta">из кэша самого клиента<span class="MessageMeta">12:02</span></div></div></div>
+    </div>
+  </div>
+  <div class="Composer"><div class="composer-wrapper"><div class="message-input-wrapper">
+    <div class="AttachMenu"><button class="Button AttachMenu--button composer-action-button" style="width:46px;height:46px;color:rgb(112,117,121)"></button></div>
+    <div id="editable-message-text" contenteditable="true"></div>
+  </div></div></div>
+</div></div></div>
+<script type="module">
+  location.hash = "#-1001234567890";
+
+  // The GramJS worker, created by the app after the userscript has run.
+  const worker = new Worker(URL.createObjectURL(new Blob(["onmessage = event => postMessage(event.data.feed ?? { echo: event.data });"], { type: "text/javascript" })));
+  window.__a = { worker, echoes: [], answers: [] };
+  worker.addEventListener("message", event => {
+    if (event.data?.echo) window.__a.echoes.push(event.data.echo);
+    else window.__a.answers.push(event.data);
+  });
+
+  document.addEventListener("contextmenu", event => {
+    const message = event.target.closest(".Message");
+    if (!message) return;
+    event.preventDefault();
+    document.querySelector("#portals .MessageContextMenu")?.parentElement.remove();
+    const portal = document.createElement("div");
+    document.getElementById("portals").append(portal);
+    // Drawn into the portal after it is in place, as Teact does.
+    queueMicrotask(() => {
+      portal.innerHTML = '<div class="Menu compact in-portal MessageContextMenu fluid"><div class="backdrop"></div>'
+        + '<div class="bubble menu-container custom-scroll"><div class="MessageContextMenu_items scrollable-content custom-scroll">'
+        + '<div role="menuitem" tabindex="0" class="MenuItem compact"><i class="icon icon-reply"></i>Reply</div>'
+        + '</div></div></div>';
+    });
+  });
+
+  document.addEventListener("mousedown", event => {
+    const menu = document.querySelector("#portals .MessageContextMenu");
+    if (menu && !menu.contains(event.target)) menu.parentElement.remove();
+  });
+</script>
+</body>
+</html>

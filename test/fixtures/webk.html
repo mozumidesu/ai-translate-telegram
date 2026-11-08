@@ -1,0 +1,64 @@
+<!doctype html>
+<!--
+  Web K's markup as far as the script touches it, from morethanwords/tweb
+  aa74832: a bubble with data-mid and data-peer-id (components/chat/bubbles.ts),
+  the chat bar's emoji button, .toggle-emoticons (components/chat/input.ts), and
+  the message menu, #bubble-contextmenu.btn-menu, appended to the body on a
+  right click (components/chat/contextMenu.ts, components/buttonMenu.ts), shut
+  by a click outside it (helpers/overlayClickHandler.ts).
+-->
+<html lang="en">
+<head><meta charset="utf-8"><title>Telegram Web K (fixture)</title></head>
+<body>
+<div class="chat active">
+  <div class="bubbles">
+    <div class="bubble" data-mid="4404" data-peer-id="-1234567890">
+      <div class="bubble-content-wrapper"><div class="bubble-content">
+        <div class="message spoilers-container"><span class="translatable-message">смотри это</span><span class="time">12:00</span></div>
+      </div></div>
+    </div>
+    <div class="bubble is-out" data-mid="4999" data-peer-id="-1234567890">
+      <div class="bubble-content-wrapper"><div class="bubble-content">
+        <div class="message"><span class="translatable-message">только на экране</span><span class="time">12:01</span></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="chat-input">
+    <div class="rows-wrapper"><div class="new-message-wrapper">
+      <div class="input-message-container"><div class="input-message-input" contenteditable="true"></div></div>
+      <button class="btn-icon toggle-emoticons" style="width:40px;height:40px;color:rgb(112,117,121)"></button>
+    </div></div>
+  </div>
+</div>
+<script type="module">
+  import { makeWebK } from "./webk-fixture.mjs";
+
+  // What Web K does as its modules run, which is after the userscript has.
+  const K = makeWebK();
+  window.__k = K;
+  window.apiManagerProxy = K.apiManagerProxy;
+  window.appImManager = K.appImManager;
+  window.rootScope = K.rootScope;
+  // Opening a chat asks the managers for its history before anything can be typed.
+  K.managers.appMessagesManager.getHistory({ peerId: K.appImManager.chat.peerId, limit: 50 });
+
+  document.addEventListener("contextmenu", event => {
+    const bubble = event.target.closest(".bubble");
+    if (!bubble) return;
+    event.preventDefault();
+    document.getElementById("bubble-contextmenu")?.remove();
+    const menu = document.createElement("div");
+    menu.id = "bubble-contextmenu";
+    menu.className = "btn-menu contextmenu active";
+    menu.setAttribute("role", "menu");
+    menu.innerHTML = '<div class="btn-menu-item rp-overflow" role="menuitem"><span class="tgico btn-menu-item-icon"></span><span class="btn-menu-item-text">Reply</span></div>';
+    document.body.append(menu);
+  });
+
+  document.addEventListener("click", event => {
+    const menu = document.getElementById("bubble-contextmenu");
+    if (menu && !menu.contains(event.target)) menu.remove();
+  }, true);
+</script>
+</body>
+</html>
