@@ -12,8 +12,10 @@ with a reply keyboard, any will do.
 
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
-   The manager shows **AI Translate**, "Unofficial." in the description, and
-   offers to install. Install.
+   The manager shows **AI Translate**, "Unofficial." in the description,
+   version 0.2.0, and offers to install. Install. With 0.1.0 already
+   installed, the manager's own update check (Tampermonkey: Utilities, Check
+   for userscript updates) offers 0.2.0 instead.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
@@ -34,7 +36,8 @@ with a reply keyboard, any will do.
    messages as context, translation exceptions, extra style instructions,
    the backslash Help), **Appearance** (Interface language), and Logs at the
    foot. Pick Groq, paste the key, leave the model. Leave the field: no red
-   line under the key.
+   line under the key. Typing in any field stays there: Telegram's chat box
+   does not take the keys, and Escape shuts only the window.
 4. Under Logs, one quiet line: "AI Translate · " and the version the
    userscript manager shows for the script (its dashboard, column Version),
    not the Discord plugin's 0.2.1a.
