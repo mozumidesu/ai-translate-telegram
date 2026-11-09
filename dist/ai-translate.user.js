@@ -3930,6 +3930,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     });
     if (kept.length > KEPT) kept.splice(0, kept.length - KEPT);
   }
+  var howMany = () => kept.length;
   function clear() {
     kept.length = 0;
   }
@@ -5416,29 +5417,298 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     setTimeout(() => note.remove(), SHOWN_MS);
   }
 
-  // src/panel.ts
+  // src/sheet.ts
+  var CSS = `
+.sheet {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: rgba(0, 0, 0, .4);
+    z-index: 2147483100;
+}
+
+.panel {
+    width: min(40rem, calc(100vw - 2rem));
+    max-height: min(46rem, calc(100vh - 2rem));
+    overflow: auto;
+    background: var(--bg);
+    color: var(--fg);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 1.2rem 1.4rem 1.6rem;
+}
+.sheet[data-name="chat"] .panel { width: min(28rem, calc(100vw - 2rem)); }
+
+.head { display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; color: var(--accent); }
+.head h1 { font-size: 1.1rem; margin: 0; flex: 1; color: var(--fg); }
+
+.x { all: unset; cursor: pointer; color: var(--muted); font-size: 1.4rem; line-height: 1; padding: 0 .3rem; }
+.x:hover, .x:focus-visible { color: var(--fg); }
+
+.field { margin-bottom: 1rem; }
+.field > label, .slot > label, .label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+.hint { display: block; font-size: .8rem; color: var(--muted); line-height: 1.4; margin: .3rem 0 0; }
+.field > .hint:not(:last-child) { margin: 0 0 .45rem; }
+.hint.bad { color: var(--bad); }
+.hint:empty { display: none; }
+
+.field input, .field select, .field textarea {
+    width: 100%;
+    padding: .5rem .65rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--field);
+    color: var(--fg);
+    font-size: .9rem;
+    font-family: inherit;
+}
+.field textarea { min-height: 5rem; resize: vertical; }
+.field label input[type="checkbox"] { width: auto; margin: 0 .5rem 0 0; vertical-align: -1px; accent-color: var(--accent); }
+.field label:has(input[type="checkbox"]) { cursor: pointer; }
+.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.divider { border: 0; border-top: 1px solid var(--line); margin: 0 0 1rem; }
+
+.section { text-align: center; font-size: 1.05rem; font-weight: 600; margin: 1.6rem 0 1rem; }
+
+.button {
+    all: unset;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    padding: .5rem .9rem;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    background: var(--field);
+    color: var(--fg);
+    font-size: .9rem;
+    font-weight: 500;
+    text-align: center;
+}
+.button.primary { background: var(--accent); border-color: var(--accent); color: #ffffff; }
+.button.wide { display: block; width: 100%; }
+.button:hover:not([disabled]), .button:focus-visible { border-color: var(--accent); }
+.button.primary:hover:not([disabled]) { filter: brightness(1.08); }
+.button[disabled] { cursor: default; opacity: .5; }
+.buttons { display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .8rem; }
+.foot { margin-bottom: 1rem; }
+
+.keep { margin: .2rem 0 0; padding-inline-start: 1.2rem; }
+.keep li { font-size: .8rem; color: var(--muted); line-height: 1.4; }
+.keep li + li { margin-top: .3rem; }
+.example {
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(128, 128, 128, .18);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .875em;
+    white-space: pre-wrap;
+}
+`;
+  var OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
+  function openSheet(opening) {
+    addStyle(CSS);
+    shutSheet(opening.name);
+    const sheet = document.createElement("div");
+    sheet.className = "sheet";
+    sheet.dataset.name = opening.name;
+    const panel = document.createElement("div");
+    panel.className = "panel";
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "true");
+    sheet.append(panel);
+    const shut = () => {
+      if (!sheet.isConnected) return;
+      sheet.remove();
+      topSheet()?.querySelector(".x")?.focus();
+      opening.onShut?.();
+    };
+    const body = document.createElement("div");
+    const made = { body, redraw: () => draw(), shut };
+    const draw = () => {
+      panel.textContent = "";
+      panel.dir = isRightToLeft() ? "rtl" : "ltr";
+      const head = document.createElement("div");
+      head.className = "head";
+      const title = document.createElement("h1");
+      title.textContent = opening.title();
+      const x = document.createElement("button");
+      x.type = "button";
+      x.className = "x";
+      x.textContent = "×";
+      x.setAttribute("aria-label", t("message.hide"));
+      x.onclick = shut;
+      head.append(translateIcon(22), title, ...opening.links?.() ?? [], x);
+      body.textContent = "";
+      opening.draw(body, made);
+      panel.append(head, body);
+      return x;
+    };
+    sheet.onmousedown = (event) => {
+      if (event.target === sheet) shut();
+    };
+    for (const type of OURS) sheet.addEventListener(type, (event) => event.stopPropagation());
+    shutters.set(sheet, shut);
+    listenForEscape();
+    ui().append(sheet);
+    draw().focus();
+    return made;
+  }
+  var shutters = /* @__PURE__ */ new WeakMap();
+  var topSheet = () => [...ui().querySelectorAll(".sheet")].at(-1);
+  var listening = false;
+  function listenForEscape() {
+    if (listening) return;
+    listening = true;
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      const top = topSheet();
+      if (!top) return;
+      event.preventDefault();
+      event.stopPropagation();
+      shutters.get(top)?.();
+    }, true);
+  }
+  function shutSheet(name) {
+    const open2 = ui().querySelector(`.sheet[data-name="${name}"]`);
+    if (open2) shutters.get(open2)?.();
+  }
+  var listeners = /* @__PURE__ */ new Set();
+  var onChange = (listener) => listeners.add(listener);
+  var changed = () => {
+    for (const listener of listeners) listener();
+  };
+  function button(label, act, { primary = false, wide = false } = {}) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = ["button", primary && "primary", wide && "wide"].filter(Boolean).join(" ");
+    b.textContent = label;
+    b.onclick = act;
+    return b;
+  }
+  function hint(text = "", bad = false) {
+    const line = document.createElement("p");
+    line.className = bad ? "hint bad" : "hint";
+    line.textContent = text;
+    return line;
+  }
+  function sectionTitle(key) {
+    const title = document.createElement("div");
+    title.className = "section";
+    title.textContent = t(key);
+    return title;
+  }
+
+  // src/logs.ts
+  var CSS2 = `
+.log {
+    margin: .8rem 0 0;
+    padding: .6rem .7rem;
+    max-height: 22rem;
+    overflow: auto;
+    border-radius: 10px;
+    background: var(--field);
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: .75rem;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+`;
+  var fileName = () => `ai-translate-${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19)}.txt`;
+  async function toClipboard(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+    }
+    try {
+      const box2 = document.createElement("textarea");
+      box2.value = text;
+      box2.style.position = "fixed";
+      box2.style.opacity = "0";
+      document.body.append(box2);
+      box2.select();
+      const ok2 = document.execCommand("copy");
+      box2.remove();
+      return ok2;
+    } catch {
+      return false;
+    }
+  }
+  function toFile(text) {
+    try {
+      const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName();
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1e4);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function openLogs(onShut) {
+    addStyle(CSS2);
+    openSheet({
+      name: "logs",
+      title: () => t("logs.title"),
+      onShut,
+      draw(body) {
+        const text = asText();
+        const log = document.createElement("pre");
+        log.className = "log";
+        log.dir = "ltr";
+        log.textContent = text || t("logs.empty");
+        const said = hint();
+        let quiet;
+        const report = (key) => {
+          said.textContent = t(key);
+          clearTimeout(quiet);
+          quiet = setTimeout(() => {
+            said.textContent = "";
+          }, 2e3);
+        };
+        const copy = button(t("logs.copy"), async () => report(await toClipboard(text) ? "logs.copied" : "logs.copyFailed"), { primary: true });
+        const save2 = button(t("logs.save"), () => report(toFile(text) ? "logs.saved" : "logs.saveFailed"));
+        const empty = button(t("logs.clear"), () => {
+          clear();
+          log.textContent = t("logs.empty");
+          for (const b of [copy, save2, empty]) b.disabled = true;
+        });
+        for (const b of [copy, save2, empty]) b.disabled = !text;
+        const buttons = document.createElement("div");
+        buttons.className = "buttons";
+        buttons.append(copy, save2, empty);
+        body.append(hint(t("logs.desc")), log, buttons, said);
+      }
+    });
+  }
+  function logsRow() {
+    const box2 = document.createElement("div");
+    box2.className = "foot logs";
+    const label = () => {
+      const kept2 = howMany();
+      return kept2 ? `${t("logs.open")} (${kept2})` : t("logs.open");
+    };
+    const open2 = button(label(), () => openLogs(() => {
+      open2.textContent = label();
+    }), { wide: true });
+    box2.append(open2);
+    return box2;
+  }
+
+  // src/settings.ts
   var APP = { app: "Telegram" };
-  var FIELDS = [
-    {
-      kind: "select",
-      name: "locale",
-      label: () => t("locale.name"),
-      hint: () => t("locale.descApp", APP),
-      options: () => LOCALES.map((l) => ({ value: l.value, label: l.value === "auto" ? t("locale.autoApp", APP) : l.label }))
-    },
-    { kind: "slots", name: "providerSlots", label: () => t("provider.name"), hint: () => t("provider.desc") },
-    {
-      kind: "select",
-      name: "sentLanguage",
-      label: () => t("panel.sentLanguage"),
-      options: () => LANGUAGES.map((l) => ({ value: l.value, label: l.label }))
-    },
-    {
-      kind: "select",
-      name: "receivedLanguage",
-      label: () => t("panel.receivedLanguage"),
-      options: () => LANGUAGES.map((l) => ({ value: l.value, label: l.label }))
-    },
+  var ITEMS = [
+    // What it talks to: first on the page, so nothing announces it.
+    { kind: "providers" },
+    { kind: "title", key: "section.behaviour" },
     {
       kind: "select",
       name: "mode",
@@ -5453,6 +5723,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       hint: () => t("onError.desc"),
       options: () => [{ value: "hold", label: t("onError.hold") }, { value: "sendAsTyped", label: t("onError.send") }]
     },
+    { kind: "switch", name: "explain", label: () => t("explain.name"), hint: () => t("explain.desc") },
+    { kind: "title", key: "section.translation" },
     {
       kind: "select",
       name: "gender",
@@ -5475,64 +5747,26 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         { value: "formal", label: t("formality.formal") }
       ]
     },
-    { kind: "switch", name: "explain", label: () => t("explain.name"), hint: () => t("explain.desc") },
     { kind: "switch", name: "useContext", label: () => t("context.name"), hint: () => t("context.desc") },
     { kind: "text", name: "glossary", label: () => t("glossary.name"), hint: () => t("glossary.desc") },
-    { kind: "area", name: "extraInstructions", label: () => t("extra.name"), hint: () => t("extra.desc") }
+    { kind: "area", name: "extraInstructions", label: () => t("extra.name"), hint: () => t("extra.desc") },
+    // Nothing to set: how to keep part of a message untranslated.
+    { kind: "keep" },
+    { kind: "title", key: "section.look" },
+    {
+      kind: "select",
+      name: "locale",
+      label: () => t("locale.name"),
+      hint: () => t("locale.descApp", APP),
+      options: () => LOCALES.map((l) => ({ value: l.value, label: l.value === "auto" ? t("locale.autoApp", APP) : l.label }))
+    },
+    // Upkeep, at the foot, with no heading.
+    { kind: "logs" }
   ];
-  var CSS = `
-.sheet {
-    position: fixed;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: rgba(0, 0, 0, .4);
-    z-index: 2147483100;
-}
-
-.panel {
-    width: min(40rem, calc(100vw - 2rem));
-    max-height: min(46rem, calc(100vh - 2rem));
-    overflow: auto;
-    background: var(--bg);
-    color: var(--fg);
-    border-radius: 16px;
-    box-shadow: var(--shadow);
-    padding: 1.2rem 1.4rem 1.6rem;
-}
-
-.head { display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; color: var(--accent); }
-.head h1 { font-size: 1.1rem; margin: 0; flex: 1; color: var(--fg); }
-
-.x { all: unset; cursor: pointer; color: var(--muted); font-size: 1.4rem; line-height: 1; padding: 0 .3rem; }
-.x:hover, .x:focus-visible { color: var(--fg); }
-
-.field { margin-bottom: 1rem; }
-.field > label, .slot > label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
-.field .hint { display: block; font-size: .8rem; color: var(--muted); line-height: 1.4; margin-bottom: .45rem; }
-
-.field input, .field select, .field textarea {
-    width: 100%;
-    padding: .5rem .65rem;
-    border-radius: 10px;
-    border: 1px solid var(--line);
-    background: var(--field);
-    color: var(--fg);
-    font-size: .9rem;
-    font-family: inherit;
-}
-.field textarea { min-height: 5rem; resize: vertical; }
-.field label input[type="checkbox"] { width: auto; margin: 0 .5rem 0 0; vertical-align: -1px; accent-color: var(--accent); }
-.field label:has(input[type="checkbox"]) { cursor: pointer; }
-.field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
-
-.chat { padding: .8rem; border-radius: 12px; background: var(--field); }
-
+  var CSS3 = `
 .slot + .slot { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid var(--line); }
 .slot > label { margin-top: .55rem; }
 .slot > label:first-child { margin-top: 0; }
-.slot .hint.bad { color: var(--bad); margin: .3rem 0 0; }
-.slot .hint.bad:empty { display: none; }
 
 .keyrow { display: flex; gap: .45rem; align-items: center; }
 .keyrow input { flex: 1; min-width: 0; }
@@ -5553,27 +5787,27 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     font-size: .9rem;
 }
 .sign:hover, .sign:focus-visible { border-color: var(--accent); }
-
-.log { width: 100%; min-height: 8rem; margin-bottom: .2rem; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .75rem; white-space: pre; }
 `;
-  var client;
-  var usePanelClient = (given) => {
-    client = given;
-  };
-  function row(field) {
+  function row(field, sheet) {
     const name = field.name;
     const value = config()[name];
     const box2 = document.createElement("div");
     box2.className = "field";
+    box2.dataset.setting = name;
     const label = document.createElement("label");
     label.textContent = field.label();
     box2.append(label);
-    if (field.hint) {
-      const hint = document.createElement("span");
-      hint.className = "hint";
-      hint.textContent = field.hint();
-      box2.append(hint);
+    const said = field.hint ? hint(field.hint()) : void 0;
+    if (field.kind === "switch") {
+      const tick = document.createElement("input");
+      tick.type = "checkbox";
+      tick.checked = value === true;
+      tick.onchange = () => set(name, tick.checked);
+      label.prepend(tick);
+      if (said) box2.append(said);
+      return box2;
     }
+    if (said) box2.append(said);
     if (field.kind === "select") {
       const select = document.createElement("select");
       for (const option of field.options()) {
@@ -5585,21 +5819,10 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       select.value = String(value ?? "");
       select.onchange = () => {
         set(name, select.value);
-        if (name === "locale" || name === "mode") redraw();
+        if (name === "locale") sheet.redraw();
+        if (name === "mode") changed();
       };
       box2.append(select);
-      return box2;
-    }
-    if (field.kind === "switch") {
-      const tick = document.createElement("input");
-      tick.type = "checkbox";
-      tick.checked = value === true;
-      tick.onchange = () => set(name, tick.checked);
-      label.prepend(tick);
-      return box2;
-    }
-    if (field.kind === "slots") {
-      box2.append(slotList());
       return box2;
     }
     const input = field.kind === "area" ? document.createElement("textarea") : document.createElement("input");
@@ -5608,35 +5831,6 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     input.spellcheck = false;
     input.onchange = () => set(name, input.value);
     box2.append(input);
-    return box2;
-  }
-  function chatRow() {
-    const chatId = client?.openChat();
-    if (!chatId) return void 0;
-    const box2 = document.createElement("div");
-    box2.className = "field chat";
-    const label = document.createElement("label");
-    const hint = document.createElement("span");
-    hint.className = "hint";
-    const tick = document.createElement("input");
-    tick.type = "checkbox";
-    if (config().mode === "always") {
-      label.textContent = t("panel.alwaysOn");
-      hint.textContent = t("panel.alwaysOnHint");
-      tick.checked = true;
-      tick.disabled = true;
-    } else {
-      const chat = client?.chatTitle(chatId) || t("panel.thisChat");
-      label.textContent = t("panel.toggle", { chat });
-      hint.textContent = t("panel.toggleHint");
-      tick.checked = isChannelEnabled(chatId);
-      tick.onchange = () => {
-        setChannelEnabled(chatId, tick.checked);
-        changed();
-      };
-    }
-    label.prepend(tick);
-    box2.append(label, hint);
     return box2;
   }
   function eye(shown) {
@@ -5659,8 +5853,9 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     }
     return svg;
   }
-  function slotList() {
+  function providers() {
     const list = document.createElement("div");
+    list.className = "field providers";
     const draw = () => {
       const slots = readSlots();
       list.textContent = "";
@@ -5690,6 +5885,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         choose.value = slot.provider;
         choose.onchange = () => change(at, (s) => ({ ...s, provider: choose.value }));
         block.append(choose);
+        if (at <= 1) block.append(hint(first ? t("provider.desc") : t("fallback.desc")));
         if (slot.provider !== NONE2) {
           const keyLabel = document.createElement("label");
           keyLabel.textContent = keyHeading(slot.provider);
@@ -5699,6 +5895,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
           const key = document.createElement("input");
           key.type = "password";
           key.value = keyOf(slot);
+          key.placeholder = t("apiKey.desc");
           key.spellcheck = false;
           key.autocomplete = "off";
           key.onchange = () => change(at, (s) => ({ ...s, keys: { ...s.keys, [s.provider]: key.value } }));
@@ -5716,22 +5913,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
           };
           keyRow.append(key, show);
           block.append(keyRow);
-          const said = document.createElement("span");
-          said.className = "hint bad";
-          block.append(said);
-          const modelLabel = document.createElement("label");
-          modelLabel.textContent = t("model.name");
-          block.append(modelLabel);
-          const model = document.createElement("input");
-          model.type = "text";
-          model.value = modelOf(slot);
-          model.spellcheck = false;
-          model.onchange = () => change(at, (s) => ({ ...s, models: { ...s.models, [s.provider]: model.value } }));
-          const suggestions = document.createElement("datalist");
-          suggestions.id = `ai-translate-models-${slot.id}`;
-          model.setAttribute("list", suggestions.id);
-          block.append(suggestions, model);
-          void offerModels(slot, suggestions, said);
+          const refused = hint("", true);
+          block.append(refused);
           if (slot.provider === "openai") {
             const urlLabel = document.createElement("label");
             urlLabel.textContent = t("baseUrl.name");
@@ -5739,10 +5922,25 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             const url = document.createElement("input");
             url.type = "text";
             url.value = baseUrlOf(slot);
+            url.placeholder = t("baseUrl.desc");
             url.spellcheck = false;
             url.onchange = () => change(at, (s) => ({ ...s, baseUrls: { ...s.baseUrls, [s.provider]: url.value } }));
             block.append(url);
           }
+          const modelLabel = document.createElement("label");
+          modelLabel.textContent = t("model.name");
+          block.append(modelLabel);
+          const model = document.createElement("input");
+          model.type = "text";
+          model.value = modelOf(slot);
+          model.placeholder = t("model.pick");
+          model.spellcheck = false;
+          model.onchange = () => change(at, (s) => ({ ...s, models: { ...s.models, [s.provider]: model.value } }));
+          const suggestions = document.createElement("datalist");
+          suggestions.id = `ai-translate-models-${slot.id}`;
+          model.setAttribute("list", suggestions.id);
+          block.append(suggestions, model);
+          void offerModels(slot, suggestions, refused);
         }
         const buttons = document.createElement("div");
         buttons.className = "signs";
@@ -5771,13 +5969,13 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     draw();
     return list;
   }
-  async function offerModels(slot, list, said) {
+  async function offerModels(slot, list, refused) {
     const apiKey = keyOf(slot);
     if (!apiKey) return;
     try {
       const { status, models } = await Bridge.listAiModels(JSON.stringify({ provider: slot.provider, apiKey, baseUrl: baseUrlOf(slot) }));
       if (status === 401 || status === 403) {
-        said.textContent = t("apiKey.bad", { provider: providerName(slot.provider) });
+        refused.textContent = t("apiKey.bad", { provider: providerName(slot.provider) });
         return;
       }
       for (const model of models) {
@@ -5788,100 +5986,138 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     } catch {
     }
   }
-  function logRow() {
+  function withExample(key, example) {
+    const line = document.createElement("li");
+    const [before, after = ""] = t(key).split("{example}");
+    const code = document.createElement("code");
+    code.className = "example";
+    code.dir = "auto";
+    code.textContent = example;
+    line.append(before, code, after);
+    return line;
+  }
+  function keepHelp() {
+    const box2 = document.createElement("div");
+    box2.className = "field keep-help";
+    const label = document.createElement("label");
+    label.textContent = t("keep.name");
+    const list = document.createElement("ul");
+    list.className = "keep";
+    const code = document.createElement("li");
+    code.textContent = t("keep.code");
+    list.append(withExample("keep.pair", "\\carpe diem\\"), withExample("keep.line", "\\" + t("keep.lineExample")), code);
+    box2.append(label, list);
+    return box2;
+  }
+  function render(item, sheet) {
+    switch (item.kind) {
+      case "title":
+        return sectionTitle(item.key);
+      case "providers":
+        return providers();
+      case "keep":
+        return keepHelp();
+      case "logs":
+        return logsRow();
+      default:
+        return row(item, sheet);
+    }
+  }
+  function openSettings() {
+    addStyle(CSS3);
+    openSheet({
+      name: "settings",
+      title: () => t("panel.title"),
+      onShut: changed,
+      draw(body, sheet) {
+        for (const item of ITEMS) body.append(render(item, sheet));
+      }
+    });
+  }
+
+  // src/panel.ts
+  var client;
+  var usePanelClient = (given) => {
+    client = given;
+  };
+  function languagePicker(title, name) {
     const box2 = document.createElement("div");
     box2.className = "field";
     const label = document.createElement("label");
-    label.textContent = t("logs.title");
-    const hint = document.createElement("span");
-    hint.className = "hint";
-    hint.textContent = t("logs.desc");
-    const text = document.createElement("textarea");
-    text.className = "log";
-    text.readOnly = true;
-    const said = document.createElement("span");
-    said.className = "hint";
-    const buttons = document.createElement("div");
-    buttons.className = "signs";
-    const button = (name, act) => {
-      const b = document.createElement("button");
-      b.type = "button";
-      b.className = "sign";
-      b.textContent = t(name);
-      b.onclick = act;
-      buttons.append(b);
-      return b;
-    };
-    const fill = () => {
-      text.value = asText() || t("logs.empty");
-    };
-    button("logs.copy", async () => {
-      fill();
-      try {
-        await navigator.clipboard.writeText(text.value);
-        said.textContent = t("logs.copied");
-      } catch {
-        said.textContent = t("logs.copyFailed");
-      }
-    });
-    button("logs.clear", () => {
-      clear();
-      fill();
-    });
-    fill();
-    box2.append(label, hint, text, buttons, said);
+    label.textContent = title;
+    const current = String(config()[name] ?? "");
+    const select = document.createElement("select");
+    const options = current && !LANGUAGES.some((l) => l.value === current) ? [{ value: current, label: current }, ...LANGUAGES] : LANGUAGES;
+    if (!current) {
+      const none = document.createElement("option");
+      none.value = "";
+      none.textContent = t("panel.pickLanguage");
+      none.disabled = true;
+      select.append(none);
+    }
+    for (const option of options) {
+      const item = document.createElement("option");
+      item.value = option.value;
+      item.textContent = option.label;
+      select.append(item);
+    }
+    select.value = current;
+    select.onchange = () => set(name, select.value);
+    box2.append(label, select);
     return box2;
   }
-  var listeners = /* @__PURE__ */ new Set();
-  var onChange = (listener) => listeners.add(listener);
-  var changed = () => {
-    for (const listener of listeners) listener();
-  };
-  function closePanel() {
-    ui().querySelector(".sheet")?.remove();
-    changed();
-  }
-  function redraw() {
-    ui().querySelector(".sheet")?.remove();
-    openPanel();
+  function chatToggle(chatId) {
+    const box2 = document.createElement("div");
+    box2.className = "field chat";
+    const label = document.createElement("label");
+    const tick = document.createElement("input");
+    tick.type = "checkbox";
+    let said;
+    if (config().mode === "always") {
+      label.textContent = t("panel.alwaysOn");
+      said = t("panel.alwaysOnHint");
+      tick.checked = true;
+      tick.disabled = true;
+    } else {
+      const chat = client?.chatTitle(chatId) || t("panel.thisChat");
+      label.textContent = t("panel.toggle", { chat });
+      said = t("panel.toggleHint");
+      tick.checked = isChannelEnabled(chatId);
+      tick.onchange = () => {
+        setChannelEnabled(chatId, tick.checked);
+        changed();
+      };
+    }
+    label.prepend(tick);
+    box2.append(label, hint(said));
+    return box2;
   }
   function openPanel() {
-    addStyle(CSS);
-    ui().querySelector(".sheet")?.remove();
-    const sheet = document.createElement("div");
-    sheet.className = "sheet";
-    sheet.onmousedown = (event) => {
-      if (event.target === sheet) closePanel();
-    };
-    sheet.onkeydown = (event) => {
-      if (event.key === "Escape") closePanel();
-    };
-    const panel = document.createElement("div");
-    panel.className = "panel";
-    panel.setAttribute("role", "dialog");
-    panel.setAttribute("aria-modal", "true");
-    const head = document.createElement("div");
-    head.className = "head";
-    const title = document.createElement("h1");
-    title.textContent = t("panel.title");
-    const shut = document.createElement("button");
-    shut.className = "x";
-    shut.textContent = "×";
-    shut.setAttribute("aria-label", t("message.hide"));
-    shut.onclick = closePanel;
-    head.append(translateIcon(22), title, shut);
-    panel.append(head);
-    const chat = chatRow();
-    if (chat) panel.append(chat);
-    for (const field of FIELDS) panel.append(row(field));
-    panel.append(logRow());
-    sheet.append(panel);
-    ui().append(sheet);
-    shut.focus();
+    const chatId = client?.openChat();
+    openSheet({
+      name: "chat",
+      title: () => t("panel.title"),
+      onShut: changed,
+      draw(body, sheet) {
+        body.append(
+          languagePicker(t("panel.sentLanguage"), "sentLanguage"),
+          languagePicker(t("panel.receivedLanguage"), "receivedLanguage")
+        );
+        if (chatId) {
+          const line = document.createElement("hr");
+          line.className = "divider";
+          body.append(line, chatToggle(chatId));
+        }
+        body.append(button(t("panel.allSettings"), () => {
+          sheet.shut();
+          openSettings();
+        }));
+      }
+    });
   }
 
   // src/composer.ts
-  var CSS2 = `
+  var CSS4 = `
 :host { all: initial; display: inline-flex; align-self: flex-end; flex: none; }
 button {
     all: unset;
@@ -5908,16 +6144,16 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       const chatId = client3.openChat();
       const on = !!chatId && isChannelEnabled(chatId);
       for (const placed of buttons) {
-        const { host, button, anchor } = placed;
+        const { host, button: button2, anchor } = placed;
         if (!host.isConnected) {
           buttons.delete(placed);
           continue;
         }
-        button.classList.toggle("on", on);
-        button.classList.toggle("busy", busy2);
-        button.title = `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
-        button.setAttribute("aria-pressed", String(on));
-        button.setAttribute("aria-label", t("panel.title"));
+        button2.classList.toggle("on", on);
+        button2.classList.toggle("busy", busy2);
+        button2.title = `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
+        button2.setAttribute("aria-pressed", String(on));
+        button2.setAttribute("aria-label", t("panel.title"));
         host.style.color = getComputedStyle(anchor).color;
       }
     };
@@ -5926,30 +6162,34 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       host.className = MARK;
       const root = host.attachShadow({ mode: "closed" });
       const style = document.createElement("style");
-      style.textContent = CSS2;
-      const button = document.createElement("button");
-      button.type = "button";
+      style.textContent = CSS4;
+      const button2 = document.createElement("button");
+      button2.type = "button";
       const size = Math.round(anchor.offsetHeight || 40);
-      button.style.width = `${size}px`;
-      button.style.height = `${size}px`;
-      button.append(translateIcon(Math.round(size * 0.55)));
-      button.onclick = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        openPanel();
-      };
-      button.oncontextmenu = (event) => {
-        event.preventDefault();
-        event.stopPropagation();
+      button2.style.width = `${size}px`;
+      button2.style.height = `${size}px`;
+      button2.append(translateIcon(Math.round(size * 0.55)));
+      const toggle = () => {
         const chatId = client3.openChat();
         if (!chatId) return;
         toggleChannel(chatId);
         show();
       };
-      button.onmousedown = (event) => event.preventDefault();
-      root.append(style, button);
+      button2.onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.shiftKey) return toggle();
+        openPanel();
+      };
+      button2.oncontextmenu = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        toggle();
+      };
+      button2.onmousedown = (event) => event.preventDefault();
+      root.append(style, button2);
       anchor.before(host);
-      buttons.add({ host, button, anchor });
+      buttons.add({ host, button: button2, anchor });
     };
     const place = () => {
       for (const anchor of client3.composerAnchors())
@@ -6007,7 +6247,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
 
   // src/menu.ts
-  var CSS3 = `
+  var CSS5 = `
 .card {
     position: fixed;
     z-index: 2147482500;
@@ -6048,7 +6288,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
   var open;
   function cardFor(shown, explaining) {
-    addStyle(CSS3);
+    addStyle(CSS5);
     open?.shut();
     const card = document.createElement("div");
     card.className = "card";
@@ -6784,7 +7024,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     if (document.body) start();
     else document.addEventListener("DOMContentLoaded", start, { once: true });
     try {
-      GM_registerMenuCommand?.(t("panel.allSettings"), openPanel);
+      GM_registerMenuCommand?.(t("panel.allSettings"), openSettings);
     } catch {
     }
   }

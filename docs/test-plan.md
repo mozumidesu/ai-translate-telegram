@@ -22,16 +22,32 @@ with a reply keyboard, any will do.
 
 1. Open any chat. A translate button is in the chat bar, beside the emoji
    button (Web K) or the attachment button (Web A).
-2. Left-click it: the panel opens. Pick Groq, paste the key, leave the model.
-   Leave the field: no red line under the key. Set "Translate my messages
-   into" to English.
-3. The manager asks to allow `api.groq.com` on the first request (step 3.2).
+2. Left-click it: the panel opens with, in this order, "Translate my
+   messages into", "Translate incoming messages into", a line, the switch
+   for this chat, and an *All plugin settings* button. Nothing else. Set
+   "Translate my messages into" to English.
+3. Press *All plugin settings*: the panel steps aside and the settings page
+   opens. It reads, top to bottom, as the Discord plugin's: Provider (with
+   the key, the model and the backup provider), then **Behaviour**
+   (Auto-translate outgoing messages, If the translation fails, AI Explain),
+   **Translation** (grammatical gender, how to address people, recent
+   messages as context, translation exceptions, extra style instructions,
+   the backslash Help), **Appearance** (Interface language), and Logs at the
+   foot. Pick Groq, paste the key, leave the model. Leave the field: no red
+   line under the key.
+4. Press Logs: a window opens over the settings with Copy, Save .txt and
+   Clear. Escape shuts it and leaves the settings; Escape again shuts them,
+   and the chat stays open.
+5. The userscript manager's menu has *All plugin settings*: it opens the same
+   page.
+6. The manager asks to allow `api.groq.com` on the first request (step 3.2).
    Choose *Always allow domain*.
 
 ## 3. Switch a chat on and send ★
 
 1. Right-click the button in a chat with your second account: it turns blue.
    The panel shows "Auto-translate my messages in <name>" ticked.
+   Shift-click switches it off and back on the same way, and opens nothing.
 2. Send `привет, как дела?`. The message appears after about a second, in
    English. On the phone, the second account sees only the English.
 3. Send one with formatting: bold a word, add a link with the link button, a
@@ -54,12 +70,12 @@ with a reply keyboard, any will do.
 1. Right-click a message from the second account: the menu has
    **AI Translate**. Choose it: the menu shuts, a card beside the message
    shows the translation and "Translated from …".
-2. Turn on *Add AI Explain to the right-click menu* in the panel; the menu
-   now has **AI Explain** too, which names the language and explains it.
+2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
+   menu now has **AI Explain** too, which names the language and explains it.
 
 ## 6. When it fails
 
-1. Put a wrong key in the panel and send in a switched-on chat. Nothing is
+1. Put a wrong key on the settings page and send in a switched-on chat. Nothing is
    sent, a red notice says why, and the text is back in the chat box.
 2. Set "If the translation fails" to send untranslated, send again: it goes
    as typed. Put the right key back.
@@ -80,10 +96,10 @@ before.
 
 ## 8. Context, last
 
-Context is off: confirm in the panel. Switch it on, send a short reply such
+Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off
 again if you do not want other people's messages sent to the provider.
 
 Write down for each step: client, browser, manager, and pass or what
-happened. The panel's Logs, Copy, is what to attach when something fails
+happened. Logs, at the foot of the settings page, Copy, is what to attach when something fails
 without saying why.

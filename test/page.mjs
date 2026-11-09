@@ -105,6 +105,19 @@ const ours = (page, selector) => page.evaluate(selector => {
     return [...(root?.querySelectorAll(selector) ?? [])].map(e => e.textContent);
 }, selector);
 
+/** A click on something of ours, which the page cannot reach through the closed root. */
+const clickOurs = (page, selector) => page.evaluate(selector => {
+    document.getElementById("ai-translate-telegram").shadowRoot.querySelector(selector).click();
+}, selector);
+
+/** The settings page as a list: each section title, setting and piece of upkeep, in the order they are drawn. */
+const settingsOrder = page => page.evaluate(() => {
+    const sheet = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="settings"]');
+    return [...(sheet?.querySelectorAll(".section, [data-setting], .providers, .keep-help, .foot") ?? [])].map(e =>
+        e.classList.contains("section") ? `# ${e.textContent}`
+            : e.dataset.setting ?? (e.classList.contains("providers") ? "providers" : e.classList.contains("keep-help") ? "keep" : e.classList[1]));
+});
+
 const waitOurs = (page, selector, text) => page.waitForFunction(([selector, text]) => {
     const root = document.getElementById("ai-translate-telegram")?.shadowRoot;
     return [...(root?.querySelectorAll(selector) ?? [])].some(e => (text ? e.textContent === text : true));
@@ -172,11 +185,38 @@ check("Web K: and is back in the chat box", await k.evaluate(() => __k.restored.
 check("Web K: and the reason is shown", await waitOurs(k, ".toast.bad"), true);
 
 await k.click(".ai-translate-button");
-check("Web K: a left click on the button opens the panel, with the open chat at the top",
-    await waitOurs(k, ".panel .chat label", "Auto-translate my messages in Book club"), true);
+check("Web K: a left click on the button opens the panel: the two languages, then the open chat",
+    await waitOurs(k, ".panel .chat label", "Auto-translate my messages in Book club")
+        ? await ours(k, '.sheet[data-name="chat"] .field > label') : [],
+    ["Translate my messages into", "Translate incoming messages into", "Auto-translate my messages in Book club"]);
+check("Web K: and a way to all the settings, and nothing else", await ours(k, '.sheet[data-name="chat"] .button'), ["All plugin settings"]);
+
+await clickOurs(k, '.sheet[data-name="chat"] .button');
+check("Web K: which steps aside for the settings page", await ours(k, ".sheet .head h1"), ["AI Translate"]);
+check("Web K: in the plugin's order, under its section titles", await settingsOrder(k), [
+    "providers",
+    "# Behaviour", "mode", "onError", "explain",
+    "# Translation", "gender", "formality", "useContext", "glossary", "extraInstructions", "keep",
+    "# Appearance", "locale",
+    "logs"
+]);
 check("Web K: the language setting names Telegram, not Discord",
-    (await ours(k, ".panel select option")).includes("Same as Telegram"), true);
+    (await ours(k, '.sheet[data-name="settings"] select option')).includes("Same as Telegram"), true);
+check("Web K: the backslashes explained, with their examples",
+    await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
+
+await clickOurs(k, ".logs .button");
+check("Web K: Logs opens over the settings, with Copy, Save .txt and Clear",
+    await ours(k, '.sheet[data-name="logs"] .button'), ["Copy", "Save .txt", "Clear"]);
 await k.keyboard.press("Escape");
+check("Web K: Escape shuts Logs and leaves the settings", await ours(k, ".sheet .head h1"), ["AI Translate"]);
+await k.keyboard.press("Escape");
+check("Web K: and then the settings", await ours(k, ".sheet"), []);
+
+await k.click(".ai-translate-button", { modifiers: ["Shift"] });
+check("Web K: a shift-click switches the open chat off, as in Discord", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "");
+check("Web K: and opens nothing", await ours(k, ".sheet"), []);
+await k.click(".ai-translate-button", { modifiers: ["Shift"] });
 
 await k.click(".ai-translate-button", { button: "right" });
 check("Web K: a right click switches the open chat off", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "");
@@ -184,6 +224,9 @@ await k.click(".ai-translate-button", { button: "right" });
 check("Web K: and on again", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "-1001234567890");
 
 check("Web K: the userscript manager's menu offers the settings too", await k.evaluate(() => __gm.menu?.name), "All plugin settings");
+await k.evaluate(() => __gm.menu.run());
+check("Web K: and opens the settings page", (await settingsOrder(k))[0], "providers");
+await k.keyboard.press("Escape");
 
 // --- Web A
 

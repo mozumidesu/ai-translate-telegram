@@ -2,8 +2,8 @@
  * AI Translate for Telegram — the button in the chat bar.
  *
  * The same button as the Discord plugin's: a left click opens the panel, a
- * right click switches the open chat on or off, and it is coloured while the
- * chat is on. It lives in a shadow root of its own beside the client's
+ * right click or a shift-click switches the open chat on or off, and it is
+ * coloured while the chat is on. It lives in a shadow root of its own beside the client's
  * buttons, takes their size and colour, and is put back whenever the client
  * redraws its chat bar without it.
  *
@@ -15,7 +15,8 @@ import { t } from "../ai-translate/core/locales";
 import type { TelegramClient } from "./client";
 import { translateIcon } from "./icons";
 import { onBusy } from "./outgoing";
-import { onChange, openPanel } from "./panel";
+import { openPanel } from "./panel";
+import { onChange } from "./sheet";
 
 const CSS = `
 :host { all: initial; display: inline-flex; align-self: flex-end; flex: none; }
@@ -78,18 +79,23 @@ export function installComposerButton(client: TelegramClient) {
         button.style.height = `${size}px`;
         button.append(translateIcon(Math.round(size * 0.55)));
 
+        const toggle = () => {
+            const chatId = client.openChat();
+            if (!chatId) return;
+            toggleChannel(chatId);
+            show();
+        };
         button.onclick = event => {
             event.preventDefault();
             event.stopPropagation();
+            // The colour already says which way it went, so switching stays silent.
+            if (event.shiftKey) return toggle();
             openPanel();
         };
         button.oncontextmenu = event => {
             event.preventDefault();
             event.stopPropagation();
-            const chatId = client.openChat();
-            if (!chatId) return;
-            toggleChannel(chatId);
-            show();
+            toggle();
         };
         // The chat box keeps its focus when the button is pressed.
         button.onmousedown = event => event.preventDefault();

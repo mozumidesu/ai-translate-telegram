@@ -16,8 +16,9 @@ import { installComposerButton } from "./composer";
 import { telegramHost } from "./host";
 import { installMenu } from "./menu";
 import { whichClient } from "./page";
-import { openPanel, usePanelClient } from "./panel";
+import { usePanelClient } from "./panel";
 import { onWord, seen, tellOthers } from "./relay";
+import { openSettings } from "./settings";
 import { toast } from "./ui";
 import { setRestoreElsewhere as restoreFromA, webA } from "./weba";
 import { setRestoreElsewhere as restoreFromK, webK } from "./webk";
@@ -62,9 +63,9 @@ if (client) {
     else document.addEventListener("DOMContentLoaded", start, { once: true });
 
     try {
-        GM_registerMenuCommand?.(t("panel.allSettings"), openPanel);
+        GM_registerMenuCommand?.(t("panel.allSettings"), openSettings);
     } catch {
-        // A manager without menu commands; the chat bar button opens the panel too.
+        // A manager without menu commands; the chat bar button's panel opens the settings too.
     }
 
     // Nothing is said by itself, as in Discord: a missing key is named when a

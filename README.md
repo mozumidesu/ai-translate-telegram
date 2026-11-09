@@ -41,16 +41,17 @@ with the same prompts, providers and settings.
 3. Open [web.telegram.org/a](https://web.telegram.org/a/) or
    [web.telegram.org/k](https://web.telegram.org/k/) and sign in as usual.
 4. Open a chat. In the chat bar there is a new **translate button**:
-   - **left-click** it for the settings: pick a provider, paste your API key,
-     choose a model and the languages;
-   - **right-click** it to switch the open chat on or off. It takes the
-     accent colour while the chat is on.
+   - **left-click** it for the panel: the two languages, the switch for this
+     chat, and *All plugin settings*, where you pick a provider, paste your
+     API key and choose a model;
+   - **right-click** or **shift-click** it to switch the open chat on or off.
+     It takes the accent colour while the chat is on.
 5. The first time the script talks to your provider, the manager asks whether
    it may. Allow that address (in Tampermonkey: *Always allow domain*).
 
 The settings are also in your userscript manager's menu, under
-*All plugin settings*. The manager keeps the script up to date from this
-repository by itself.
+*All plugin settings*, laid out as the Discord plugin's are. The manager keeps
+the script up to date from this repository by itself.
 
 Groq is the recommended provider and has a free tier. Google Gemini, Anthropic
 Claude, Z.ai GLM and any OpenAI-compatible API work too, and up to four
@@ -102,7 +103,8 @@ goes into that repository. `src/` is the script itself:
 | `outgoing.ts` | Whether a message is translated, and what happens when that fails |
 | `formatted.ts` | Telegram's entities as the core's marks on the way to the model, and back |
 | `menu.ts` | The items in a message's menu, and the card with the answer |
-| `composer.ts`, `panel.ts` | The chat bar button and the settings |
+| `composer.ts`, `panel.ts` | The chat bar button and the panel behind it: the languages and this chat |
+| `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window, and the windows they open in |
 | `host.ts`, `storage.ts`, `ui.ts`, `relay.ts` | The core's host, settings, the shadow root, word between tabs |
 
 ## Licence
