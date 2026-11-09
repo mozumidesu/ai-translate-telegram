@@ -12,14 +12,9 @@ import { isChannelEnabled, setChannelEnabled } from "../ai-translate/core/chats"
 import { config, set } from "../ai-translate/core/host";
 import { LANGUAGES } from "../ai-translate/core/languages";
 import { t } from "../ai-translate/core/locales";
-import type { TelegramClient } from "./client";
+import { theClient } from "./client";
 import { openSettings } from "./settings";
 import { button, changed, hint, openSheet } from "./sheet";
-
-let client: TelegramClient | undefined;
-export const usePanelClient = (given: TelegramClient) => {
-    client = given;
-};
 
 function languagePicker(title: string, name: "sentLanguage" | "receivedLanguage") {
     const box = document.createElement("div");
@@ -71,7 +66,7 @@ function chatToggle(chatId: string) {
         tick.checked = true;
         tick.disabled = true;
     } else {
-        const chat = client?.chatTitle(chatId) || t("panel.thisChat");
+        const chat = theClient()?.chatTitle(chatId) || t("panel.thisChat");
         label.textContent = t("panel.toggle", { chat });
         said = t("panel.toggleHint");
         tick.checked = isChannelEnabled(chatId);
@@ -87,7 +82,7 @@ function chatToggle(chatId: string) {
 }
 
 export function openPanel() {
-    const chatId = client?.openChat();
+    const chatId = theClient()?.openChat();
 
     openSheet({
         name: "chat",

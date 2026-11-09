@@ -46,3 +46,11 @@ export interface TelegramClient {
     /** The chat box of `chatId` holds `text` again, if it is open here and empty. */
     restore(chatId: string, text: string, entities: Entity[]): boolean;
 }
+
+let current: TelegramClient | undefined;
+
+/** Which client this page is, set once by main.ts. */
+export const useClient = (client: TelegramClient) => {
+    current = client;
+};
+export const theClient = () => current;

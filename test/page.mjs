@@ -124,6 +124,14 @@ const clickOurs = (page, selector) => page.evaluate(selector => {
     document.getElementById("ai-translate-telegram").shadowRoot.querySelector(selector).click();
 }, selector);
 
+/** Typing into a field of ours. */
+const fillOurs = (page, selector, value) => page.evaluate(([selector, value]) => {
+    const field = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(selector);
+    field.focus();
+    field.value = value;
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+}, [selector, value]);
+
 /** The settings page as a list: each section title, setting and piece of upkeep, in the order they are drawn. */
 const settingsOrder = page => page.evaluate(() => {
     const sheet = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="settings"]');
@@ -263,6 +271,74 @@ await k.evaluate(() => __gm.menu.run());
 await press();
 check("Web K: with no answer, it says GitHub could not be reached", await updateSays(),
     ["Check for updates", "Could not reach GitHub. Check your connection and try again.", true]);
+
+// The two links beside the title, and the window behind the envelope.
+check("Web K: beside the title, the source code and support, as on the plugin's page",
+    await k.evaluate(() => [...document.getElementById("ai-translate-telegram").shadowRoot
+        .querySelectorAll('.sheet[data-name="settings"] .head .link')].map(b => b.getAttribute("aria-label"))), ["Source code", "Support"]);
+await clickOurs(k, '.sheet[data-name="settings"] .head .link');
+check("Web K: the source is this script's, its header's @homepageURL", await k.evaluate(() => __gm.opened.at(-1)), header("homepageURL"));
+
+await clickOurs(k, '.sheet[data-name="settings"] .head .link:last-child');
+const form = '.sheet[data-name="feedback"]';
+check("Web K: the envelope opens the feedback form, over the settings", await ours(k, ".sheet .head h1"), ["AI Translate", "Support and feedback"]);
+check("Web K: the early-build line names this script's version",
+    (await ours(k, `${form} .alpha`))[0], `This is ${await version()}, an early build. Rough edges are expected, and what you write here is what gets them fixed.`);
+check("Web K: and says the Telegram name goes with it, not the Discord one",
+    (await ours(k, `${form} .hint`)).includes("Your Telegram name is attached so I can reply."), true);
+const sendable = () => k.evaluate(form => !document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} .button.primary`).disabled, form);
+check("Web K: Send waits for a subject and a message", await sendable(), false);
+
+await fillOurs(k, `${form} input[name="subject"]`, "Ошибка в Web K");
+await fillOurs(k, `${form} textarea[name="message"]`, "Перевод не пришёл");
+check("Web K: and then can be pressed", await sendable(), true);
+await fillOurs(k, `${form} input[name="email"]`, "not an address");
+await k.evaluate(form => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} input[name="email"]`).dispatchEvent(new Event("blur")), form);
+check("Web K: an address that cannot be one is said so when the field is left",
+    (await ours(k, `${form} .hint.bad`)).includes("That does not look like an email address."), true);
+await fillOurs(k, `${form} input[name="email"]`, "reader@example.org");
+await k.evaluate(form => {
+    const input = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} input[name="subject"]`);
+    const pixel = Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="), c => c.charCodeAt(0));
+    const files = new DataTransfer();
+    files.items.add(new File([pixel], "shot.png", { type: "image/png" }));
+    __gm.pasteReachedPage = false;
+    document.addEventListener("paste", () => { __gm.pasteReachedPage = true; }, { once: true });
+    input.dispatchEvent(new ClipboardEvent("paste", { clipboardData: files, bubbles: true, composed: true, cancelable: true }));
+}, form);
+await k.waitForFunction(form => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} .shot img`), form, { timeout: 5000 }).catch(() => { });
+check("Web K: a pasted screenshot joins the form", (await ours(k, `${form} .shot`)).length, 1);
+check("Web K: and never reaches Telegram, which would send it to the chat", await k.evaluate(() => __gm.pasteReachedPage), false);
+
+const RELAY = "https://ai-translate-feedback.mozumidesu.workers.dev";
+await k.evaluate(relay => {
+    __gm.routes[relay] = options => {
+        __gm.relayed = JSON.parse(options.data);
+        return [500, "{}"];
+    };
+}, RELAY);
+await clickOurs(k, `${form} .button.primary`);
+check("Web K: a refusal from the relay is said with its code",
+    await waitOurs(k, `${form} .result`, "Could not send: the service answered with an error (500). Please write on Discord instead."), true);
+await k.evaluate(relay => {
+    __gm.routes[relay] = options => {
+        __gm.relayed = JSON.parse(options.data);
+        return [200, ""];
+    };
+}, RELAY);
+await clickOurs(k, `${form} .button.primary`);
+check("Web K: sent, it says so", await waitOurs(k, `${form} .result`, "Sent. Thank you."), true);
+check("Web K: and Send cannot be pressed twice", await sendable(), false);
+check("Web K: what reaches the relay: the form, the Telegram name, this script's build, and no key", await k.evaluate(async version => {
+    const { images, ...rest } = __gm.relayed;
+    return [rest, images.map(i => [i.name, i.type, i.data.length > 0]), JSON.stringify(__gm.relayed).includes("test-key")];
+}), [{
+    subject: "Ошибка в Web K", message: "Перевод не пришёл", replyTo: "reader@example.org", discord: "", telegram: "Mozumi (4242)",
+    locale: "en", build: `telegram userscript ${await version()}, web k`
+}, [["shot.png", "image/png", true]], false]);
+await clickOurs(k, `${form} .centre .button`);
+check("Web K: or, Write on Discord opens the support server", await k.evaluate(() => __gm.opened.at(-1)), "https://discord.gg/HKRc9FfK43");
+await k.keyboard.press("Escape");
 
 await clickOurs(k, ".logs .button");
 check("Web K: Logs opens over the settings, with Copy, Save .txt and Clear",

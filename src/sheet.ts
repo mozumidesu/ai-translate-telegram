@@ -42,7 +42,7 @@ const CSS = `
 .x:hover, .x:focus-visible { color: var(--fg); }
 
 .field { margin-bottom: 1rem; }
-.field > label, .slot > label, .label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
+.field > label, .field-head > label, .slot > label, .label { display: block; font-size: .85rem; font-weight: 600; margin-bottom: .3rem; }
 .hint { display: block; font-size: .8rem; color: var(--muted); line-height: 1.4; margin: .3rem 0 0; }
 .field > .hint:not(:last-child) { margin: 0 0 .45rem; }
 .hint.bad { color: var(--bad); }

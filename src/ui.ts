@@ -66,6 +66,9 @@ const STYLE = `
 @media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
 `;
 
+/** The element our closed root hangs from, which is what the page sees as the target of anything inside. */
+export const UI_ID = "ai-translate-telegram";
+
 let shadow: ShadowRoot | undefined;
 let box: HTMLElement | undefined;
 
@@ -80,7 +83,7 @@ export function ui(): HTMLElement {
     if (box) return box;
 
     const mount = document.createElement("div");
-    mount.id = "ai-translate-telegram";
+    mount.id = UI_ID;
     // Closed: nothing on the page can reach in.
     shadow = mount.attachShadow({ mode: "closed" });
 

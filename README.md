@@ -66,6 +66,10 @@ backup providers can stand behind the first one.
 - **A message being translated** goes from your browser straight to the
   provider you chose, and nowhere else. There is no server of ours in
   between.
+- **A feedback report**, written in the form behind the envelope on the
+  settings page, goes to the same relay as the Discord plugin's: what you
+  wrote, the screenshots you added, your Telegram name and id so a reply can
+  reach you, and the script's version. No key and no setting.
 - **Other people's messages** are sent to the provider only when you ask for
   a translation or an explanation of one, or when you switch on *Use recent
   messages as context*, which sends the last few messages of the conversation
@@ -108,6 +112,7 @@ goes into that repository. `src/` is the script itself:
 | `composer.ts`, `panel.ts` | The chat bar button and the panel behind it: the languages and this chat |
 | `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window with the version under it, and the windows they open in |
 | `version.ts`, `update.ts` | This script's own version, the one in its header, and Check for updates |
+| `feedback.ts` | The source and support links beside the settings title, and the feedback form |
 | `host.ts`, `storage.ts`, `ui.ts`, `relay.ts` | The core's host, settings, the shadow root, word between tabs |
 
 ## Licence

@@ -11,12 +11,11 @@
 
 import { useHost } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
-import type { TelegramClient } from "./client";
+import { type TelegramClient, useClient } from "./client";
 import { installComposerButton } from "./composer";
 import { telegramHost } from "./host";
 import { installMenu } from "./menu";
 import { whichClient } from "./page";
-import { usePanelClient } from "./panel";
 import { onWord, seen, tellOthers } from "./relay";
 import { openSettings } from "./settings";
 import { toast } from "./ui";
@@ -30,6 +29,7 @@ const client: TelegramClient | undefined = which === "a" ? webA : which === "k" 
 
 if (client) {
     // First, before anything asks for a setting.
+    useClient(client);
     useHost(telegramHost(client));
 
     // At once: the client's own code is about to run.
@@ -51,7 +51,6 @@ if (client) {
 
     const start = () => {
         try {
-            usePanelClient(client);
             installMenu(client);
             installComposerButton(client);
         } catch (e) {

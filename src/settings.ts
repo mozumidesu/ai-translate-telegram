@@ -17,6 +17,7 @@ import {
     baseUrlOf, canRemove, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, PROVIDERS, providerLabel, providerName,
     readSlots, type Slot, writeSlots
 } from "../ai-translate/core/slots";
+import { headerLinks } from "./feedback";
 import { logsRow } from "./logs";
 import { changed, hint, openSheet, sectionTitle, type Sheet } from "./sheet";
 import { addStyle } from "./ui";
@@ -406,6 +407,7 @@ export function openSettings() {
     openSheet({
         name: "settings",
         title: () => t("panel.title"),
+        links: headerLinks,
         onShut: changed,
         draw(body, sheet) {
             for (const item of ITEMS) body.append(render(item, sheet));

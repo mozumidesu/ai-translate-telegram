@@ -106,7 +106,29 @@ with a reply keyboard, any will do.
 4. Offline (the browser's network off, or the address refused in the
    manager): "Could not reach GitHub…", in red.
 
-## 8. Nothing looks different to anyone else
+## 8. Feedback ★
+
+1. On the settings page, beside the title: a GitHub button (*Source code*)
+   and an envelope (*Support*). GitHub opens this repository in a new tab.
+2. The envelope opens *Support and feedback* over the settings: a line that
+   names this script's version as an early build, the envelope and the
+   thanks, Subject, Message, Screenshot (optional), Email (optional) with
+   "Your Telegram name is attached so I can reply." under it, Send, "Or",
+   and *Write on Discord*.
+3. Send stays grey until Subject and Message both have something. Type
+   `nobody` in Email and click elsewhere: it says that is not an address.
+4. Take a screenshot (Win+Shift+S, Cmd+Ctrl+Shift+4) and paste it with the
+   cursor in Subject: it appears as a thumbnail, and nothing is attached to
+   the chat behind. Drop a second one on the dashed box; *Choose an image*
+   adds a third, and then greys out. × on a thumbnail takes it away.
+5. Write a real subject and message (say it is a test) and Send. The
+   manager asks once to allow `ai-translate-feedback.mozumidesu.workers.dev`.
+   It says "Sent. Thank you." The report arrives where the Discord plugin's
+   do, with the Telegram name and id, and a build that reads
+   "telegram userscript" and the version.
+6. *Write on Discord* opens the support server's invite in a new tab.
+
+## 9. Nothing looks different to anyone else
 
 From the second account, open the profile of the account that used the
 script, and the chat where it sent: no warning about an unofficial or
@@ -114,7 +136,7 @@ third-party app, no "via" line, nothing that was not there before. In
 Settings → Devices on the phone, the session reads as Telegram Web, as
 before.
 
-## 9. Context, last
+## 10. Context, last
 
 Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off
