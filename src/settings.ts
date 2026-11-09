@@ -20,6 +20,7 @@ import {
 import { logsRow } from "./logs";
 import { changed, hint, openSheet, sectionTitle, type Sheet } from "./sheet";
 import { addStyle } from "./ui";
+import { updateRow } from "./update";
 
 type Option = { value: string; label: string; };
 
@@ -30,7 +31,7 @@ type Field =
 type Item =
     | Field
     | { kind: "title"; key: string; }
-    | { kind: "providers" | "keep" | "logs"; };
+    | { kind: "providers" | "keep" | "update" | "logs"; };
 
 const APP = { app: "Telegram" };
 
@@ -80,6 +81,7 @@ const ITEMS: Item[] = [
     },
 
     // Upkeep, at the foot, with no heading.
+    { kind: "update" },
     { kind: "logs" }
 ];
 
@@ -392,6 +394,7 @@ function render(item: Item, sheet: Sheet): HTMLElement {
         case "title": return sectionTitle(item.key);
         case "providers": return providers();
         case "keep": return keepHelp();
+        case "update": return updateRow();
         case "logs": return logsRow();
         default: return row(item, sheet);
     }

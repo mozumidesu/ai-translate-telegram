@@ -50,6 +50,9 @@ const manager = saved => `
 window.__gm = {
     store: { aiTranslateSettings: ${JSON.stringify(saved)} },
     asked: [],
+    requests: [],
+    routes: {},
+    opened: [],
     listeners: [],
     toasts: [],
     reply: () => "[ru] translated",
@@ -63,15 +66,26 @@ function GM_getValue(name, fallback) { return name in __gm.store ? JSON.parse(JS
 function GM_setValue(name, value) { __gm.store[name] = JSON.parse(JSON.stringify(value)); }
 function GM_addValueChangeListener(name, listener) { __gm.listeners.push(listener); }
 function GM_registerMenuCommand(name, run) { __gm.menu = { name, run }; }
+// A provider in OpenAI's shape for the chat, and __gm.routes, by address, for anything else.
 function GM_xmlhttpRequest(options) {
-    const body = JSON.parse(options.data);
-    __gm.asked.push(body.messages.at(-1).content);
-    const answer = __gm.reply(body.messages.at(-1).content);
-    setTimeout(() => options.onload(typeof answer === "number"
-        ? { status: answer, responseText: "{}", responseHeaders: "" }
-        : { status: 200, responseText: JSON.stringify({ choices: [{ message: { content: answer }, finish_reason: "stop" }] }), responseHeaders: "" }), 5);
+    __gm.requests.push({ url: options.url, method: options.method ?? "GET", data: options.data });
+    const route = Object.keys(__gm.routes).find(prefix => options.url.startsWith(prefix));
+    let status = 404, text = "";
+    if (route) [status, text] = __gm.routes[route](options);
+    else if (options.data && options.url.endsWith("/chat/completions")) {
+        const body = JSON.parse(options.data);
+        __gm.asked.push(body.messages.at(-1).content);
+        const answer = __gm.reply(body.messages.at(-1).content);
+        [status, text] = typeof answer === "number" ? [answer, "{}"]
+            : [200, JSON.stringify({ choices: [{ message: { content: answer }, finish_reason: "stop" }] })];
+    }
+    setTimeout(() => status === -1 ? options.onerror() : options.onload({ status, responseText: text, responseHeaders: "" }), 5);
     return { abort() {} };
 }
+window.open = url => {
+    __gm.opened.push(url);
+    return {};
+};
 const attach = Element.prototype.attachShadow;
 Element.prototype.attachShadow = function (init) {
     const root = attach.call(this, { ...init, mode: "open" });
@@ -198,7 +212,7 @@ check("Web K: in the plugin's order, under its section titles", await settingsOr
     "# Behaviour", "mode", "onError", "explain",
     "# Translation", "gender", "formality", "useContext", "glossary", "extraInstructions", "keep",
     "# Appearance", "locale",
-    "logs"
+    "update", "logs"
 ]);
 check("Web K: the language setting names Telegram, not Discord",
     (await ours(k, '.sheet[data-name="settings"] select option')).includes("Same as Telegram"), true);
@@ -208,6 +222,47 @@ check("Web K: the backslashes explained, with their examples",
 check("Web K: under Logs, the version: this script's, as its header gives it to the manager",
     await ours(k, ".logs .hint"), [`AI Translate · ${await version()}`]);
 check("Web K: which is the header's @version", script.match(/^\/\/ @version +(\S+)$/m)?.[1], await version());
+
+// Check for updates: the header on main, asked through the manager.
+const header = name => script.match(new RegExp(`^// @${name} +(\\S+)$`, "m"))?.[1];
+const RAW = "https://raw.githubusercontent.com/";
+const updateSays = () => k.evaluate(() => {
+    const row = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(".update");
+    return [row.querySelector(".button").textContent, row.querySelector(".hint").textContent, row.querySelector(".hint").classList.contains("bad")];
+});
+const press = async () => {
+    await clickOurs(k, ".update .button");
+    await k.waitForFunction(() => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(".update .button").textContent !== "Checking…");
+};
+
+check("Web K: Check for updates, before it is pressed, says nothing", await updateSays(), ["Check for updates", "", false]);
+await k.evaluate(([raw, mine]) => {
+    __gm.routes[raw] = () => [200, `// ==UserScript==\n// @name            AI Translate\n// @version         ${mine}\n// ==/UserScript==\n`];
+}, [RAW, await version()]);
+await press();
+check("Web K: the same version on main is the latest", await updateSays(), ["Check for updates", "You have the latest version.", false]);
+check("Web K: asked of the header's own @updateURL, through the manager",
+    await k.evaluate(() => __gm.requests.at(-1).url.split("?")[0]), header("updateURL"));
+
+await k.evaluate(raw => {
+    __gm.routes[raw] = () => [200, "// ==UserScript==\n// @version         9.10.0\n// ==/UserScript==\n"];
+}, RAW);
+await press();
+check("Web K: a newer one is offered", await updateSays(),
+    ["Update now", "A new version is available. Your userscript manager updates it by itself on its own schedule. To do it now, press the button.", false]);
+await clickOurs(k, ".update .button");
+check("Web K: and pressing it hands the header's @downloadURL to the manager, from the click", await k.evaluate(() => __gm.opened), [header("downloadURL")]);
+check("Web K: then says to confirm it there and reload", await updateSays(),
+    ["Reload the page", "The update is open in a new tab. Confirm it there in your userscript manager, then reload this page.", false]);
+
+await k.evaluate(raw => {
+    __gm.routes[raw] = () => [-1, ""];
+}, RAW);
+await k.keyboard.press("Escape");
+await k.evaluate(() => __gm.menu.run());
+await press();
+check("Web K: with no answer, it says GitHub could not be reached", await updateSays(),
+    ["Check for updates", "Could not reach GitHub. Check your connection and try again.", true]);
 
 await clickOurs(k, ".logs .button");
 check("Web K: Logs opens over the settings, with Copy, Save .txt and Clear",

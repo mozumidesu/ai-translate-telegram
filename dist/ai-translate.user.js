@@ -5706,6 +5706,77 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     return box2;
   }
 
+  // src/update.ts
+  var DIST = "https://raw.githubusercontent.com/mozumidesu/ai-translate-telegram/main/dist";
+  var META_URL = `${DIST}/ai-translate.meta.js`;
+  var SCRIPT_URL = `${DIST}/ai-translate.user.js`;
+  function isNewer(found, mine) {
+    const a = found.split(".").map((n) => parseInt(n, 10) || 0);
+    const b = mine.split(".").map((n) => parseInt(n, 10) || 0);
+    for (let i = 0; i < Math.max(a.length, b.length); i++)
+      if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0);
+    return false;
+  }
+  async function newestVersion() {
+    const res = await pickNet()({
+      // Past the five minutes GitHub keeps a raw file for.
+      url: `${META_URL}?${Date.now()}`,
+      headers: { "Cache-Control": "no-cache" },
+      // The manager may be waiting for its owner to allow this address.
+      signal: timeoutSignal(3e4)
+    });
+    if (res.status !== 200) throw new Error(res.status === -1 ? res.data : `HTTP ${res.status}`);
+    const found = /^\/\/\s*@version\s+(\S+)/m.exec(res.data)?.[1];
+    if (!found) throw new Error("no @version in the header");
+    return found;
+  }
+  var LABEL = {
+    idle: () => t("update.check"),
+    checking: () => t("update.checking"),
+    found: () => t("update.browserInstall"),
+    opened: () => t("update.reload"),
+    current: () => t("update.check"),
+    offline: () => t("update.check")
+  };
+  var NOTE = {
+    found: () => t("update.browserFound"),
+    opened: () => t("update.browserOpened"),
+    current: () => t("update.current"),
+    offline: () => t("update.offline")
+  };
+  function updateRow() {
+    const box2 = document.createElement("div");
+    box2.className = "foot update";
+    let phase = "idle";
+    const said = hint();
+    const draw = () => {
+      go.textContent = LABEL[phase]();
+      go.disabled = phase === "checking";
+      said.textContent = NOTE[phase]?.() ?? "";
+      said.classList.toggle("bad", phase === "offline");
+    };
+    const run = async () => {
+      if (phase === "opened") return location.reload();
+      if (phase === "found") {
+        if (!window.open(SCRIPT_URL, "_blank")) location.assign(SCRIPT_URL);
+        phase = "opened";
+        return draw();
+      }
+      phase = "checking";
+      draw();
+      try {
+        phase = isNewer(await newestVersion(), VERSION) ? "found" : "current";
+      } catch {
+        phase = "offline";
+      }
+      draw();
+    };
+    const go = button("", () => void run(), { primary: true, wide: true });
+    draw();
+    box2.append(go, said);
+    return box2;
+  }
+
   // src/settings.ts
   var APP = { app: "Telegram" };
   var ITEMS = [
@@ -5764,6 +5835,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       options: () => LOCALES.map((l) => ({ value: l.value, label: l.value === "auto" ? t("locale.autoApp", APP) : l.label }))
     },
     // Upkeep, at the foot, with no heading.
+    { kind: "update" },
     { kind: "logs" }
   ];
   var CSS3 = `
@@ -6020,6 +6092,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         return providers();
       case "keep":
         return keepHelp();
+      case "update":
+        return updateRow();
       case "logs":
         return logsRow();
       default:

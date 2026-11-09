@@ -51,7 +51,9 @@ with the same prompts, providers and settings.
 
 The settings are also in your userscript manager's menu, under
 *All plugin settings*, laid out as the Discord plugin's are. The manager keeps
-the script up to date from this repository by itself.
+the script up to date from this repository by itself; *Check for updates*, at
+the foot of the settings, says whether it has and hands it a newer version at
+once.
 
 Groq is the recommended provider and has a free tier. Google Gemini, Anthropic
 Claude, Z.ai GLM and any OpenAI-compatible API work too, and up to four
@@ -105,7 +107,7 @@ goes into that repository. `src/` is the script itself:
 | `menu.ts` | The items in a message's menu, and the card with the answer |
 | `composer.ts`, `panel.ts` | The chat bar button and the panel behind it: the languages and this chat |
 | `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window with the version under it, and the windows they open in |
-| `version.ts` | This script's own version, package.json's, the one in its header |
+| `version.ts`, `update.ts` | This script's own version, the one in its header, and Check for updates |
 | `host.ts`, `storage.ts`, `ui.ts`, `relay.ts` | The core's host, settings, the shadow root, word between tabs |
 
 ## Licence

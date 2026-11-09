@@ -89,7 +89,24 @@ with a reply keyboard, any will do.
    chat box. Right-click a message, AI Translate: the same notice. Put the
    key back.
 
-## 7. Nothing looks different to anyone else
+## 7. Check for updates ★
+
+1. On the settings page, above Logs, press *Check for updates*. The first
+   time, the manager asks to allow `raw.githubusercontent.com`: allow it.
+   With the newest version installed it says "You have the latest version."
+2. To see an update offered, make the installed copy older: in the
+   manager's editor for the script, find the line `var VERSION = "…";` and
+   put `0.0.1` between the quotes, save, reload Telegram, and press the
+   button again: "A new version is available…", and the button reads
+   *Update now*.
+3. Press *Update now*: a new tab opens where the manager offers the script
+   from `main` as an update. Confirm it. Back in Telegram the button reads
+   *Reload the page*; press it, open the settings, and the line under Logs
+   shows the new version.
+4. Offline (the browser's network off, or the address refused in the
+   manager): "Could not reach GitHub…", in red.
+
+## 8. Nothing looks different to anyone else
 
 From the second account, open the profile of the account that used the
 script, and the chat where it sent: no warning about an unofficial or
@@ -97,7 +114,7 @@ third-party app, no "via" line, nothing that was not there before. In
 Settings → Devices on the phone, the session reads as Telegram Web, as
 before.
 
-## 8. Context, last
+## 9. Context, last
 
 Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off
