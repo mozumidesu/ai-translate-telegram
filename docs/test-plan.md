@@ -13,9 +13,9 @@ with a reply keyboard, any will do.
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description,
-   version 0.2.0, and offers to install. Install. With 0.1.0 already
+   version 0.2.1, and offers to install. Install. With 0.2.0 already
    installed, the manager's own update check (Tampermonkey: Utilities, Check
-   for userscript updates) offers 0.2.0 instead.
+   for userscript updates) offers 0.2.1 instead.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
@@ -178,8 +178,11 @@ Both clients, in a switched-on chat that translates into English.
 5. Write a real subject and message (say it is a test) and Send. The
    manager asks once to allow `ai-translate-feedback.mozumidesu.workers.dev`.
    It says "Sent. Thank you." The report arrives where the Discord plugin's
-   do, with the Telegram name and id, and a build that reads
-   "telegram userscript" and the version.
+   do. Its Telegram field is two lines: the name and id, then the client,
+   "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is this script's
+   version and, in brackets, the core it was built with, "0.2.1 (59d38e7)"
+   for example: the first seven characters of the commit that
+   `git submodule status` shows for `ai-translate`.
 6. *Write on Discord* opens the support server's invite in a new tab.
 
 ## 11. Nothing looks different to anyone else

@@ -3,8 +3,9 @@
  * and the window behind the envelope, as ai-translate/ui/Feedback.tsx has them.
  *
  * What is written here goes to the same relay as the Discord plugin's, with
- * the Telegram name in place of the Discord one, so a reply can find its way.
- * Nothing else is sent: no key and no setting.
+ * the Telegram name in place of the Discord one, and the client it came from
+ * on the line after, so a reply can find its way. Nothing else is sent: no
+ * key and no setting.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -16,7 +17,7 @@ import { postFeedback } from "../ai-translate/core/providers";
 import { theClient } from "./client";
 import { button, hint, openSheet } from "./sheet";
 import { addStyle, UI_ID } from "./ui";
-import { VERSION } from "./version";
+import { CORE, VERSION } from "./version";
 
 /** This script's own source: what the GitHub link opens. */
 export const PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -181,6 +182,12 @@ function author() {
     if (!id) return "";
     const name = theClient()?.chatTitle(id);
     return name ? `${name} (${id})` : id;
+}
+
+/** What the report says under Telegram: who is writing, then which client they write in, a line each. */
+function telegramField() {
+    const client = theClient();
+    return [author(), client && `Web ${client.name.toUpperCase()}`].filter(Boolean).join("\n");
 }
 
 function labelled(text: string, optional = false) {
@@ -375,10 +382,10 @@ export function openFeedback() {
                     message: message.value.slice(0, MESSAGE_LIMIT),
                     replyTo: email.value.trim().slice(0, 200),
                     discord: "",
-                    telegram: author(),
+                    telegram: telegramField(),
                     locale: currentLocale(),
                     images: shots,
-                    build: `telegram userscript ${VERSION}, web ${theClient()?.name ?? "?"}`
+                    build: `${VERSION} (${CORE})`
                 });
 
                 answered = status;

@@ -21,7 +21,7 @@ import { mkdtemp, readFile } from "fs/promises";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { join } from "path";
-import { check, done, ROOT, version } from "./lib.mjs";
+import { check, coreCommit, done, ROOT, version } from "./lib.mjs";
 
 let chromium;
 try {
@@ -343,15 +343,26 @@ await k.evaluate(relay => {
 await clickOurs(k, `${form} .button.primary`);
 check("Web K: sent, it says so", await waitOurs(k, `${form} .result`, "Sent. Thank you."), true);
 check("Web K: and Send cannot be pressed twice", await sendable(), false);
-check("Web K: what reaches the relay: the form, the Telegram name, this script's build, and no key", await k.evaluate(async version => {
+check("Web K: what reaches the relay: the form, the Telegram name and the client, this script's version and its core, and no key", await k.evaluate(async version => {
     const { images, ...rest } = __gm.relayed;
     return [rest, images.map(i => [i.name, i.type, i.data.length > 0]), JSON.stringify(__gm.relayed).includes("test-key")];
 }), [{
-    subject: "Ошибка в Web K", message: "Перевод не пришёл", replyTo: "reader@example.org", discord: "", telegram: "Mozumi (4242)",
-    locale: "en", build: `telegram userscript ${await version()}, web k`
+    subject: "Ошибка в Web K", message: "Перевод не пришёл", replyTo: "reader@example.org", discord: "", telegram: "Mozumi (4242)\nWeb K",
+    locale: "en", build: `${await version()} (${coreCommit()})`
 }, [["shot.png", "image/png", true]], false]);
 await clickOurs(k, `${form} .centre .button`);
 check("Web K: or, Write on Discord opens the support server", await k.evaluate(() => __gm.opened.at(-1)), "https://discord.gg/HKRc9FfK43");
+await k.keyboard.press("Escape");
+
+// Nobody signed in: there is no name to attach, and the client is all the report says of Telegram.
+await k.evaluate(() => { __k.rootScope.myId = 0; });
+await clickOurs(k, '.sheet[data-name="settings"] .head .link:last-child');
+await fillOurs(k, `${form} input[name="subject"]`, "Без входа");
+await fillOurs(k, `${form} textarea[name="message"]`, "Проверка");
+await clickOurs(k, `${form} .button.primary`);
+await waitOurs(k, `${form} .result`, "Sent. Thank you.");
+check("Web K: with nobody signed in, the report names only the client", await k.evaluate(() => __gm.relayed.telegram), "Web K");
+await k.evaluate(() => { __k.rootScope.myId = 4242; });
 await k.keyboard.press("Escape");
 
 await clickOurs(k, ".logs .button");
@@ -608,6 +619,25 @@ await a.waitForFunction(() => document.getElementById("editable-message-text").t
 check("Web A: a message that could not be translated never reaches the worker", await a.evaluate(() => __a.echoes.length), 0);
 check("Web A: the app is told the call is over", await a.evaluate(() => __a.answers.some(d => d.payloads?.[0]?.messageId === "m9")), true);
 check("Web A: and the text is back in the chat box", await a.evaluate(() => document.getElementById("editable-message-text").textContent), "не переводится");
+
+// The report from Web A, once the worker has said who the person is.
+await a.evaluate(relay => {
+    __a.worker.postMessage({
+        feed: { payloads: [{ type: "updates", updates: [{ "@type": "updateCurrentUser", currentUser: { id: "4242", firstName: "Mozumi" }, currentUserFullInfo: {} }] }] }
+    });
+    __gm.routes[relay] = options => {
+        __gm.relayed = JSON.parse(options.data);
+        return [200, ""];
+    };
+}, RELAY);
+await a.evaluate(() => __gm.menu.run());
+await clickOurs(a, '.sheet[data-name="settings"] .head .link:last-child');
+await fillOurs(a, `${form} input[name="subject"]`, "Ошибка в Web A");
+await fillOurs(a, `${form} textarea[name="message"]`, "Перевод не пришёл");
+await clickOurs(a, `${form} .button.primary`);
+await waitOurs(a, `${form} .result`, "Sent. Thank you.");
+check("Web A: the report names the Telegram user and the client, then this script's version and its core",
+    await a.evaluate(() => [__gm.relayed.telegram, __gm.relayed.build]), ["Mozumi (4242)\nWeb A", `${await version()} (${coreCommit()})`]);
 
 // --- a fresh install, with no key yet
 

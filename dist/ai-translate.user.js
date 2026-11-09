@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.0
+// @version         0.2.1
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -5930,7 +5930,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/version.ts
-  var VERSION = "0.2.0";
+  var VERSION = "0.2.1";
+  var CORE = "59d38e7";
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -6060,6 +6061,10 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     if (!id2) return "";
     const name = theClient()?.chatTitle(id2);
     return name ? `${name} (${id2})` : id2;
+  }
+  function telegramField() {
+    const client2 = theClient();
+    return [author(), client2 && `Web ${client2.name.toUpperCase()}`].filter(Boolean).join("\n");
   }
   function labelled(text, optional = false) {
     const label = document.createElement("label");
@@ -6222,10 +6227,10 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             message: message.value.slice(0, MESSAGE_LIMIT),
             replyTo: email.value.trim().slice(0, 200),
             discord: "",
-            telegram: author(),
+            telegram: telegramField(),
             locale: currentLocale(),
             images: shots,
-            build: `telegram userscript ${VERSION}, web ${theClient()?.name ?? "?"}`
+            build: `${VERSION} (${CORE})`
           });
           answered = status;
           state = status >= 200 && status < 300 ? "sent" : "failed";

@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { execFileSync } from "child_process";
 import { mkdtemp, readFile } from "fs/promises";
 import { tmpdir } from "os";
 import { dirname, join, resolve } from "path";
@@ -44,7 +45,7 @@ export async function built(exports) {
         platform: "node",
         outfile: file,
         logLevel: "error",
-        define: { SCRIPT_VERSION: JSON.stringify(await version()) }
+        define: { SCRIPT_VERSION: JSON.stringify(await version()), CORE_COMMIT: JSON.stringify(coreCommit()) }
     });
 
     return import(file);
@@ -52,6 +53,34 @@ export async function built(exports) {
 
 /** This script's version, as build.mjs puts it in the header and the code. */
 export const version = async () => JSON.parse(await readFile(join(ROOT, "package.json"), "utf8")).version;
+
+let commit;
+
+/**
+ * The commit the core, the submodule, is checked out at, seven characters of
+ * it, as build.mjs puts it in the code. Cut here and not by git's own short
+ * form, which grows with a repository and would build the same sources
+ * differently.
+ */
+export function coreCommit() {
+    if (commit) return commit;
+
+    let status = "";
+    try {
+        status = execFileSync("git", ["submodule", "status", "ai-translate"], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+    } catch {
+        // No git here, or not a checkout of one: said below.
+    }
+
+    // A "-" in front is a submodule nobody checked out, which has no commit to name.
+    const found = /^[ +]([0-9a-f]{40}) /.exec(status);
+    if (!found) {
+        console.error("The core is not checked out. Run: git submodule update --init");
+        process.exit(2);
+    }
+
+    return commit = found[1].slice(0, 7);
+}
 
 let passed = 0;
 let failed = 0;
