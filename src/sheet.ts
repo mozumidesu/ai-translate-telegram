@@ -5,11 +5,14 @@
  * in the same shadow root as the notices. They stack as Vencord's modals do:
  * the settings page over the panel's place, Logs over the settings page.
  * Escape, × or a press outside shuts the one on top and leaves the rest.
+ * Each comes and goes as the client's own windows do, which the client's
+ * file describes; the one underneath does not move, in either client.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { isRightToLeft, t } from "../ai-translate/core/locales";
+import { theClient } from "./client";
 import { translateIcon } from "./icons";
 import { addStyle, ui } from "./ui";
 
@@ -22,9 +25,12 @@ const CSS = `
     background: rgba(0, 0, 0, .4);
     z-index: 2147483100;
 }
+.sheet.closing { pointer-events: none; }
 
+/* Discord's widths, from its Modal's CSS: md, which its Modal takes when given content and no size, is 480px; Vencord's plugin modal asks for lg, 680px. */
 .panel {
-    width: min(40rem, calc(100vw - 2rem));
+    width: 480px;
+    max-width: calc(100vw - 32px);
     max-height: min(46rem, calc(100vh - 2rem));
     overflow: auto;
     background: var(--bg);
@@ -33,7 +39,7 @@ const CSS = `
     box-shadow: var(--shadow);
     padding: 1.2rem 1.4rem 1.6rem;
 }
-.sheet[data-name="chat"] .panel { width: min(28rem, calc(100vw - 2rem)); }
+.sheet[data-name="settings"] .panel { width: 680px; }
 
 .head { display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; color: var(--accent); }
 .head h1 { font-size: 1.1rem; margin: 0; flex: 1; color: var(--fg); }
@@ -102,6 +108,13 @@ const CSS = `
 }
 `;
 
+/** No movement when the client's own setting or the system asks for none, the fade kept as both clients keep it; nothing at all with Web K's animations off. */
+const STILL = `
+.sheet:is([data-motion="fade"], [data-motion="none"]) .panel { transform: none !important; transition: none !important; }
+.sheet[data-motion="none"] { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .panel { transform: none !important; transition: none !important; } }
+`;
+
 export interface Sheet {
     /** Where the window's content goes, under its heading. */
     body: HTMLElement;
@@ -124,12 +137,16 @@ interface Opening {
 const OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
 
 export function openSheet(opening: Opening): Sheet {
+    const client = theClient()?.windows;
     addStyle(CSS);
+    if (client) addStyle(client.css);
+    addStyle(STILL);
     shutSheet(opening.name);
 
     const sheet = document.createElement("div");
     sheet.className = "sheet";
     sheet.dataset.name = opening.name;
+    sheet.dataset.motion = client?.motion() ?? "none";
 
     const panel = document.createElement("div");
     panel.className = "panel";
@@ -138,9 +155,19 @@ export function openSheet(opening: Opening): Sheet {
     sheet.append(panel);
 
     const shut = () => {
-        if (!sheet.isConnected) return;
-        sheet.remove();
-        // The one underneath has the keyboard again.
+        if (!sheet.isConnected || sheet.classList.contains("closing")) return;
+        const shown = sheet.classList.contains("open");
+        sheet.classList.remove("open");
+        sheet.classList.add("closing");
+        // Asked again: the setting may have changed while it was open.
+        const motion = client?.motion() ?? "none";
+        sheet.dataset.motion = motion;
+        if (shown && motion !== "none") setTimeout(() => sheet.remove(), client!.leavesIn);
+        else sheet.remove();
+
+        // The one underneath has the keyboard again; with none, a window on its way out does not keep it.
+        const active = (sheet.getRootNode() as ShadowRoot | Document).activeElement;
+        if (active instanceof HTMLElement && sheet.contains(active)) active.blur();
         topSheet()?.querySelector<HTMLElement>(".x")?.focus();
         opening.onShut?.();
     };
@@ -179,11 +206,18 @@ export function openSheet(opening: Opening): Sheet {
 
     ui().append(sheet);
     draw().focus();
+    // Drawn shut first, then open: two frames, as Web K waits, or the window would be there without moving.
+    if (sheet.dataset.motion === "none") sheet.classList.add("open");
+    else requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (!sheet.classList.contains("closing")) sheet.classList.add("open");
+    }));
     return made;
 }
 
 const shutters = new WeakMap<Element, () => void>();
-const topSheet = () => [...ui().querySelectorAll<HTMLElement>(".sheet")].at(-1);
+/** The windows that are open: one on its way out is still drawn, and is none of them. */
+const STAYING = ".sheet:not(.closing)";
+const topSheet = () => [...ui().querySelectorAll<HTMLElement>(STAYING)].at(-1);
 
 let listening = false;
 /** Escape shuts the window on top wherever the keyboard is, and goes no further: Telegram would shut the chat too. */
@@ -202,11 +236,11 @@ function listenForEscape() {
 
 /** Shuts the window of that name, if it is open. */
 export function shutSheet(name: string) {
-    const open = ui().querySelector<HTMLElement>(`.sheet[data-name="${name}"]`);
+    const open = ui().querySelector<HTMLElement>(`${STAYING}[data-name="${name}"]`);
     if (open) shutters.get(open)?.();
 }
 
-export const isOpen = (name: string) => !!ui().querySelector(`.sheet[data-name="${name}"]`);
+export const isOpen = (name: string) => !!ui().querySelector(`${STAYING}[data-name="${name}"]`);
 
 const listeners = new Set<() => void>();
 /** Told when a window changed what the chat bar button shows. */

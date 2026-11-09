@@ -420,6 +420,24 @@ export const webK: TelegramClient = {
         }
     },
 
+    // As src/scss/partials/popups/_popup.scss, with --popup-transition from base.scss: the overlay fades in .15s,
+    // the window rises from 3rem below on the way in and fades where it stands on the way out; destroy() keeps it 250ms.
+    windows: {
+        css: `
+.sheet { opacity: 0; transition: opacity .15s cubic-bezier(.4, 0, .2, 1); }
+.sheet.open { opacity: 1; }
+.panel { transform: translate3d(0, 3rem, 0); transition: transform .15s cubic-bezier(.4, 0, .2, 1); }
+.sheet.open .panel, .sheet.closing .panel { transform: translate3d(0, 0, 0); }
+`,
+        leavesIn: 250,
+        // Levels on <body>: 0 nothing, 1 fades where things stand, 2 movement too.
+        motion() {
+            const body = document.body.classList;
+            if (body.contains("animation-level-0")) return "none";
+            return body.contains("animation-level-1") && !body.contains("animation-level-2") ? "fade" : "full";
+        }
+    },
+
     composerAnchors() {
         return [...document.querySelectorAll(".chat-input .toggle-emoticons")];
     },

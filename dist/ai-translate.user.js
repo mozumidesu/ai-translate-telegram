@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.1a
+// @version         0.2.2a
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -5514,9 +5514,12 @@ ${text.replace(/\s+/g, "")}`;
     background: rgba(0, 0, 0, .4);
     z-index: 2147483100;
 }
+.sheet.closing { pointer-events: none; }
 
+/* Discord's widths, from its Modal's CSS: md, which its Modal takes when given content and no size, is 480px; Vencord's plugin modal asks for lg, 680px. */
 .panel {
-    width: min(40rem, calc(100vw - 2rem));
+    width: 480px;
+    max-width: calc(100vw - 32px);
     max-height: min(46rem, calc(100vh - 2rem));
     overflow: auto;
     background: var(--bg);
@@ -5525,7 +5528,7 @@ ${text.replace(/\s+/g, "")}`;
     box-shadow: var(--shadow);
     padding: 1.2rem 1.4rem 1.6rem;
 }
-.sheet[data-name="chat"] .panel { width: min(28rem, calc(100vw - 2rem)); }
+.sheet[data-name="settings"] .panel { width: 680px; }
 
 .head { display: flex; align-items: center; gap: .6rem; margin-bottom: 1rem; color: var(--accent); }
 .head h1 { font-size: 1.1rem; margin: 0; flex: 1; color: var(--fg); }
@@ -5593,21 +5596,38 @@ ${text.replace(/\s+/g, "")}`;
     white-space: pre-wrap;
 }
 `;
+  var STILL = `
+.sheet:is([data-motion="fade"], [data-motion="none"]) .panel { transform: none !important; transition: none !important; }
+.sheet[data-motion="none"] { transition: none !important; }
+@media (prefers-reduced-motion: reduce) { .panel { transform: none !important; transition: none !important; } }
+`;
   var OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
   function openSheet(opening) {
+    const client2 = theClient()?.windows;
     addStyle(CSS2);
+    if (client2) addStyle(client2.css);
+    addStyle(STILL);
     shutSheet(opening.name);
     const sheet = document.createElement("div");
     sheet.className = "sheet";
     sheet.dataset.name = opening.name;
+    sheet.dataset.motion = client2?.motion() ?? "none";
     const panel = document.createElement("div");
     panel.className = "panel";
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-modal", "true");
     sheet.append(panel);
     const shut = () => {
-      if (!sheet.isConnected) return;
-      sheet.remove();
+      if (!sheet.isConnected || sheet.classList.contains("closing")) return;
+      const shown = sheet.classList.contains("open");
+      sheet.classList.remove("open");
+      sheet.classList.add("closing");
+      const motion = client2?.motion() ?? "none";
+      sheet.dataset.motion = motion;
+      if (shown && motion !== "none") setTimeout(() => sheet.remove(), client2.leavesIn);
+      else sheet.remove();
+      const active = sheet.getRootNode().activeElement;
+      if (active instanceof HTMLElement && sheet.contains(active)) active.blur();
       topSheet()?.querySelector(".x")?.focus();
       opening.onShut?.();
     };
@@ -5640,10 +5660,15 @@ ${text.replace(/\s+/g, "")}`;
     listenForEscape();
     ui().append(sheet);
     draw2().focus();
+    if (sheet.dataset.motion === "none") sheet.classList.add("open");
+    else requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (!sheet.classList.contains("closing")) sheet.classList.add("open");
+    }));
     return made;
   }
   var shutters = /* @__PURE__ */ new WeakMap();
-  var topSheet = () => [...ui().querySelectorAll(".sheet")].at(-1);
+  var STAYING = ".sheet:not(.closing)";
+  var topSheet = () => [...ui().querySelectorAll(STAYING)].at(-1);
   var listening = false;
   function listenForEscape() {
     if (listening) return;
@@ -5658,7 +5683,7 @@ ${text.replace(/\s+/g, "")}`;
     }, true);
   }
   function shutSheet(name) {
-    const open2 = ui().querySelector(`.sheet[data-name="${name}"]`);
+    const open2 = ui().querySelector(`${STAYING}[data-name="${name}"]`);
     if (open2) shutters.get(open2)?.();
   }
   var listeners = /* @__PURE__ */ new Set();
@@ -5930,7 +5955,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/version.ts
-  var VERSION = "0.2.1a";
+  var VERSION = "0.2.2a";
   var CORE = "59d38e7";
 
   // src/feedback.ts
@@ -7496,6 +7521,20 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         document.body.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
       }
     },
+    // As src/components/ui/Modal.scss: the whole window fades in .15s (.opacity-transition), the dialog comes
+    // down from 1rem above and leaves 1rem downwards in .2s, and useShowTransition keeps a closing one 350ms.
+    windows: {
+      css: `
+.sheet { opacity: 0; transition: opacity .15s ease; }
+.sheet.open { opacity: 1; }
+.panel { transform: translate3d(0, -1rem, 0); transition: transform .2s ease; }
+.sheet.open .panel { transform: none; }
+.sheet.closing .panel { transform: translate3d(0, 1rem, 0); }
+`,
+      leavesIn: 350,
+      // Page transitions off, in its animation settings, stop the dialog moving and keep the fade.
+      motion: () => document.body.classList.contains("no-page-transitions") ? "fade" : "full"
+    },
     composerAnchors() {
       return [...document.querySelectorAll(".message-input-wrapper .AttachMenu")];
     },
@@ -7800,6 +7839,23 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       close() {
         for (const type of ["mousedown", "click"])
           document.body.dispatchEvent(new MouseEvent(type, { bubbles: true, cancelable: true }));
+      }
+    },
+    // As src/scss/partials/popups/_popup.scss, with --popup-transition from base.scss: the overlay fades in .15s,
+    // the window rises from 3rem below on the way in and fades where it stands on the way out; destroy() keeps it 250ms.
+    windows: {
+      css: `
+.sheet { opacity: 0; transition: opacity .15s cubic-bezier(.4, 0, .2, 1); }
+.sheet.open { opacity: 1; }
+.panel { transform: translate3d(0, 3rem, 0); transition: transform .15s cubic-bezier(.4, 0, .2, 1); }
+.sheet.open .panel, .sheet.closing .panel { transform: translate3d(0, 0, 0); }
+`,
+      leavesIn: 250,
+      // Levels on <body>: 0 nothing, 1 fades where things stand, 2 movement too.
+      motion() {
+        const body = document.body.classList;
+        if (body.contains("animation-level-0")) return "none";
+        return body.contains("animation-level-1") && !body.contains("animation-level-2") ? "fade" : "full";
       }
     },
     composerAnchors() {

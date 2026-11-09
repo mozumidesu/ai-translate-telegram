@@ -118,33 +118,102 @@ await context.route("https://web.telegram.org/**", async route => {
 });
 await context.addInitScript({ content: `${manager(SETTINGS)}\n${script}` });
 
+/** Until no window of ours is still coming or going: one on its way out stays on the screen a moment, as the client's do. */
+const settled = page => page.waitForFunction(() => [...(__ours()?.querySelectorAll(".sheet, .panel") ?? [])]
+    .every(e => !e.matches(".sheet:not(.open)") && !e.getAnimations().length), null, { timeout: 5000 });
+
 /** What our shadow root holds, read through the handle the test kept on it. */
-const ours = (page, selector) => page.evaluate(selector => {
-    const root = __ours();
-    return [...(root?.querySelectorAll(selector) ?? [])].map(e => e.textContent);
-}, selector);
+const ours = async (page, selector) => {
+    await settled(page);
+    return page.evaluate(selector => {
+        const root = __ours();
+        return [...(root?.querySelectorAll(selector) ?? [])].map(e => e.textContent);
+    }, selector);
+};
 
 /** A click on something of ours, which the page itself cannot reach through the closed root. */
-const clickOurs = (page, selector) => page.evaluate(selector => {
-    __ours().querySelector(selector).click();
-}, selector);
+const clickOurs = async (page, selector) => {
+    await settled(page);
+    await page.evaluate(selector => {
+        __ours().querySelector(selector).click();
+    }, selector);
+};
 
 /** Typing into a field of ours. */
-const fillOurs = (page, selector, value) => page.evaluate(([selector, value]) => {
+const fillOurs = async (page, selector, value) => (await settled(page), page.evaluate(([selector, value]) => {
     const field = __ours().querySelector(selector);
     field.focus();
     field.value = value;
     field.dispatchEvent(new Event("input", { bubbles: true }));
-}, [selector, value]);
+}, [selector, value]));
 
 /** The settings page as a list: each section title, setting and piece of upkeep, in the order they are drawn. */
-const settingsOrder = page => page.evaluate(() => {
+const settingsOrder = async page => (await settled(page), page.evaluate(() => {
     const sheet = __ours().querySelector('.sheet[data-name="settings"]');
     return [...(sheet?.querySelectorAll(".section, [data-setting], .providers, .keep-help, .foot") ?? [])].map(e =>
         (e.classList.contains("section") ? `# ${e.textContent}`
             : e.dataset.setting ?? (e.classList.contains("providers") ? "providers" : e.classList.contains("keep-help") ? "keep" : e.classList[1]))
         + (e.hidden ? " (hidden)" : ""));
-});
+}));
+
+/**
+ * What moves the moment the window of that name next takes the class `state`, open or closing: in every window of
+ * ours then drawn, each transition the browser runs, on the dim layer or the window, from where to where, for how
+ * long and on what curve. Read the instant the class lands, so a slow machine reads the same.
+ */
+const watchMotion = (page, name, state) => page.evaluate(([name, state]) => {
+    window.__motion = undefined;
+    const root = __ours();
+    const runs = element => element.getAnimations().map(run => {
+        const [from, to] = run.effect.getKeyframes();
+        const { duration, easing } = run.effect.getTiming();
+        const what = run.transitionProperty;
+        return `${what} ${from[what]} → ${to[what]}, ${duration}ms ${easing}`;
+    });
+    const observer = new MutationObserver(() => {
+        if (!root.querySelector(`.sheet[data-name="${name}"].${state}`)) return;
+        observer.disconnect();
+        window.__motion = Object.fromEntries([...root.querySelectorAll(".sheet")].map(sheet => [
+            sheet.dataset.name + (sheet.classList.contains("closing") ? ", shutting" : ""),
+            { layer: runs(sheet), window: runs(sheet.querySelector(".panel")) }
+        ]));
+    });
+    observer.observe(root, { subtree: true, attributes: true, attributeFilter: ["class"] });
+}, [name, state]);
+const motion = page => page.waitForFunction(() => window.__motion, null, { timeout: 5000 }).then(seen => seen.jsonValue());
+
+// What each client's own windows do, from its sources (src/weba.ts, src/webk.ts), as the browser runs it: Web K's
+// popup rises 3rem and goes where it stands, on its popup curve; Web A's modal comes down 1rem and goes on down 1rem.
+const K_IN = {layer: ["opacity 0 → 1, 150ms cubic-bezier(0.4, 0, 0.2, 1)"], window: ["transform translate3d(0px, 48px, 0px) → translate3d(0px, 0px, 0px), 150ms cubic-bezier(0.4, 0, 0.2, 1)"]};
+const K_OUT = {layer: ["opacity 1 → 0, 150ms cubic-bezier(0.4, 0, 0.2, 1)"], window: []};
+const K_FADE = {layer: ["opacity 0 → 1, 150ms cubic-bezier(0.4, 0, 0.2, 1)"], window: []};
+const A_IN = {layer: ["opacity 0 → 1, 150ms ease"], window: ["transform translate3d(0px, -16px, 0px) → none, 200ms ease"]};
+const A_OUT = {layer: ["opacity 1 → 0, 150ms ease"], window: ["transform none → translate3d(0px, 16px, 0px), 200ms ease"]};
+const A_FADE = {layer: ["opacity 0 → 1, 150ms ease"], window: []};
+const STILL = {layer: [], window: []};
+
+/** How long the window of that name stays drawn once it starts to shut, in milliseconds. */
+const watchLeaving = (page, name) => page.evaluate(name => {
+    window.__left = undefined;
+    const root = __ours();
+    let since;
+    const observer = new MutationObserver(() => {
+        const sheet = root.querySelector(`.sheet[data-name="${name}"]`);
+        if (sheet?.classList.contains("closing")) since ??= performance.now();
+        else if (!sheet && since !== undefined) {
+            observer.disconnect();
+            window.__left = performance.now() - since;
+        }
+    });
+    observer.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+}, name);
+/** About what the client keeps its own for, and not stuck there: the browser's clock is coarse by a few milliseconds. */
+const leftAfter = (page, least) => page.waitForFunction(() => window.__left, null, { timeout: 5000 })
+    .then(seen => seen.jsonValue()).then(ms => ms > least - 5 && ms < least + 1000);
+
+/** How wide the window of that name is drawn, in CSS pixels. */
+const widthOf = async (page, name) => (await settled(page),
+    page.evaluate(name => __ours().querySelector(`.sheet[data-name="${name}"] .panel`)?.getBoundingClientRect().width, name));
 
 const waitOurs = (page, selector, text) => page.waitForFunction(([selector, text]) => {
     const root = __ours();
@@ -220,15 +289,24 @@ check("Web K: a message that could not be translated is not sent", await k.evalu
 check("Web K: and is back in the chat box", await k.evaluate(() => __k.restored.map(r => r.text)), ["не переводится"]);
 check("Web K: and the reason is shown", await waitOurs(k, ".toast.bad"), true);
 
+await settled(k);
+await watchMotion(k, "chat", "open");
 await k.click(".ai-translate-button");
+check("Web K: the panel comes as Web K's popups do: the layer fades in and the window rises 3rem, .15s on the popup curve",
+    await motion(k), { chat: K_IN });
+check("Web K: the panel is as wide as Discord's default modal, 480px", await widthOf(k, "chat"), 480);
 check("Web K: a left click on the button opens the panel: the two languages, then the open chat",
     await waitOurs(k, ".panel .chat label", "Auto-translate my messages in Book club")
         ? await ours(k, '.sheet[data-name="chat"] .field > label') : [],
     ["Translate my messages into", "Translate incoming messages into", "Auto-translate my messages in Book club"]);
 check("Web K: and a way to all the settings, and nothing else", await ours(k, '.sheet[data-name="chat"] .button'), ["All plugin settings"]);
 
+await watchMotion(k, "settings", "open");
 await clickOurs(k, '.sheet[data-name="chat"] .button');
+check("Web K: the panel fades where it stands as the settings page comes, as one popup gives way to another",
+    await motion(k), { "chat, shutting": K_OUT, settings: K_IN });
 check("Web K: which steps aside for the settings page", await ours(k, ".sheet .head h1"), ["AI Translate"]);
+check("Web K: the settings page is as wide as Vencord's plugin modal, 680px", await widthOf(k, "settings"), 680);
 check("Web K: in the plugin's order, under its section titles", await settingsOrder(k), [
     "providers",
     "# Behaviour", "mode", "onError", "explain", "aiLearn", "learn (hidden)",
@@ -293,9 +371,13 @@ check("Web K: beside the title, the source code and support, as on the plugin's 
 await clickOurs(k, '.sheet[data-name="settings"] .head .link');
 check("Web K: the source is this script's, its header's @homepageURL", await k.evaluate(() => __gm.opened.at(-1)), header("homepageURL"));
 
+await watchMotion(k, "feedback", "open");
 await clickOurs(k, '.sheet[data-name="settings"] .head .link:last-child');
 const form = '.sheet[data-name="feedback"]';
+check("Web K: the feedback form comes over the settings as a popup over a popup: it moves, the settings stay",
+    await motion(k), { settings: STILL, feedback: K_IN });
 check("Web K: the envelope opens the feedback form, over the settings", await ours(k, ".sheet .head h1"), ["AI Translate", "Support and feedback"]);
+check("Web K: as wide as Discord's default modal, 480px", await widthOf(k, "feedback"), 480);
 check("Web K: the early-build line names this script's version",
     (await ours(k, `${form} .alpha`))[0], `This is ${await version()}, an early build. Rough edges are expected, and what you write here is what gets them fixed.`);
 check("Web K: and says the Telegram name goes with it, not the Discord one",
@@ -368,7 +450,13 @@ await k.keyboard.press("Escape");
 await clickOurs(k, ".logs .button");
 check("Web K: Logs opens over the settings, with Copy, Save .txt and Clear",
     await ours(k, '.sheet[data-name="logs"] .button'), ["Copy", "Save .txt", "Clear"]);
+check("Web K: Logs is as wide as Discord's default modal, 480px", await widthOf(k, "logs"), 480);
+await watchMotion(k, "logs", "closing");
+await watchLeaving(k, "logs");
+await settled(k);
 await k.keyboard.press("Escape");
+check("Web K: Logs goes as a popup goes: it fades where it stands", await motion(k), { settings: STILL, "logs, shutting": K_OUT });
+check("Web K: and is gone once 250ms are over, as Web K keeps a popup that shuts", await leftAfter(k, 250), true);
 check("Web K: Escape shuts Logs and leaves the settings", await ours(k, ".sheet .head h1"), ["AI Translate"]);
 await k.keyboard.press("Escape");
 check("Web K: and then the settings", await ours(k, ".sheet"), []);
@@ -451,9 +539,44 @@ check("Web K: and lists it: what you wrote, the native version with the change m
     }), ["shall we meet tomorrow in noon?", "Shall we meet tomorrow at noon", '"at noon", not "in noon"', ["at"]]);
 await clickOurs(k, '.sheet[data-name="corrections"] .button');
 check("Web K: Clear empties it", await ours(k, '.sheet[data-name="corrections"] .kept-empty'), ["Nothing yet."]);
+check("Web K: Corrections is as wide as Discord's default modal, 480px", await widthOf(k, "corrections"), 480);
 await k.keyboard.press("Escape");
 check("Web K: and the count goes with them", await ours(k, ".learn .button"), ["Corrections"]);
 await k.keyboard.press("Escape");
+
+// The client's own animation setting, and the system's.
+const animationLevels = (page, levels) => page.evaluate(levels => {
+    document.body.classList.remove("animation-level-0", "animation-level-1", "animation-level-2");
+    document.body.classList.add(...levels.map(level => `animation-level-${level}`));
+}, levels);
+
+await settled(k);
+await animationLevels(k, [1]);
+await watchMotion(k, "settings", "open");
+await k.evaluate(() => __gm.menu.run());
+check("Web K: with its animations reduced, a window fades in where it stands", await motion(k), { settings: K_FADE });
+await k.keyboard.press("Escape");
+
+await settled(k);
+await animationLevels(k, [0]);
+check("Web K: with its animations off, a window is there at once and goes at once",
+    await k.evaluate(() => {
+        __gm.menu.run();
+        const sheet = __ours().querySelector('.sheet[data-name="settings"]');
+        const there = [sheet.classList.contains("open"), sheet.getAnimations().length + sheet.querySelector(".panel").getAnimations().length];
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        return [...there, __ours().querySelectorAll(".sheet").length];
+    }), [true, 0, 0]);
+
+await animationLevels(k, [1, 2]);
+await k.emulateMedia({ reducedMotion: "reduce" });
+await watchMotion(k, "settings", "open");
+await k.evaluate(() => __gm.menu.run());
+check("Web K: with the system asking for less motion, a window fades and does not move", await motion(k), { settings: K_FADE });
+await k.keyboard.press("Escape");
+await settled(k);
+await k.emulateMedia({ reducedMotion: null });
+await animationLevels(k, []);
 
 // --- Show the original, in Web K
 
@@ -630,14 +753,62 @@ await a.evaluate(relay => {
         return [200, ""];
     };
 }, RELAY);
+await watchMotion(a, "settings", "open");
 await a.evaluate(() => __gm.menu.run());
+check("Web A: the settings page comes as Web A's modals do: it fades in .15s and comes down 1rem in .2s", await motion(a), { settings: A_IN });
+check("Web A: as wide as Vencord's plugin modal, 680px", await widthOf(a, "settings"), 680);
+await watchMotion(a, "feedback", "open");
 await clickOurs(a, '.sheet[data-name="settings"] .head .link:last-child');
+check("Web A: the feedback form comes over it as one modal over another: it moves, the settings stay", await motion(a), { settings: STILL, feedback: A_IN });
+check("Web A: as wide as Discord's default modal, 480px", await widthOf(a, "feedback"), 480);
 await fillOurs(a, `${form} input[name="subject"]`, "Ошибка в Web A");
 await fillOurs(a, `${form} textarea[name="message"]`, "Перевод не пришёл");
 await clickOurs(a, `${form} .button.primary`);
 await waitOurs(a, `${form} .result`, "Sent. Thank you.");
 check("Web A: the report names the Telegram user and the client, then this script's version and its core",
     await a.evaluate(() => [__gm.relayed.telegram, __gm.relayed.build]), ["Mozumi (4242)\nWeb A", `${await version()} (${coreCommit()})`]);
+
+await watchMotion(a, "feedback", "closing");
+await watchLeaving(a, "feedback");
+await settled(a);
+await a.keyboard.press("Escape");
+check("Web A: Escape sends it off as Web A's modals go: it fades in .15s and goes on down 1rem in .2s", await motion(a), { settings: STILL, "feedback, shutting": A_OUT });
+check("Web A: and it is gone once 350ms are over, as Web A keeps a modal that shuts", await leftAfter(a, 350), true);
+await a.keyboard.press("Escape");
+
+await settled(a);
+await watchMotion(a, "chat", "open");
+await a.click(".ai-translate-button");
+check("Web A: the panel comes the same way", await motion(a), { chat: A_IN });
+check("Web A: as wide as Discord's default modal, 480px", await widthOf(a, "chat"), 480);
+await watchMotion(a, "settings", "open");
+await clickOurs(a, '.sheet[data-name="chat"] .button');
+check("Web A: and goes on down as the settings page comes down in its place, as one modal gives way to another",
+    await motion(a), { "chat, shutting": A_OUT, settings: A_IN });
+await a.keyboard.press("Escape");
+
+await settled(a);
+await a.evaluate(() => document.body.classList.add("no-page-transitions"));
+await watchMotion(a, "settings", "open");
+await a.evaluate(() => __gm.menu.run());
+check("Web A: with page transitions off, a window fades in where it stands", await motion(a), { settings: A_FADE });
+await a.keyboard.press("Escape");
+await settled(a);
+await a.evaluate(() => document.body.classList.remove("no-page-transitions"));
+
+await a.emulateMedia({ reducedMotion: "reduce" });
+await watchMotion(a, "settings", "open");
+await a.evaluate(() => __gm.menu.run());
+check("Web A: with the system asking for less motion, a window fades and does not move", await motion(a), { settings: A_FADE });
+await a.keyboard.press("Escape");
+await settled(a);
+await a.emulateMedia({ reducedMotion: null });
+
+await a.setViewportSize({ width: 400, height: 720 });
+await a.evaluate(() => __gm.menu.run());
+await clickOurs(a, '.sheet[data-name="settings"] .head .link:last-child');
+check("Web A: on a narrow screen, the wide window and the narrow one both leave 16px a side",
+    [await widthOf(a, "settings"), await widthOf(a, "feedback")], [368, 368]);
 
 // --- a fresh install, with no key yet
 

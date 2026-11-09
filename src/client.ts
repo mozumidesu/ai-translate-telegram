@@ -45,6 +45,15 @@ export interface TelegramClient {
         item(label: string): HTMLElement;
         close(): void;
     };
+    /** How the client's own windows come and go, for ours to do the same. */
+    windows: {
+        /** Rules for .sheet, the dimmed layer, whose opacity is the fade, and .panel, the window that moves: as first drawn, .open, .closing. */
+        css: string;
+        /** How long one that is shutting stays, as the client keeps its own. */
+        leavesIn: number;
+        /** What the client's own animation setting leaves of it now: movement and fade, the fade alone, or nothing. */
+        motion(): "full" | "fade" | "none";
+    };
     /** The button in each chat bar that ours goes in front of. */
     composerAnchors(): Element[];
     /** The chat box of `chatId` holds `text` again, if it is open here and empty. */

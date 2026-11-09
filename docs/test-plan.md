@@ -13,9 +13,9 @@ with a reply keyboard, any will do.
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description,
-   version 0.2.1a, and offers to install. Install. With 0.2.0 already
+   version 0.2.2a, and offers to install. Install. With 0.2.1a already
    installed, the manager's own update check (Tampermonkey: Utilities, Check
-   for userscript updates) offers 0.2.1a instead.
+   for userscript updates) offers 0.2.2a instead.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
@@ -179,7 +179,7 @@ Both clients, in a switched-on chat that translates into English.
    It says "Sent. Thank you." The report arrives where the Discord plugin's
    do. Its Telegram field is two lines: the name and id, then the client,
    "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is this script's
-   version and, in brackets, the core it was built with, "0.2.1a (59d38e7)"
+   version and, in brackets, the core it was built with, "0.2.2a (59d38e7)"
    for example: the first seven characters of the commit that
    `git submodule status` shows for `ai-translate`.
 6. *Write on Discord* opens the support server's invite in a new tab.
@@ -192,7 +192,42 @@ third-party app, no "via" line, nothing that was not there before. In
 Settings → Devices on the phone, the session reads as Telegram Web, as
 before.
 
-## 12. Context, last
+## 12. The windows ★
+
+Both clients. One of the client's own windows to compare with: right-click
+a chat in the chat list, *Delete*, then *Cancel*.
+
+1. Watch that window come and go. Web K: the screen dims as the window rises
+   a little from below, and on *Cancel* it fades where it stands. Web A: the
+   window comes down a little from above as the screen dims, and on *Cancel*
+   it fades while going on down.
+2. Left-click the translate button: the panel comes the same way and as
+   fast. × sends it off the same way, and so does a press outside it.
+3. Open it again and press *All plugin settings*: the panel goes and the
+   settings page comes in its place, both at once, each as the client's
+   window does.
+4. Press the envelope: *Support and feedback* comes over the settings the
+   same way; the settings page under it does not move, it only gets darker.
+   Escape: the form goes and the settings page is as it was. The same with
+   Logs, and with Corrections (AI Learn on).
+5. Turn movement off in the client. Web K: Settings, Power Saving, *Motion
+   Effects* off. Web A: Settings, Animations and Performance, *Page
+   Transitions* off. Every window of ours now fades in and out where it
+   stands, as the client's own do. In Web K turn *Interface Animations* off
+   as well: ours are there at once and gone at once. Put both back.
+6. Turn on reduced motion in the system (Windows: Settings, Accessibility,
+   Visual effects, *Animation effects* off; macOS: System Settings,
+   Accessibility, Display, *Reduce motion*) and reload the page: in both
+   clients ours fade and do not move. Turn it back.
+7. The widths, against Discord. With the browser's developer tools (F12,
+   then the element picker on a window of ours), the panel, *Support and
+   feedback*, Logs and Corrections are 480 pixels wide, and the settings
+   page 680: the same windows in Discord with Vencord (Ctrl+Shift+I there)
+   measure the same. Make the browser window narrower than 712 pixels: the
+   settings page keeps 16 pixels from each edge; narrower than 512, every
+   window does.
+
+## 13. Context, last
 
 Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off

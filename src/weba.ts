@@ -389,6 +389,21 @@ export const webA: TelegramClient = {
         }
     },
 
+    // As src/components/ui/Modal.scss: the whole window fades in .15s (.opacity-transition), the dialog comes
+    // down from 1rem above and leaves 1rem downwards in .2s, and useShowTransition keeps a closing one 350ms.
+    windows: {
+        css: `
+.sheet { opacity: 0; transition: opacity .15s ease; }
+.sheet.open { opacity: 1; }
+.panel { transform: translate3d(0, -1rem, 0); transition: transform .2s ease; }
+.sheet.open .panel { transform: none; }
+.sheet.closing .panel { transform: translate3d(0, 1rem, 0); }
+`,
+        leavesIn: 350,
+        // Page transitions off, in its animation settings, stop the dialog moving and keep the fade.
+        motion: () => (document.body.classList.contains("no-page-transitions") ? "fade" : "full")
+    },
+
     composerAnchors() {
         return [...document.querySelectorAll(".message-input-wrapper .AttachMenu")];
     },

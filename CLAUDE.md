@@ -31,7 +31,7 @@ message's menu.
   `dist/` on `main`. The build is deterministic; `test/dist.mjs` fails when
   `npm run build` was forgotten. The version is `package.json`'s, raised when
   a change should reach installed copies. It has the plugin's shape, three
-  numbers and a stage letter, `a` while this is early (`0.2.1a`), which
+  numbers and a stage letter, `a` while this is early (`0.2.2a`), which
   `test/version.mjs` holds it to. Edit it by hand: `npm version` turns the
   letter into `-a`.
 
@@ -64,6 +64,12 @@ from the page, an event inside one has the root's host as its target and a
 `composedPath()` that stops there, so whether something happened inside is
 asked of the target, never of the path. `test/page.mjs` keeps the roots
 closed, as a browser does, and holds a handle on each.
+
+The windows come and go as the client's own do: `windows` in `weba.ts` and
+`webk.ts` holds the timings, taken from the client's sources, and what its
+animation setting leaves. A window that is shutting stays drawn for 350ms
+(Web A) or 250ms (Web K) with `.closing`, and is no longer open, so a test
+waits for `settled` before it reads or clicks. Their widths are Discord's.
 
 ## Running things
 
