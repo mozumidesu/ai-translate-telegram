@@ -85,6 +85,7 @@ const ITEMS: Item[] = [
         label: () => t("locale.name"), hint: () => t("locale.descApp", APP),
         options: () => LOCALES.map(l => ({ value: l.value, label: l.value === "auto" ? t("locale.autoApp", APP) : l.label }))
     },
+    { kind: "switch", name: "showOriginal", label: () => t("showOriginal.name"), hint: () => t("showOriginal.desc") },
 
     // Upkeep, at the foot, with no heading.
     { kind: "update" },

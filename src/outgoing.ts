@@ -16,6 +16,7 @@ import { looksLikeOwnAttempt } from "../ai-translate/core/learn";
 import { aiTranslate, collectContext, isJustAName, isNotWorthTranslating, notify, scriptShare } from "../ai-translate/core/translate";
 import { type Entity, type Formatted, toMarked } from "./formatted";
 import { askForCorrection } from "./learn";
+import { noteUnder } from "./notes";
 import { fresh } from "./storage";
 
 /** The message must not go: the translation failed and the settings say to hold it. */
@@ -113,6 +114,8 @@ export async function translateOutgoing(chatId: string, text: string, entities: 
                 const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
                 const back = marked.back(result.text);
                 remember(key, back);
+                // What was typed, for the line under the sent message while Show the original is on.
+                noteUnder(chatId, back.text, { kind: "original", text, entities });
                 return back;
             } catch (e) {
                 notify(e, "failure");

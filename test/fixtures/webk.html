@@ -40,9 +40,10 @@
   window.appImManager = K.appImManager;
   window.rootScope = K.rootScope;
   // What Web K does once a message is sent: keeps it in its mirror and draws its bubble.
+  let nextMid = 6000;
   K.drawSent = () => {
     const { args: [sent] } = [...K.calls].reverse().find(c => c.payload.method === "sendText").payload;
-    const mid = 6000 + K.calls.length;
+    const mid = nextMid++;
     K.history[mid] = { _: "message", mid, peerId: sent.peerId, fromId: 4242, message: sent.text, pFlags: { out: true } };
     const bubble = document.createElement("div");
     bubble.className = "bubble is-out";

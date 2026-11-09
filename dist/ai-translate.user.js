@@ -3526,8 +3526,8 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   var WORDS = /[\p{L}\p{N}][\p{L}\p{N}'\u2019\u2010\u2011-]*/gu;
   var wordsOf = (text) => text.match(WORDS) ?? [];
   var compared = (text) => wordsOf(text).map((word) => word.toLowerCase().replace(/i\u0307/g, "i").replace(/[\u2019\u02bc]/g, "'").replace(/[\u2010\u2011]/g, "-"));
-  function looksLikeOwnAttempt(typed, share) {
-    return share >= 0.97 && wordsOf(typed).length >= ENOUGH_WORDS;
+  function looksLikeOwnAttempt(typed2, share) {
+    return share >= 0.97 && wordsOf(typed2).length >= ENOUGH_WORDS;
   }
   var WHY = /^\s*why\s*:\s*/i;
   function splitCorrection(answer) {
@@ -4779,11 +4779,11 @@ These are names of people, not words. Never translate them or any affectionate f
     paces.set(id2, pace);
   }
   var expectedMs = (id2, chars) => paceOf(id2).base + paceOf(id2).perChar * chars;
-  async function aiTranslate(kind, typed, context = "", mine = false, signal) {
-    const kept2 = kind === "explain" || kind === "correct" ? void 0 : keepPieces(typed, kind === "sent", glossaryKeeps());
-    const text = kept2?.masked ?? typed;
+  async function aiTranslate(kind, typed2, context = "", mine = false, signal) {
+    const kept2 = kind === "explain" || kind === "correct" ? void 0 : keepPieces(typed2, kind === "sent", glossaryKeeps());
+    const text = kept2?.masked ?? typed2;
     if (kept2?.pieces.length && isNotWorthTranslating(kept2.bare(text)))
-      return { text: kept2.restore(text) ?? typed };
+      return { text: kept2.restore(text) ?? typed2 };
     const slots = readSlots();
     const first = slots[0];
     const apiKey = keyOf(first);
@@ -4806,7 +4806,7 @@ These are names of people, not words. Never translate them or any affectionate f
       config().glossary,
       context,
       mine,
-      typed
+      typed2
     ].join("|");
     const hit = cache.get(cacheKey);
     if (hit !== void 0) return hit;
@@ -4958,7 +4958,7 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
     };
     let result = await ask(basePrompt);
     if (kind === "sent" && result.inTarget && scriptShare(kept2 ? kept2.bare(text) : text, target) >= 0.97) {
-      const asTyped = { text: kept2?.restore(text) ?? typed };
+      const asTyped = { text: kept2?.restore(text) ?? typed2 };
       cache.set(cacheKey, asTyped);
       return asTyped;
     }
@@ -5001,7 +5001,7 @@ IMPORTANT: your previous answer was not written on ${lines2} lines. Give the sam
       );
       if (lineCount(rebroken.text) === lines2 && scriptShare(rebroken.text, target) >= 0.3) result = rebroken;
     }
-    if (kind !== "explain" && kind !== "correct" && SHOUTED.test(typed) && !SHOUTED.test(result.text)) {
+    if (kind !== "explain" && kind !== "correct" && SHOUTED.test(typed2) && !SHOUTED.test(result.text)) {
       const louder = await ask(
         basePrompt + `
 
@@ -5295,7 +5295,33 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
 svg { vertical-align: text-bottom; margin-inline-end: .25em; }
 .fixed { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 2px; }
 .why { display: block; opacity: .85; }
+.bold { font-weight: 600; }
+/* Inside a line in italics, emphasis is upright. */
+.italic { font-style: normal; }
+.underline { text-decoration: underline; }
+.strike { text-decoration: line-through; }
+.underline.strike { text-decoration: underline line-through; }
+.code { font-family: ui-monospace, Menlo, Consolas, monospace; font-style: normal; }
 `;
+  var DRAWN = { bold: "bold", italic: "italic", underline: "underline", strike: "strike", code: "code", pre: "code" };
+  function typed(text, entities) {
+    const drawn = entities.filter((e) => DRAWN[e.kind]);
+    const cuts = [.../* @__PURE__ */ new Set([0, text.length, ...drawn.flatMap((e) => [e.offset, e.offset + e.length])])].filter((at) => at >= 0 && at <= text.length).sort((a, b) => a - b);
+    const parts = [];
+    for (let i = 0; i + 1 < cuts.length; i++) {
+      const [from, to] = [cuts[i], cuts[i + 1]];
+      const classes = [...new Set(drawn.filter((e) => e.offset <= from && e.offset + e.length >= to).map((e) => DRAWN[e.kind]))];
+      if (!classes.length) {
+        parts.push(text.slice(from, to));
+        continue;
+      }
+      const span = document.createElement("span");
+      span.className = classes.join(" ");
+      span.textContent = text.slice(from, to);
+      parts.push(span);
+    }
+    return parts;
+  }
   var KEPT3 = 200;
   var notes = /* @__PURE__ */ new Map();
   var keyOf2 = (chatId, text) => `${chatId}
@@ -5308,6 +5334,10 @@ ${text.replace(/\s+/g, "")}`;
   function render(note) {
     const line = document.createElement("span");
     line.className = "note";
+    if (note.kind === "original") {
+      line.append(translateIcon(16), t("message.youWrote"), " ", ...typed(note.text, note.entities));
+      return line;
+    }
     line.append(correctIcon(16));
     if (!note.parts.length) {
       line.append(t("message.fine"));
@@ -5343,8 +5373,10 @@ ${text.replace(/\s+/g, "")}`;
   function draw() {
     const client2 = theClient();
     if (!client2 || !notes.size && !document.querySelector(TAG)) return;
+    const originals = config().showOriginal === true;
     for (const message of client2.ownMessages()) {
-      const want = notes.get(keyOf2(message.chatId, message.text));
+      const found = notes.get(keyOf2(message.chatId, message.text));
+      const want = found?.kind === "original" && !originals ? void 0 : found;
       const there = message.element.querySelector(TAG);
       if (there && placed.get(there) === want) continue;
       there?.remove();
@@ -5789,6 +5821,7 @@ ${sent}`;
     // Other people's messages would go to the provider with every request.
     useContext: false,
     formality: "match",
+    showOriginal: false,
     glossary: "",
     extraInstructions: ""
   };
@@ -5879,6 +5912,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
           const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
           const back = marked.back(result.text);
           remember(key, back);
+          noteUnder(chatId, back.text, { kind: "original", text, entities });
           return back;
         } catch (e) {
           notify(e, "failure");
@@ -6492,6 +6526,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       hint: () => t("locale.descApp", APP),
       options: () => LOCALES.map((l) => ({ value: l.value, label: l.value === "auto" ? t("locale.autoApp", APP) : l.label }))
     },
+    { kind: "switch", name: "showOriginal", label: () => t("showOriginal.name"), hint: () => t("showOriginal.desc") },
     // Upkeep, at the foot, with no heading.
     { kind: "update" },
     { kind: "logs" }

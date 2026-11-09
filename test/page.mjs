@@ -220,7 +220,7 @@ check("Web K: in the plugin's order, under its section titles", await settingsOr
     "providers",
     "# Behaviour", "mode", "onError", "explain", "aiLearn", "learn (hidden)",
     "# Translation", "gender", "formality", "useContext", "glossary", "extraInstructions", "keep",
-    "# Appearance", "locale",
+    "# Appearance", "locale", "showOriginal",
     "update", "logs"
 ]);
 check("Web K: the language setting names Telegram, not Discord",
@@ -431,6 +431,32 @@ await k.keyboard.press("Escape");
 check("Web K: and the count goes with them", await ours(k, ".learn .button"), ["Corrections"]);
 await k.keyboard.press("Escape");
 
+// --- Show the original, in Web K
+
+await k.evaluate(() => __gm.menu.run());
+await clickOurs(k, '[data-setting="showOriginal"] input');
+check("Web K: Show the original is switched on from Appearance", await k.evaluate(() => __gm.store.aiTranslateSettings.showOriginal), true);
+await k.keyboard.press("Escape");
+
+await k.evaluate(() => {
+    __gm.reply = () => "[ru] see you on **saturday**";
+    __k.calls.length = 0;
+    return __k.type("до встречи в субботу", [{ _: "messageEntityBold", offset: 13, length: 7 }]);
+});
+await k.waitForFunction(() => __k.calls.some(c => c.payload.method === "sendText"));
+const shownOver = await k.evaluate(() => __k.drawSent());
+const shownAt = `.bubble[data-mid="${shownOver}"]`;
+check("Web K: the message went translated", await k.evaluate(s => document.querySelector(`${s} .translatable-message`).textContent, shownAt), "see you on saturday");
+await waitNote(k, shownAt);
+check("Web K: and under it, only here, what you typed",
+    await noteUnder(k, shownAt), ["you wrote: до встречи в субботу", [], ""]);
+check("Web K: in bold where you made it bold",
+    await k.evaluate(s => [...document.querySelector(`${s} ai-translate-note`).shadowRoot.querySelectorAll(".bold")].map(b => b.textContent), shownAt), ["субботу"]);
+
+await k.evaluate(() => __gm.change("showOriginal", false));
+check("Web K: switched off, the line goes", await k.waitForFunction(s => !document.querySelector(`${s} ai-translate-note`), shownAt, { timeout: 3000 }).then(() => true, () => false), true);
+check("Web K: and AI Learn's stays", await noteUnder(k, learntAt).then(n => n?.[0]), "a native speaker would write: Shall we meet tomorrow at noon");
+
 // --- Web A
 
 const a = await context.newPage();
@@ -527,6 +553,35 @@ check("Web A: AI Learn: under it, what a native speaker would have written",
 check("Web A: right after the text and its time",
     await a.evaluate(() => document.querySelector(".Message[data-message-id='4420'] .text-content").nextElementSibling?.tagName), "AI-TRANSLATE-NOTE");
 await a.evaluate(() => __gm.change("aiLearn", false));
+
+// Show the original, in Web A.
+await a.evaluate(() => {
+    __gm.change("showOriginal", true);
+    __gm.reply = () => "[ru] until tonight";
+    __a.echoes.length = 0;
+    __a.worker.postMessage({
+        payloads: [{ messageId: "m21", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "до вечера", wasDrafted: false }] }]
+    });
+});
+await a.waitForFunction(() => __a.echoes.length >= 1, null, { timeout: 5000 }).catch(() => { });
+check("Web A: a translated message", await a.evaluate(() => __a.echoes[0]?.payloads[0].args[0].text), "until tonight");
+await a.evaluate(() => {
+    __a.worker.postMessage({
+        feed: {
+            payloads: [{
+                type: "updates", updates: [{
+                    "@type": "newMessage", chatId: "-1001234567890", id: 4421,
+                    message: { id: 4421, chatId: "-1001234567890", senderId: "4242", isOutgoing: true, content: { text: { text: "until tonight" } } }
+                }]
+            }]
+        }
+    });
+    __a.drawOwn(4421, "until tonight");
+});
+await waitNote(a, ".Message[data-message-id='4421']");
+check("Web A: has what you typed under it, with Show the original on",
+    await noteUnder(a, ".Message[data-message-id='4421']"), ["you wrote: до вечера", [], ""]);
+await a.evaluate(() => __gm.change("showOriginal", false));
 
 await a.evaluate(() => {
     __gm.reply = () => 401;

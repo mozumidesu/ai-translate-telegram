@@ -22,7 +22,6 @@ import { built, check, done, findEsbuild, ROOT } from "./lib.mjs";
 const NOT_HERE = {
     updateChannel: "the userscript manager keeps the script current, from the address in its header",
     lastUpdateCheck: "the same",
-    showOriginal: "nothing is drawn under a sent message: the clients redraw their messages and it would vanish",
     apiKey: "the single key from before there were several, migrated and then left empty",
     model: "the single model from the same time"
 };

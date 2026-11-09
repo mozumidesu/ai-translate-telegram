@@ -24,6 +24,9 @@ with the same prompts, providers and settings.
 - **Other people's messages, on request.** Right-click a message and choose
   **AI Translate**. Turn on **AI Explain** in the settings for a second item
   that names the language and explains slang, shorthand and inside jokes.
+- **What you typed, under what went.** *Show the original text under sent
+  messages* puts a quiet line under your translated message with what you
+  actually wrote, which only you see.
 - **AI Learn, for the language you are learning.** Switch it on in the
   settings, and what you write yourself in the language you translate into
   goes as you typed it, with a native speaker's version under it, the
@@ -114,7 +117,7 @@ goes into that repository. `src/` is the script itself:
 | `outgoing.ts` | Whether a message is translated, and what happens when that fails |
 | `formatted.ts` | Telegram's entities as the core's marks on the way to the model, and back |
 | `menu.ts` | The items in a message's menu, and the card with the answer |
-| `learn.ts`, `notes.ts` | AI Learn and its Corrections window, and the line of ours under your own messages |
+| `learn.ts`, `notes.ts` | AI Learn and its Corrections window, and the line of ours under your own messages: a correction, or what you typed |
 | `composer.ts`, `panel.ts` | The chat bar button and the panel behind it: the languages and this chat |
 | `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window with the version under it, and the windows they open in |
 | `version.ts`, `update.ts` | This script's own version, the one in its header, and Check for updates |

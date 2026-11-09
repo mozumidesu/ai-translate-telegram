@@ -50,6 +50,7 @@ export const DEFAULTS: Config = {
     // Other people's messages would go to the provider with every request.
     useContext: false,
     formality: "match",
+    showOriginal: false,
     glossary: "",
     extraInstructions: ""
 };

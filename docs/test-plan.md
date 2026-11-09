@@ -109,7 +109,22 @@ messages into" English.
 10. Put a wrong key in and write in English: the message goes, and nothing
     is said. Put the right key back.
 
-## 7. When it fails
+## 7. Show the original ★
+
+Both clients, in a switched-on chat that translates into English.
+
+1. On the settings page, under Appearance, turn on *Show the original text
+   under sent messages*.
+2. Send `до встречи в субботу` with *субботу* in bold. It goes in English.
+   Under it, on this screen only: the translate icon, then in italics
+   "you wrote: до встречи в субботу", *субботу* in bold. The phone and the
+   second account see only the English.
+3. Scroll away and back, open another chat and come back: the line is still
+   there. React to the message: the reaction and the time stay in place.
+4. Turn the switch off: the line goes within a second, and a correction from
+   AI Learn under another message stays.
+
+## 8. When it fails
 
 1. Put a wrong key on the settings page and send in a switched-on chat. Nothing is
    sent, a red notice says why, and the text is back in the chat box.
@@ -122,7 +137,7 @@ messages into" English.
    chat box. Right-click a message, AI Translate: the same notice. Put the
    key back.
 
-## 8. Check for updates ★
+## 9. Check for updates ★
 
 1. On the settings page, above Logs, press *Check for updates*. The first
    time, the manager asks to allow `raw.githubusercontent.com`: allow it.
@@ -139,7 +154,7 @@ messages into" English.
 4. Offline (the browser's network off, or the address refused in the
    manager): "Could not reach GitHub…", in red.
 
-## 9. Feedback ★
+## 10. Feedback ★
 
 1. On the settings page, beside the title: a GitHub button (*Source code*)
    and an envelope (*Support*). GitHub opens this repository in a new tab.
@@ -161,7 +176,7 @@ messages into" English.
    "telegram userscript" and the version.
 6. *Write on Discord* opens the support server's invite in a new tab.
 
-## 10. Nothing looks different to anyone else
+## 11. Nothing looks different to anyone else
 
 From the second account, open the profile of the account that used the
 script, and the chat where it sent: no warning about an unofficial or
@@ -169,7 +184,7 @@ third-party app, no "via" line, nothing that was not there before. In
 Settings → Devices on the phone, the session reads as Telegram Web, as
 before.
 
-## 11. Context, last
+## 12. Context, last
 
 Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off

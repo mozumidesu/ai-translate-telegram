@@ -1,7 +1,8 @@
 /*
  * AI Translate for Telegram — a line of ours under your own messages.
  *
- * What a native speaker would have written, from AI Learn: the line
+ * What a native speaker would have written, from AI Learn, and what you
+ * typed before it was translated, while Show the original is on: the line
  * ai-translate/index.tsx draws under a message, seen only by the person
  * using the script, since it is drawn in their browser and sent nowhere.
  *
@@ -13,12 +14,16 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { config } from "../ai-translate/core/host";
 import type { Part } from "../ai-translate/core/learn";
 import { t } from "../ai-translate/core/locales";
 import { theClient } from "./client";
-import { correctIcon } from "./icons";
+import type { Entity, Kind } from "./formatted";
+import { correctIcon, translateIcon } from "./icons";
 
-export type Note = { kind: "correction"; parts: Part[]; why: string; };
+export type Note =
+    | { kind: "correction"; parts: Part[]; why: string; }
+    | { kind: "original"; text: string; entities: Entity[]; };
 
 /** Its own element: no rule of the client's is written for a name like this. */
 export const TAG = "ai-translate-note";
@@ -39,7 +44,40 @@ const CSS = `
 svg { vertical-align: text-bottom; margin-inline-end: .25em; }
 .fixed { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 2px; }
 .why { display: block; opacity: .85; }
+.bold { font-weight: 600; }
+/* Inside a line in italics, emphasis is upright. */
+.italic { font-style: normal; }
+.underline { text-decoration: underline; }
+.strike { text-decoration: line-through; }
+.underline.strike { text-decoration: underline line-through; }
+.code { font-family: ui-monospace, Menlo, Consolas, monospace; font-style: normal; }
 `;
+
+/** What the typed text's formatting looks like in the line: its own kinds, as classes. */
+const DRAWN: Partial<Record<Kind, string>> = { bold: "bold", italic: "italic", underline: "underline", strike: "strike", code: "code", pre: "code" };
+
+/** The text as it was typed, with the formatting it was typed with. */
+function typed(text: string, entities: Entity[]) {
+    const drawn = entities.filter(e => DRAWN[e.kind]);
+    const cuts = [...new Set([0, text.length, ...drawn.flatMap(e => [e.offset, e.offset + e.length])])]
+        .filter(at => at >= 0 && at <= text.length)
+        .sort((a, b) => a - b);
+
+    const parts: (string | HTMLElement)[] = [];
+    for (let i = 0; i + 1 < cuts.length; i++) {
+        const [from, to] = [cuts[i], cuts[i + 1]];
+        const classes = [...new Set(drawn.filter(e => e.offset <= from && e.offset + e.length >= to).map(e => DRAWN[e.kind]!))];
+        if (!classes.length) {
+            parts.push(text.slice(from, to));
+            continue;
+        }
+        const span = document.createElement("span");
+        span.className = classes.join(" ");
+        span.textContent = text.slice(from, to);
+        parts.push(span);
+    }
+    return parts;
+}
 
 const KEPT = 200;
 const notes = new Map<string, Note>();
@@ -57,6 +95,11 @@ export function noteUnder(chatId: string, text: string, note: Note) {
 function render(note: Note) {
     const line = document.createElement("span");
     line.className = "note";
+
+    if (note.kind === "original") {
+        line.append(translateIcon(16), t("message.youWrote"), " ", ...typed(note.text, note.entities));
+        return line;
+    }
 
     line.append(correctIcon(16));
     if (!note.parts.length) {
@@ -100,8 +143,11 @@ export function draw() {
     const client = theClient();
     if (!client || (!notes.size && !document.querySelector(TAG))) return;
 
+    // Read each time: switched off, what is already drawn goes too.
+    const originals = config().showOriginal === true;
     for (const message of client.ownMessages()) {
-        const want = notes.get(keyOf(message.chatId, message.text));
+        const found = notes.get(keyOf(message.chatId, message.text));
+        const want = found?.kind === "original" && !originals ? undefined : found;
         const there = message.element.querySelector(TAG);
         if (there && placed.get(there) === want) continue;
 
