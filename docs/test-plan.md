@@ -131,8 +131,9 @@ Both clients, in a switched-on chat that translates into English.
 
 ## 8. When it fails
 
-1. Put a wrong key on the settings page and send in a switched-on chat. Nothing is
-   sent, a red notice says why, and the text is back in the chat box.
+1. Put a wrong key on the settings page and send in a switched-on chat.
+   Nothing is sent, a red notice says why, and the text is back in the chat
+   box.
 2. Set "If the translation fails" to send untranslated, send again: it goes
    as typed. Put the right key back.
 3. Web A only: open a second tab of `/a/`, send from it. The message is

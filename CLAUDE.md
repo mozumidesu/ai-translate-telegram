@@ -53,6 +53,15 @@ Both clients change often. Read again before relying on any of this:
 `node test/live.mjs` opens the real sites, without signing in, and says
 whether the hooks still go in front of those lines.
 
+## Our own interface
+
+Everything of ours sits in closed shadow roots: the windows and notices in
+one, the chat bar button and each line under a message in their own. Seen
+from the page, an event inside one has the root's host as its target and a
+`composedPath()` that stops there, so whether something happened inside is
+asked of the target, never of the path. `test/page.mjs` keeps the roots
+closed, as a browser does, and holds a handle on each.
+
 ## Running things
 
 ```
