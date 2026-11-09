@@ -5,8 +5,8 @@
  * the machinery the script hooks into. Web A creates its GramJS worker and
  * talks to it in { payloads } batches; Web K mounts apiManagerProxy and calls
  * its managers through invoke. This says whether the hooks went in front of
- * those in today's production builds, and whether the client still drew its
- * sign-in screen with them in place.
+ * those in today's production builds, whether the client still drew its
+ * sign-in screen with them in place, and whether the script kept quiet there.
  *
  * It reaches the internet and depends on a site that changes, so it is not
  * part of npm test. Run it by hand after either client changes:
@@ -74,6 +74,9 @@ check("Web A: and is talked to in { payloads } batches, as the script expects", 
 check("Web A: of the kinds the script reads", Object.keys(seenA.kinds).some(k => k === "callMethod" || k === "initApi"), true);
 check("Web A: the sign-in screen is drawn with the script in place",
     await a.evaluate(() => !!document.querySelector("#auth-qr-form, #auth-phone-number-form, .auth-form, #auth-pages")), true);
+// The root of ours is made the first time something is drawn; no key and nothing asked means nothing drawn.
+check("Web A: with no key, the sign-in screen shows nothing of ours, no notice either",
+    await a.evaluate(() => !document.getElementById("ai-translate-telegram")), true);
 console.log("       Web A calls seen:", Object.keys(seenA.names).slice(0, 12).join(", ") || "(none)");
 if (errorsA.length) console.log("       Web A page errors:", errorsA.slice(0, 3));
 
@@ -102,6 +105,8 @@ const managerCalls = await k.evaluate(async () => {
 console.log(`       Web K manager calls in 5 s on the sign-in screen: ${managerCalls}`);
 check("Web K: the sign-in screen is drawn with the script in place",
     await k.evaluate(() => !!document.querySelector("#auth-pages, .page-signQR, .page-sign, .auth-image")), true);
+check("Web K: with no key, the sign-in screen shows nothing of ours, no notice either",
+    await k.evaluate(() => !document.getElementById("ai-translate-telegram")), true);
 if (errorsK.length) console.log("       Web K page errors:", errorsK.slice(0, 3));
 
 await browser.close();
