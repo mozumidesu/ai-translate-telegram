@@ -9,9 +9,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { notice, useHost } from "../ai-translate/core/host";
+import { useHost } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
-import { keyOf, providerName, readSlots } from "../ai-translate/core/slots";
 import type { TelegramClient } from "./client";
 import { installComposerButton } from "./composer";
 import { telegramHost } from "./host";
@@ -68,15 +67,6 @@ if (client) {
         // A manager without menu commands; the chat bar button opens the panel too.
     }
 
-    // A key is the one thing nobody can guess, and without one nothing works:
-    // a fresh install says so once, after the client has drawn itself.
-    setTimeout(() => {
-        try {
-            const [first] = readSlots();
-            if (!first || keyOf(first)) return;
-            notice(t("error.noKey", { provider: providerName(first.provider) }), "failure");
-        } catch (e) {
-            console.error("[AI Translate]", e);
-        }
-    }, 8000);
+    // Nothing is said by itself, as in Discord: a missing key is named when a
+    // message is sent in a chat that is on, or something is read from the menu.
 }

@@ -14,8 +14,9 @@ with a reply keyboard, any will do.
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description, and
    offers to install. Install.
-2. Open `https://web.telegram.org/k/`, sign in. After a few seconds a notice
-   says no API key is set.
+2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
+   while signing in and not after: wait a minute on the chat list, then
+   reload the page and wait again. Nothing is said until you do something.
 
 ## 2. Set up ★
 
@@ -64,6 +65,10 @@ with a reply keyboard, any will do.
    as typed. Put the right key back.
 3. Web A only: open a second tab of `/a/`, send from it. The message is
    translated; with the wrong key, the notice shows in the tab you are in.
+4. Empty the key field and send in a switched-on chat: nothing is sent, a
+   red notice says no API key is set for Groq, and the text is back in the
+   chat box. Right-click a message, AI Translate: the same notice. Put the
+   key back.
 
 ## 7. Nothing looks different to anyone else
 

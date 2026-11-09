@@ -35,15 +35,23 @@ const out = await mkdtemp(join(tmpdir(), "ai-translate-telegram-dist-"));
 execFileSync(process.execPath, [join(ROOT, "build.mjs"), `--out=${out}`], { stdio: "pipe" });
 const script = await readFile(join(out, "ai-translate.user.js"), "utf8");
 
-/** The userscript manager, as far as the script uses it, and shadow roots a test can look into. */
-const MANAGER = `
+/** The settings a page starts from: Groq with a key, the Book club chat switched on. */
+const SETTINGS = {
+    provider: "groq", groqApiKey: "test-key", groqModel: "openai/gpt-oss-120b",
+    sentLanguage: "English", receivedLanguage: "English", mode: "perChannel", enabledChannels: "-1001234567890", onError: "hold"
+};
+
+/**
+ * The userscript manager, as far as the script uses it, and shadow roots a
+ * test can look into. Every notice ever drawn is noted in __gm.toasts, so one
+ * that came and went between two looks is still seen.
+ */
+const manager = saved => `
 window.__gm = {
-    store: { aiTranslateSettings: {
-        provider: "groq", groqApiKey: "test-key", groqModel: "openai/gpt-oss-120b",
-        sentLanguage: "English", receivedLanguage: "English", mode: "perChannel", enabledChannels: "-1001234567890", onError: "hold"
-    } },
+    store: { aiTranslateSettings: ${JSON.stringify(saved)} },
     asked: [],
     listeners: [],
+    toasts: [],
     reply: () => "[ru] translated",
     change(name, value) {
         this.store.aiTranslateSettings[name] = value;
@@ -65,7 +73,15 @@ function GM_xmlhttpRequest(options) {
     return { abort() {} };
 }
 const attach = Element.prototype.attachShadow;
-Element.prototype.attachShadow = function (init) { return attach.call(this, { ...init, mode: "open" }); };
+Element.prototype.attachShadow = function (init) {
+    const root = attach.call(this, { ...init, mode: "open" });
+    new MutationObserver(records => {
+        for (const record of records)
+            for (const node of record.addedNodes)
+                if (node.classList?.contains("toast")) __gm.toasts.push(node.textContent);
+    }).observe(root, { childList: true, subtree: true });
+    return root;
+};
 `;
 
 const FILES = {
@@ -81,7 +97,7 @@ await context.route("https://web.telegram.org/**", async route => {
     if (!file) return route.fulfill({ status: 404, body: "" });
     await route.fulfill({ status: 200, contentType: file[1], body: await readFile(join(ROOT, "test", file[0])) });
 });
-await context.addInitScript({ content: `${MANAGER}\n${script}` });
+await context.addInitScript({ content: `${manager(SETTINGS)}\n${script}` });
 
 /** What our shadow root holds, read through the open root the test asked for. */
 const ours = (page, selector) => page.evaluate(selector => {
@@ -247,6 +263,36 @@ await a.waitForFunction(() => document.getElementById("editable-message-text").t
 check("Web A: a message that could not be translated never reaches the worker", await a.evaluate(() => __a.echoes.length), 0);
 check("Web A: the app is told the call is over", await a.evaluate(() => __a.answers.some(d => d.payloads?.[0]?.messageId === "m9")), true);
 check("Web A: and the text is back in the chat box", await a.evaluate(() => document.getElementById("editable-message-text").textContent), "не переводится");
+
+// --- a fresh install, with no key yet
+
+const bare = await browser.newContext();
+await bare.route("https://web.telegram.org/**", async route => {
+    const file = FILES[new URL(route.request().url()).pathname];
+    if (!file) return route.fulfill({ status: 404, body: "" });
+    await route.fulfill({ status: 200, contentType: file[1], body: await readFile(join(ROOT, "test", file[0])) });
+});
+// Before the script, or its timers would be the real ones.
+await bare.clock.install();
+await bare.addInitScript({ content: `${manager({ ...SETTINGS, groqApiKey: "" })}\n${script}` });
+
+for (const [name, path, ready] of [["Web K", "/k/", "__k"], ["Web A", "/a/", "__a"]]) {
+    const page = await bare.newPage();
+    await page.goto(`https://web.telegram.org${path}`);
+    await page.waitForFunction(ready => window[ready], ready);
+    await bare.clock.runFor(120_000);
+    check(`${name}: a page loaded with no key shows no notice, even after its timers have run`, await page.evaluate(() => __gm.toasts), []);
+    await page.close();
+}
+
+const noKey = await bare.newPage();
+await noKey.goto("https://web.telegram.org/k/");
+await noKey.waitForFunction(() => window.__k);
+await noKey.evaluate(() => __k.type("привет"));
+await bare.clock.runFor(1000);
+check("Web K: with no key, sending in a chat that is on is what says so",
+    await waitOurs(noKey, ".toast.bad", "AI Translate: No API key set for Groq. Open the plugin settings"), true);
+await bare.close();
 
 await browser.close();
 done();

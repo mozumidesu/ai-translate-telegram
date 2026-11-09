@@ -3228,68 +3228,6 @@
     return text;
   }
 
-  // ai-translate/core/slots.ts
-  var PROVIDERS = ["groq", "gemini", "glm", "anthropic", "openai"];
-  var NONE2 = "none";
-  var withoutAdvice = (label) => label.replace(/\s*\(.*\)\s*$/, "");
-  var providerLabel = (id2, first = false) => first ? t(`provider.${id2}`) : withoutAdvice(t(`provider.${id2}`));
-  var providerName = (id2) => id2 === "openai" ? "OpenAI-compatible" : withoutAdvice(t(`provider.${id2}`));
-  var keyHeading = (id2) => `${t("apiKey.name")} — ${id2 === "openai" ? t("provider.openaiInline") : providerName(id2)}`;
-  var MOST_SLOTS = 5;
-  var canRemove = (count, at) => at > 0 && count > 2;
-  var keyOf = (slot) => slot.keys?.[slot.provider] ?? "";
-  var modelOf = (slot) => slot.models?.[slot.provider] ?? "";
-  var baseUrlOf = (slot) => slot.baseUrls?.[slot.provider] ?? "";
-  var isReady = (slot) => !!keyOf(slot) && !!modelOf(slot);
-  var newId = () => Math.random().toString(36).slice(2, 10);
-  var emptySlot = (provider) => ({ id: newId(), provider, keys: {}, models: {} });
-  function asSlot(raw) {
-    if (!raw || typeof raw !== "object") return null;
-    if (raw.provider !== NONE2 && !PROVIDERS.includes(raw.provider)) return null;
-    return {
-      id: typeof raw.id === "string" && raw.id ? raw.id : newId(),
-      provider: raw.provider,
-      keys: raw.keys && typeof raw.keys === "object" ? raw.keys : {},
-      models: raw.models && typeof raw.models === "object" ? raw.models : {},
-      baseUrls: raw.baseUrls && typeof raw.baseUrls === "object" ? raw.baseUrls : void 0
-    };
-  }
-  function fromOldSettings() {
-    const c = config();
-    const made = (provider) => {
-      const key = String(c[`${provider}ApiKey`] ?? "");
-      return {
-        id: provider,
-        provider,
-        keys: { [provider]: key },
-        // The model these carried was a default rather than a choice, and
-        // with no key it was never checked against anything. Showing it
-        // would say the provider is set up when nothing has been asked.
-        models: { [provider]: key ? String(c[`${provider}Model`] ?? "") : "" },
-        baseUrls: { [provider]: String(c.baseUrl ?? "") }
-      };
-    };
-    const first = PROVIDERS.includes(c.provider) ? c.provider : PROVIDERS[0];
-    const slots = [made(first)];
-    const backup = c.fallbackProvider;
-    slots.push(PROVIDERS.includes(backup) && backup !== first ? made(backup) : { id: "backup", provider: NONE2, keys: {}, models: {} });
-    return slots;
-  }
-  function readSlots() {
-    try {
-      const raw = JSON.parse(String(config().providerSlots || "[]"));
-      if (Array.isArray(raw)) {
-        const slots = raw.map(asSlot).filter((s) => s !== null);
-        if (slots.length) return slots.slice(0, MOST_SLOTS);
-      }
-    } catch {
-    }
-    return fromOldSettings();
-  }
-  function writeSlots(slots) {
-    set("providerSlots", JSON.stringify(slots.slice(0, MOST_SLOTS)));
-  }
-
   // ai-translate/core/chats.ts
   var switchedOn = () => new Set(String(config().enabledChannels ?? "").split(",").filter(Boolean));
   function isChannelEnabled(channelId) {
@@ -4003,6 +3941,68 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       return e.detail ? `${head}
 ${" ".repeat(21)}${e.detail}` : head;
     }).join("\n");
+  }
+
+  // ai-translate/core/slots.ts
+  var PROVIDERS = ["groq", "gemini", "glm", "anthropic", "openai"];
+  var NONE2 = "none";
+  var withoutAdvice = (label) => label.replace(/\s*\(.*\)\s*$/, "");
+  var providerLabel = (id2, first = false) => first ? t(`provider.${id2}`) : withoutAdvice(t(`provider.${id2}`));
+  var providerName = (id2) => id2 === "openai" ? "OpenAI-compatible" : withoutAdvice(t(`provider.${id2}`));
+  var keyHeading = (id2) => `${t("apiKey.name")} — ${id2 === "openai" ? t("provider.openaiInline") : providerName(id2)}`;
+  var MOST_SLOTS = 5;
+  var canRemove = (count, at) => at > 0 && count > 2;
+  var keyOf = (slot) => slot.keys?.[slot.provider] ?? "";
+  var modelOf = (slot) => slot.models?.[slot.provider] ?? "";
+  var baseUrlOf = (slot) => slot.baseUrls?.[slot.provider] ?? "";
+  var isReady = (slot) => !!keyOf(slot) && !!modelOf(slot);
+  var newId = () => Math.random().toString(36).slice(2, 10);
+  var emptySlot = (provider) => ({ id: newId(), provider, keys: {}, models: {} });
+  function asSlot(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    if (raw.provider !== NONE2 && !PROVIDERS.includes(raw.provider)) return null;
+    return {
+      id: typeof raw.id === "string" && raw.id ? raw.id : newId(),
+      provider: raw.provider,
+      keys: raw.keys && typeof raw.keys === "object" ? raw.keys : {},
+      models: raw.models && typeof raw.models === "object" ? raw.models : {},
+      baseUrls: raw.baseUrls && typeof raw.baseUrls === "object" ? raw.baseUrls : void 0
+    };
+  }
+  function fromOldSettings() {
+    const c = config();
+    const made = (provider) => {
+      const key = String(c[`${provider}ApiKey`] ?? "");
+      return {
+        id: provider,
+        provider,
+        keys: { [provider]: key },
+        // The model these carried was a default rather than a choice, and
+        // with no key it was never checked against anything. Showing it
+        // would say the provider is set up when nothing has been asked.
+        models: { [provider]: key ? String(c[`${provider}Model`] ?? "") : "" },
+        baseUrls: { [provider]: String(c.baseUrl ?? "") }
+      };
+    };
+    const first = PROVIDERS.includes(c.provider) ? c.provider : PROVIDERS[0];
+    const slots = [made(first)];
+    const backup = c.fallbackProvider;
+    slots.push(PROVIDERS.includes(backup) && backup !== first ? made(backup) : { id: "backup", provider: NONE2, keys: {}, models: {} });
+    return slots;
+  }
+  function readSlots() {
+    try {
+      const raw = JSON.parse(String(config().providerSlots || "[]"));
+      if (Array.isArray(raw)) {
+        const slots = raw.map(asSlot).filter((s) => s !== null);
+        if (slots.length) return slots.slice(0, MOST_SLOTS);
+      }
+    } catch {
+    }
+    return fromOldSettings();
+  }
+  function writeSlots(slots) {
+    set("providerSlots", JSON.stringify(slots.slice(0, MOST_SLOTS)));
   }
 
   // ai-translate/core/translate.ts
@@ -6787,14 +6787,5 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       GM_registerMenuCommand?.(t("panel.allSettings"), openPanel);
     } catch {
     }
-    setTimeout(() => {
-      try {
-        const [first] = readSlots();
-        if (!first || keyOf(first)) return;
-        notice(t("error.noKey", { provider: providerName(first.provider) }), "failure");
-      } catch (e) {
-        console.error("[AI Translate]", e);
-      }
-    }, 8e3);
   }
 })();
