@@ -7099,7 +7099,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       card.style.left = `${Math.round(Math.min(Math.max(8, left), innerWidth - size.width - 8))}px`;
     };
     const onKey = (e) => e.key === "Escape" && shut();
-    const onPress = (e) => !e.composedPath().includes(card) && shut();
+    const onPress = (e) => e.target?.id !== UI_ID && shut();
     function shut() {
       card.remove();
       document.removeEventListener("scroll", place, true);

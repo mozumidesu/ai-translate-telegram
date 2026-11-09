@@ -86,9 +86,12 @@ window.open = url => {
     __gm.opened.push(url);
     return {};
 };
+// Closed roots stay closed, so the page and its events see what they would see in a real browser; the test keeps a handle.
+const roots = new WeakMap();
 const attach = Element.prototype.attachShadow;
 Element.prototype.attachShadow = function (init) {
-    const root = attach.call(this, { ...init, mode: "open" });
+    const root = attach.call(this, init);
+    roots.set(this, root);
     new MutationObserver(records => {
         for (const record of records)
             for (const node of record.addedNodes)
@@ -96,6 +99,8 @@ Element.prototype.attachShadow = function (init) {
     }).observe(root, { childList: true, subtree: true });
     return root;
 };
+window.__shadow = element => (element ? roots.get(element) : undefined);
+window.__ours = () => __shadow(document.getElementById("ai-translate-telegram"));
 `;
 
 const FILES = {
@@ -113,20 +118,20 @@ await context.route("https://web.telegram.org/**", async route => {
 });
 await context.addInitScript({ content: `${manager(SETTINGS)}\n${script}` });
 
-/** What our shadow root holds, read through the open root the test asked for. */
+/** What our shadow root holds, read through the handle the test kept on it. */
 const ours = (page, selector) => page.evaluate(selector => {
-    const root = document.getElementById("ai-translate-telegram")?.shadowRoot;
+    const root = __ours();
     return [...(root?.querySelectorAll(selector) ?? [])].map(e => e.textContent);
 }, selector);
 
-/** A click on something of ours, which the page cannot reach through the closed root. */
+/** A click on something of ours, which the page itself cannot reach through the closed root. */
 const clickOurs = (page, selector) => page.evaluate(selector => {
-    document.getElementById("ai-translate-telegram").shadowRoot.querySelector(selector).click();
+    __ours().querySelector(selector).click();
 }, selector);
 
 /** Typing into a field of ours. */
 const fillOurs = (page, selector, value) => page.evaluate(([selector, value]) => {
-    const field = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(selector);
+    const field = __ours().querySelector(selector);
     field.focus();
     field.value = value;
     field.dispatchEvent(new Event("input", { bubbles: true }));
@@ -134,7 +139,7 @@ const fillOurs = (page, selector, value) => page.evaluate(([selector, value]) =>
 
 /** The settings page as a list: each section title, setting and piece of upkeep, in the order they are drawn. */
 const settingsOrder = page => page.evaluate(() => {
-    const sheet = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="settings"]');
+    const sheet = __ours().querySelector('.sheet[data-name="settings"]');
     return [...(sheet?.querySelectorAll(".section, [data-setting], .providers, .keep-help, .foot") ?? [])].map(e =>
         (e.classList.contains("section") ? `# ${e.textContent}`
             : e.dataset.setting ?? (e.classList.contains("providers") ? "providers" : e.classList.contains("keep-help") ? "keep" : e.classList[1]))
@@ -142,7 +147,7 @@ const settingsOrder = page => page.evaluate(() => {
 });
 
 const waitOurs = (page, selector, text) => page.waitForFunction(([selector, text]) => {
-    const root = document.getElementById("ai-translate-telegram")?.shadowRoot;
+    const root = __ours();
     return [...(root?.querySelectorAll(selector) ?? [])].some(e => (text ? e.textContent === text : true));
 }, [selector, text], { timeout: 5000 }).then(() => true, () => false);
 
@@ -180,6 +185,14 @@ check("Web K: and choosing it shuts the menu", await k.evaluate(() => !document.
 check("Web K: the translation is shown beside the message", await waitOurs(k, ".card .text", "look at this"), true);
 check("Web K: with the language it came from", (await ours(k, ".card .note"))[0], "Translated from Russian");
 check("Web K: the text came from Web K's own copy of the message", await k.evaluate(() => __gm.asked.at(-1)), "смотри это");
+const onCard = await k.evaluate(() => {
+    const at = __ours().querySelector(".card .text").getBoundingClientRect();
+    return [at.x + 10, at.y + at.height / 2];
+});
+await k.mouse.click(...onCard);
+check("Web K: a press on the card's own text leaves it open, so the translation can be selected", await ours(k, ".card .text"), ["look at this"]);
+await k.mouse.click(600, 700);
+check("Web K: a press outside it shuts it", await ours(k, ".card"), []);
 
 await k.keyboard.press("Escape");
 await k.click(".bubble[data-mid='4999']", { button: "right" });
@@ -236,12 +249,12 @@ check("Web K: which is the header's @version", script.match(/^\/\/ @version +(\S
 const header = name => script.match(new RegExp(`^// @${name} +(\\S+)$`, "m"))?.[1];
 const RAW = "https://raw.githubusercontent.com/";
 const updateSays = () => k.evaluate(() => {
-    const row = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(".update");
+    const row = __ours().querySelector(".update");
     return [row.querySelector(".button").textContent, row.querySelector(".hint").textContent, row.querySelector(".hint").classList.contains("bad")];
 });
 const press = async () => {
     await clickOurs(k, ".update .button");
-    await k.waitForFunction(() => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(".update .button").textContent !== "Checking…");
+    await k.waitForFunction(() => __ours().querySelector(".update .button").textContent !== "Checking…");
 };
 
 check("Web K: Check for updates, before it is pressed, says nothing", await updateSays(), ["Check for updates", "", false]);
@@ -275,7 +288,7 @@ check("Web K: with no answer, it says GitHub could not be reached", await update
 
 // The two links beside the title, and the window behind the envelope.
 check("Web K: beside the title, the source code and support, as on the plugin's page",
-    await k.evaluate(() => [...document.getElementById("ai-translate-telegram").shadowRoot
+    await k.evaluate(() => [...__ours()
         .querySelectorAll('.sheet[data-name="settings"] .head .link')].map(b => b.getAttribute("aria-label"))), ["Source code", "Support"]);
 await clickOurs(k, '.sheet[data-name="settings"] .head .link');
 check("Web K: the source is this script's, its header's @homepageURL", await k.evaluate(() => __gm.opened.at(-1)), header("homepageURL"));
@@ -287,19 +300,19 @@ check("Web K: the early-build line names this script's version",
     (await ours(k, `${form} .alpha`))[0], `This is ${await version()}, an early build. Rough edges are expected, and what you write here is what gets them fixed.`);
 check("Web K: and says the Telegram name goes with it, not the Discord one",
     (await ours(k, `${form} .hint`)).includes("Your Telegram name is attached so I can reply."), true);
-const sendable = () => k.evaluate(form => !document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} .button.primary`).disabled, form);
+const sendable = () => k.evaluate(form => !__ours().querySelector(`${form} .button.primary`).disabled, form);
 check("Web K: Send waits for a subject and a message", await sendable(), false);
 
 await fillOurs(k, `${form} input[name="subject"]`, "Ошибка в Web K");
 await fillOurs(k, `${form} textarea[name="message"]`, "Перевод не пришёл");
 check("Web K: and then can be pressed", await sendable(), true);
 await fillOurs(k, `${form} input[name="email"]`, "not an address");
-await k.evaluate(form => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} input[name="email"]`).dispatchEvent(new Event("blur")), form);
+await k.evaluate(form => __ours().querySelector(`${form} input[name="email"]`).dispatchEvent(new Event("blur")), form);
 check("Web K: an address that cannot be one is said so when the field is left",
     (await ours(k, `${form} .hint.bad`)).includes("That does not look like an email address."), true);
 await fillOurs(k, `${form} input[name="email"]`, "reader@example.org");
 await k.evaluate(form => {
-    const input = document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} input[name="subject"]`);
+    const input = __ours().querySelector(`${form} input[name="subject"]`);
     const pixel = Uint8Array.from(atob("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="), c => c.charCodeAt(0));
     const files = new DataTransfer();
     files.items.add(new File([pixel], "shot.png", { type: "image/png" }));
@@ -307,7 +320,7 @@ await k.evaluate(form => {
     document.addEventListener("paste", () => { __gm.pasteReachedPage = true; }, { once: true });
     input.dispatchEvent(new ClipboardEvent("paste", { clipboardData: files, bubbles: true, composed: true, cancelable: true }));
 }, form);
-await k.waitForFunction(form => document.getElementById("ai-translate-telegram").shadowRoot.querySelector(`${form} .shot img`), form, { timeout: 5000 }).catch(() => { });
+await k.waitForFunction(form => __ours().querySelector(`${form} .shot img`), form, { timeout: 5000 }).catch(() => { });
 check("Web K: a pasted screenshot joins the form", (await ours(k, `${form} .shot`)).length, 1);
 check("Web K: and never reaches Telegram, which would send it to the chat", await k.evaluate(() => __gm.pasteReachedPage), false);
 
@@ -368,12 +381,12 @@ await k.keyboard.press("Escape");
 
 /** The line of ours under a message, as its parts: the words, the ones a correction changed, and why. */
 const noteUnder = (page, selector) => page.evaluate(selector => {
-    const note = document.querySelector(`${selector} ai-translate-note`)?.shadowRoot?.querySelector(".note");
+    const note = __shadow(document.querySelector(`${selector} ai-translate-note`))?.querySelector(".note");
     if (!note) return undefined;
     const why = note.querySelector(".why")?.textContent ?? "";
     return [note.textContent.slice(0, note.textContent.length - why.length), [...note.querySelectorAll(".fixed")].map(f => f.textContent), why];
 }, selector);
-const waitNote = (page, selector) => page.waitForFunction(selector => document.querySelector(`${selector} ai-translate-note`)?.shadowRoot?.querySelector(".note"),
+const waitNote = (page, selector) => page.waitForFunction(selector => __shadow(document.querySelector(`${selector} ai-translate-note`))?.querySelector(".note"),
     selector, { timeout: 5000 }).then(() => true, () => false);
 
 await k.evaluate(() => __gm.menu.run());
@@ -422,7 +435,7 @@ check("Web K: Corrections counts what was kept", await ours(k, ".learn .button")
 await clickOurs(k, ".learn .button");
 check("Web K: and lists it: what you wrote, the native version with the change marked, and why",
     await k.evaluate(() => {
-        const entry = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="corrections"] .kept');
+        const entry = __ours().querySelector('.sheet[data-name="corrections"] .kept');
         return [...entry.querySelectorAll("p")].slice(0, 3).map(p => p.textContent).concat([[...entry.querySelectorAll(".fixed")].map(f => f.textContent)]);
     }), ["shall we meet tomorrow in noon?", "Shall we meet tomorrow at noon", '"at noon", not "in noon"', ["at"]]);
 await clickOurs(k, '.sheet[data-name="corrections"] .button');
@@ -451,7 +464,7 @@ await waitNote(k, shownAt);
 check("Web K: and under it, only here, what you typed",
     await noteUnder(k, shownAt), ["you wrote: до встречи в субботу", [], ""]);
 check("Web K: in bold where you made it bold",
-    await k.evaluate(s => [...document.querySelector(`${s} ai-translate-note`).shadowRoot.querySelectorAll(".bold")].map(b => b.textContent), shownAt), ["субботу"]);
+    await k.evaluate(s => [...__shadow(document.querySelector(`${s} ai-translate-note`)).querySelectorAll(".bold")].map(b => b.textContent), shownAt), ["субботу"]);
 
 await k.evaluate(() => __gm.change("showOriginal", false));
 check("Web K: switched off, the line goes", await k.waitForFunction(s => !document.querySelector(`${s} ai-translate-note`), shownAt, { timeout: 3000 }).then(() => true, () => false), true);

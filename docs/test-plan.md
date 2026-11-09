@@ -72,7 +72,9 @@ with a reply keyboard, any will do.
 
 1. Right-click a message from the second account: the menu has
    **AI Translate**. Choose it: the menu shuts, a card beside the message
-   shows the translation and "Translated from …".
+   shows the translation and "Translated from …". Select a few words of the
+   translation with the mouse and copy them: the card stays open. A click
+   anywhere outside it shuts it.
 2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
    menu now has **AI Explain** too, which names the language and explains it.
 

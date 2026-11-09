@@ -19,7 +19,7 @@ import type { Shown, TelegramClient } from "./client";
 import { toMarked } from "./formatted";
 import { explainIcon, translateIcon } from "./icons";
 import { askForCorrection } from "./learn";
-import { addStyle, ui } from "./ui";
+import { addStyle, ui, UI_ID } from "./ui";
 
 const CSS = `
 .card {
@@ -113,7 +113,8 @@ function cardFor(shown: Shown, explaining: boolean) {
     };
 
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && shut();
-    const onPress = (e: MouseEvent) => !e.composedPath().includes(card) && shut();
+    // Seen from the document, a press inside our closed root has its host as the target, and the path stops there.
+    const onPress = (e: MouseEvent) => (e.target as Element | null)?.id !== UI_ID && shut();
 
     function shut() {
         card.remove();
