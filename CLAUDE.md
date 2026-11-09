@@ -30,7 +30,10 @@ message's menu.
 - **`dist/` is built and committed.** People install and update from
   `dist/` on `main`. The build is deterministic; `test/dist.mjs` fails when
   `npm run build` was forgotten. The version is `package.json`'s, raised when
-  a change should reach installed copies.
+  a change should reach installed copies. It has the plugin's shape, three
+  numbers and a stage letter, `a` while this is early (`0.2.1a`), which
+  `test/version.mjs` holds it to. Edit it by hand: `npm version` turns the
+  letter into `-a`.
 
 ## Where the hooks are
 
@@ -67,7 +70,7 @@ closed, as a browser does, and holds a handle on each.
 ```
 npm install
 npm run build
-npm test             # formatted, weba, webk, defaults, strings, dist, page
+npm test             # formatted, weba, webk, defaults, strings, version, dist, page
 node test/live.mjs   # needs the internet
 tsc --noEmit --strict --target es2022 --module esnext --moduleResolution bundler \
     --lib es2022,dom,dom.iterable --skipLibCheck src/main.ts

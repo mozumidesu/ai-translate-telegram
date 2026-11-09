@@ -13,9 +13,9 @@ with a reply keyboard, any will do.
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description,
-   version 0.2.1, and offers to install. Install. With 0.2.0 already
+   version 0.2.1a, and offers to install. Install. With 0.2.0 already
    installed, the manager's own update check (Tampermonkey: Utilities, Check
-   for userscript updates) offers 0.2.1 instead.
+   for userscript updates) offers 0.2.1a instead.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
@@ -39,8 +39,7 @@ with a reply keyboard, any will do.
    line under the key. Typing in any field stays there: Telegram's chat box
    does not take the keys, and Escape shuts only the window.
 4. Under Logs, one quiet line: "AI Translate · " and the version the
-   userscript manager shows for the script (its dashboard, column Version),
-   not the Discord plugin's 0.2.1a.
+   userscript manager shows for the script (its dashboard, column Version).
    Press Logs: a window opens over the settings with Copy, Save .txt and
    Clear. Escape shuts it and leaves the settings; Escape again shuts them,
    and the chat stays open.
@@ -180,7 +179,7 @@ Both clients, in a switched-on chat that translates into English.
    It says "Sent. Thank you." The report arrives where the Discord plugin's
    do. Its Telegram field is two lines: the name and id, then the client,
    "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is this script's
-   version and, in brackets, the core it was built with, "0.2.1 (59d38e7)"
+   version and, in brackets, the core it was built with, "0.2.1a (59d38e7)"
    for example: the first seven characters of the commit that
    `git submodule status` shows for `ai-translate`.
 6. *Write on Discord* opens the support server's invite in a new tab.

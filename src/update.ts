@@ -22,13 +22,24 @@ const DIST = "https://raw.githubusercontent.com/mozumidesu/ai-translate-telegram
 export const META_URL = `${DIST}/ai-translate.meta.js`;
 export const SCRIPT_URL = `${DIST}/ai-translate.user.js`;
 
-/** Number by number, so 0.10.0 is newer than 0.9.1. */
+/** The numbers of a version and its stage letter: "0.2.1a" is 0, 2, 1 and "a". */
+function readVersion(version: string) {
+    const [, numbers = "", stage = ""] = /^(\d+(?:\.\d+)*)([a-z]*)/i.exec(version.trim()) ?? [];
+    return { numbers: numbers.split(".").map(Number), stage: stage.toLowerCase() };
+}
+
+/** Number by number, so 0.10.0 is newer than 0.9.1. With the numbers the same the stage decides: 0.2.1a, then 0.2.1b, then 0.2.1. */
 export function isNewer(found: string, mine: string) {
-    const a = found.split(".").map(n => parseInt(n, 10) || 0);
-    const b = mine.split(".").map(n => parseInt(n, 10) || 0);
-    for (let i = 0; i < Math.max(a.length, b.length); i++)
-        if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0);
-    return false;
+    const a = readVersion(found);
+    const b = readVersion(mine);
+    for (let i = 0; i < Math.max(a.numbers.length, b.numbers.length); i++)
+        if ((a.numbers[i] ?? 0) !== (b.numbers[i] ?? 0)) return (a.numbers[i] ?? 0) > (b.numbers[i] ?? 0);
+
+    if (a.stage === b.stage) return false;
+    // No letter is the release itself, which comes after every stage before it.
+    if (a.stage === "") return true;
+    if (b.stage === "") return false;
+    return a.stage > b.stage;
 }
 
 /** The @version of the header on main. Throws when it cannot be found out. */

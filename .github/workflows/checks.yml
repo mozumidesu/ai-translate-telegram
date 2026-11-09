@@ -55,6 +55,9 @@ jobs:
       - name: Every word, in sixteen languages, and the header
         run: node test/strings.mjs
 
+      - name: Which version is newer, the stage letter counting
+        run: node test/version.mjs
+
       - name: Whether dist/ is what the sources build
         run: node test/dist.mjs
 

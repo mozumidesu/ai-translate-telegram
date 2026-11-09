@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.1
+// @version         0.2.1a
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -5930,7 +5930,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/version.ts
-  var VERSION = "0.2.1";
+  var VERSION = "0.2.1a";
   var CORE = "59d38e7";
 
   // src/feedback.ts
@@ -6404,12 +6404,19 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   var DIST = "https://raw.githubusercontent.com/mozumidesu/ai-translate-telegram/main/dist";
   var META_URL = `${DIST}/ai-translate.meta.js`;
   var SCRIPT_URL = `${DIST}/ai-translate.user.js`;
+  function readVersion(version) {
+    const [, numbers = "", stage = ""] = /^(\d+(?:\.\d+)*)([a-z]*)/i.exec(version.trim()) ?? [];
+    return { numbers: numbers.split(".").map(Number), stage: stage.toLowerCase() };
+  }
   function isNewer(found, mine) {
-    const a = found.split(".").map((n) => parseInt(n, 10) || 0);
-    const b = mine.split(".").map((n) => parseInt(n, 10) || 0);
-    for (let i = 0; i < Math.max(a.length, b.length); i++)
-      if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0);
-    return false;
+    const a = readVersion(found);
+    const b = readVersion(mine);
+    for (let i = 0; i < Math.max(a.numbers.length, b.numbers.length); i++)
+      if ((a.numbers[i] ?? 0) !== (b.numbers[i] ?? 0)) return (a.numbers[i] ?? 0) > (b.numbers[i] ?? 0);
+    if (a.stage === b.stage) return false;
+    if (a.stage === "") return true;
+    if (b.stage === "") return false;
+    return a.stage > b.stage;
   }
   async function newestVersion() {
     const res = await pickNet()({
