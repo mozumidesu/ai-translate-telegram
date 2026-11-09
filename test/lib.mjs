@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { mkdtemp } from "fs/promises";
+import { mkdtemp, readFile } from "fs/promises";
 import { tmpdir } from "os";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
@@ -43,11 +43,15 @@ export async function built(exports) {
         format: "esm",
         platform: "node",
         outfile: file,
-        logLevel: "error"
+        logLevel: "error",
+        define: { SCRIPT_VERSION: JSON.stringify(await version()) }
     });
 
     return import(file);
 }
+
+/** This script's version, as build.mjs puts it in the header and the code. */
+export const version = async () => JSON.parse(await readFile(join(ROOT, "package.json"), "utf8")).version;
 
 let passed = 0;
 let failed = 0;

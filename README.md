@@ -104,7 +104,8 @@ goes into that repository. `src/` is the script itself:
 | `formatted.ts` | Telegram's entities as the core's marks on the way to the model, and back |
 | `menu.ts` | The items in a message's menu, and the card with the answer |
 | `composer.ts`, `panel.ts` | The chat bar button and the panel behind it: the languages and this chat |
-| `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window, and the windows they open in |
+| `settings.ts`, `logs.ts`, `sheet.ts` | The settings page in the plugin's order, the Logs window with the version under it, and the windows they open in |
+| `version.ts` | This script's own version, package.json's, the one in its header |
 | `host.ts`, `storage.ts`, `ui.ts`, `relay.ts` | The core's host, settings, the shadow root, word between tabs |
 
 ## Licence

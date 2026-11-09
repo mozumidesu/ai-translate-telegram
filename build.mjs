@@ -37,6 +37,8 @@ const built = await esbuild.build({
     charset: "utf8",
     legalComments: "none",
     banner: { js: header },
+    // The same number as @version, for the line under Logs and for Check for updates.
+    define: { SCRIPT_VERSION: JSON.stringify(version) },
     write: false,
     metafile: true,
     logLevel: "warning",

@@ -35,7 +35,10 @@ with a reply keyboard, any will do.
    the backslash Help), **Appearance** (Interface language), and Logs at the
    foot. Pick Groq, paste the key, leave the model. Leave the field: no red
    line under the key.
-4. Press Logs: a window opens over the settings with Copy, Save .txt and
+4. Under Logs, one quiet line: "AI Translate · " and the version the
+   userscript manager shows for the script (its dashboard, column Version),
+   not the Discord plugin's 0.2.1a.
+   Press Logs: a window opens over the settings with Copy, Save .txt and
    Clear. Escape shuts it and leaves the settings; Escape again shuts them,
    and the chat stays open.
 5. The userscript manager's menu has *All plugin settings*: it opens the same

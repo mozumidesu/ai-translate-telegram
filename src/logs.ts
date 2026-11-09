@@ -14,6 +14,7 @@ import { t } from "../ai-translate/core/locales";
 import { asText, clear, howMany } from "../ai-translate/core/log";
 import { button, hint, openSheet } from "./sheet";
 import { addStyle } from "./ui";
+import { VERSION } from "./version";
 
 const CSS = `
 .log {
@@ -133,6 +134,7 @@ export function logsRow() {
         open.textContent = label();
     }), { wide: true });
 
-    box.append(open);
+    // The one place a person can read which version they run: this script's, not the Discord plugin's.
+    box.append(open, hint(`AI Translate · ${VERSION}`));
     return box;
 }

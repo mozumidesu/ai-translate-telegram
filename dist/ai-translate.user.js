@@ -5600,6 +5600,9 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     return title;
   }
 
+  // src/version.ts
+  var VERSION = "0.1.0";
+
   // src/logs.ts
   var CSS2 = `
 .log {
@@ -5699,7 +5702,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const open2 = button(label(), () => openLogs(() => {
       open2.textContent = label();
     }), { wide: true });
-    box2.append(open2);
+    box2.append(open2, hint(`AI Translate · ${VERSION}`));
     return box2;
   }
 

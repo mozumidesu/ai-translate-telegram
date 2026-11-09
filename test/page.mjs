@@ -21,7 +21,7 @@ import { mkdtemp, readFile } from "fs/promises";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { join } from "path";
-import { check, done, ROOT } from "./lib.mjs";
+import { check, done, ROOT, version } from "./lib.mjs";
 
 let chromium;
 try {
@@ -204,6 +204,10 @@ check("Web K: the language setting names Telegram, not Discord",
     (await ours(k, '.sheet[data-name="settings"] select option')).includes("Same as Telegram"), true);
 check("Web K: the backslashes explained, with their examples",
     await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
+
+check("Web K: under Logs, the version: this script's, as its header gives it to the manager",
+    await ours(k, ".logs .hint"), [`AI Translate · ${await version()}`]);
+check("Web K: which is the header's @version", script.match(/^\/\/ @version +(\S+)$/m)?.[1], await version());
 
 await clickOurs(k, ".logs .button");
 check("Web K: Logs opens over the settings, with Copy, Save .txt and Clear",
