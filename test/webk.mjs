@@ -148,6 +148,42 @@ await settle();
 check("with sendAsTyped the original goes", sent()[0]?.args[0].text, "отправь как есть");
 store.aiTranslateSettings.onError = "hold";
 
+// --- AI Learn
+
+reset();
+store.aiTranslateSettings.aiLearn = true;
+provider.reply = () => "Shall we meet tomorrow at noon?\nwhy: \"at noon\", not \"in noon\"";
+await K.type("shall we meet tomorrow in noon?");
+// Before the provider could have answered: the chat waits on nothing.
+check("AI Learn: a message in the alphabet it would be translated into goes at once, as typed",
+    sent().map(p => p.args[0].text), ["shall we meet tomorrow in noon?"]);
+check("AI Learn: without the script's own mark", Object.getOwnPropertySymbols(sent()[0]?.args[0] ?? {}).length, 0);
+await settle();
+check("AI Learn: and a native speaker's version is asked for on the side", provider.lastMessage, "shall we meet tomorrow in noon?");
+check("AI Learn: with the prompt that asks for one", provider.asked.at(-1)?.messages[0].content.includes("Give the version a native speaker of English would have written"), true);
+check("AI Learn: the correction is kept, for Corrections", JSON.parse(store.aiTranslateSettings.learnHistory)
+    .map(c => [c.typed, c.native, c.why]), [["shall we meet tomorrow in noon?", "Shall we meet tomorrow at noon?", "\"at noon\", not \"in noon\""]]);
+
+reset();
+await K.type("please keep \\Book club\\ the way it is");
+await settle();
+check("AI Learn: the writer's own backslashes come off, as they would in a translation",
+    [sent()[0]?.args[0].text, provider.lastMessage], ["please keep Book club the way it is", "please keep Book club the way it is"]);
+
+reset();
+provider.reply = () => 401;
+await K.type("this one will not be looked at");
+await settle();
+check("AI Learn: a correction nobody asked for fails without a word", [sent().length, notices], [1, []]);
+
+reset();
+provider.reply = () => "[ru] I am on my way";
+await K.type("я уже в пути, скоро буду");
+await settle();
+check("AI Learn: a message in another alphabet is still translated", sent()[0]?.args[0].text, "I am on my way");
+store.aiTranslateSettings.aiLearn = false;
+store.aiTranslateSettings.learnHistory = "";
+
 // --- what is shown
 
 check("the conversation comes from the mirrors, oldest first, without service messages",

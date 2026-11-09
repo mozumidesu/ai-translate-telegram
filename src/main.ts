@@ -15,6 +15,7 @@ import { type TelegramClient, useClient } from "./client";
 import { installComposerButton } from "./composer";
 import { telegramHost } from "./host";
 import { installMenu } from "./menu";
+import { installNotes } from "./notes";
 import { whichClient } from "./page";
 import { onWord, seen, tellOthers } from "./relay";
 import { openSettings } from "./settings";
@@ -53,6 +54,7 @@ if (client) {
         try {
             installMenu(client);
             installComposerButton(client);
+            installNotes();
         } catch (e) {
             console.error("[AI Translate]", e);
         }

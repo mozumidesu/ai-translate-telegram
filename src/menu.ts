@@ -1,8 +1,9 @@
 /*
  * AI Translate for Telegram — a message read on request.
  *
- * The client's own menu, opened on a message, gets AI Translate, and AI
- * Explain when it is switched on in the settings. The answer is shown beside
+ * The client's own menu, opened on a message, gets AI Translate, AI Explain
+ * when it is switched on in the settings, and on your own messages AI Learn
+ * while that is on, whose answer goes under the message (notes.ts). The answer is shown beside
  * the message in a card of ours, rather than inside the message: the client
  * redraws its messages as it pleases, and anything put in one would vanish
  * or be drawn over.
@@ -17,6 +18,7 @@ import { aiTranslate, collectContext, isJustAName, notify } from "../ai-translat
 import type { Shown, TelegramClient } from "./client";
 import { toMarked } from "./formatted";
 import { explainIcon, translateIcon } from "./icons";
+import { askForCorrection } from "./learn";
 import { addStyle, ui } from "./ui";
 
 const CSS = `
@@ -208,6 +210,21 @@ export function installMenu(client: TelegramClient) {
 
         add(t("message.translate"), false);
         if (config().explain) add(t("message.explain"), true);
+
+        // Your own message only: a correction of somebody else's writing is not
+        // something to hand them. This asks again for one that went by, or at
+        // all when the message was too short to be caught; it always answers.
+        if (config().aiLearn && shown.mine) {
+            const item = client.menu.item(t("message.correct"));
+            item.addEventListener("click", e => {
+                e.preventDefault();
+                e.stopPropagation();
+                client.menu.close();
+                const now = (target && client.shownAt(target)) || shown;
+                void askForCorrection(now.chatId, now.text, true);
+            });
+            items.append(item);
+        }
     };
 
     const watch = (root: Element, subtree: boolean) => new MutationObserver(records => {

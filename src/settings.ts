@@ -18,6 +18,7 @@ import {
     readSlots, type Slot, writeSlots
 } from "../ai-translate/core/slots";
 import { headerLinks } from "./feedback";
+import { correctionsRow } from "./learn";
 import { logsRow } from "./logs";
 import { changed, hint, openSheet, sectionTitle, type Sheet } from "./sheet";
 import { addStyle } from "./ui";
@@ -32,7 +33,8 @@ type Field =
 type Item =
     | Field
     | { kind: "title"; key: string; }
-    | { kind: "providers" | "keep" | "update" | "logs"; };
+    | { kind: "providers" | "keep" | "update" | "logs"; }
+    | { kind: "corrections"; follows: string; };
 
 const APP = { app: "Telegram" };
 
@@ -50,6 +52,9 @@ const ITEMS: Item[] = [
         options: () => [{ value: "hold", label: t("onError.hold") }, { value: "sendAsTyped", label: t("onError.send") }]
     },
     { kind: "switch", name: "explain", label: () => t("explain.name"), hint: () => t("explain.desc") },
+    { kind: "switch", name: "aiLearn", label: () => t("learn.name"), hint: () => t("learn.desc") },
+    // Nothing to look back over until the switch above is on.
+    { kind: "corrections", follows: "aiLearn" },
 
     { kind: "title", key: "section.translation" },
     {
@@ -130,7 +135,10 @@ function row(field: Field, sheet: Sheet): HTMLElement {
         const tick = document.createElement("input");
         tick.type = "checkbox";
         tick.checked = value === true;
-        tick.onchange = () => set(name, tick.checked);
+        tick.onchange = () => {
+            set(name, tick.checked);
+            for (const follower of sheet.body.querySelectorAll<HTMLElement>(`[data-follows="${name}"]`)) follower.hidden = !tick.checked;
+        };
         // Inside the label, so the words switch it too.
         label.prepend(tick);
         if (said) box.append(said);
@@ -395,6 +403,12 @@ function render(item: Item, sheet: Sheet): HTMLElement {
         case "title": return sectionTitle(item.key);
         case "providers": return providers();
         case "keep": return keepHelp();
+        case "corrections": {
+            const box = correctionsRow();
+            box.dataset.follows = item.follows;
+            box.hidden = config()[item.follows] !== true;
+            return box;
+        }
         case "update": return updateRow();
         case "logs": return logsRow();
         default: return row(item, sheet);

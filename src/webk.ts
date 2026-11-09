@@ -22,7 +22,7 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
-import { Held, translateOutgoing, wouldTranslate } from "./outgoing";
+import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
 import { page } from "./page";
 
 // --- entities, as the layer writes them
@@ -183,7 +183,8 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
         if (type !== "manager") return invoke.call(this, type, payload, ...rest);
 
         const found = typedIn(payload);
-        if (found && wouldTranslate(found.chatId, found.text, found.entities)) {
+        const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
+        if (found && plan === "translate") {
             const ready = translateOutgoing(found.chatId, found.text, found.entities).then(
                 result => result ? carrying(payload, found, result.text, result.entities) : unmarked(payload),
                 e => {
@@ -207,7 +208,13 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
             });
         }
 
-        const plain = unmarked(payload);
+        let plain = unmarked(payload);
+        if (found && plan === "learn") {
+            // AI Learn's: at once, as written, with the writer's own markers off.
+            const out = asWritten(found.chatId, found.text, found.entities);
+            if (out) plain = carrying(payload, found, out.text, out.entities);
+        }
+
         if (queued && plain?.name === "appMessagesManager" && ORDERED.test(plain.method ?? ""))
             return later(() => invoke.call(this, type, plain, ...rest));
 
@@ -368,6 +375,17 @@ export const webK: TelegramClient = {
 
         const text = textOnScreen(bubble);
         return text ? { chatId, id, text, entities: [], mine: bubble.classList.contains("is-out"), element: bubble } : undefined;
+    },
+
+    ownMessages() {
+        return [...document.querySelectorAll(".bubble.is-out[data-mid]")]
+            .map(bubble => webK.shownAt(bubble))
+            .filter((shown): shown is Shown => !!shown?.mine);
+    },
+
+    // The bubble's .message holds the text, then the time; the line goes after both.
+    putUnder(element, line) {
+        element.querySelector(".message")?.append(line);
     },
 
     menu: {

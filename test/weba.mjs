@@ -165,6 +165,24 @@ await settle();
 check("with sendAsTyped the original goes instead", worker.sent[0]?.payloads[0].args[0].text, "отправь как есть");
 store.aiTranslateSettings.onError = SETTINGS.onError;
 
+// --- AI Learn
+
+reset();
+store.aiTranslateSettings.aiLearn = true;
+provider.reply = () => "See you on Saturday then.";
+worker.postMessage({ payloads: [A.typed("see you at saturday then"), A.markRead()] });
+check("AI Learn: a message written in English goes at once, as typed, with what came with it",
+    [sentNames(), worker.sent[0]?.payloads[0].args[0].text, provider.asked.length], [["sendMessage", "markMessageListRead"], "see you at saturday then", 0]);
+await settle();
+check("AI Learn: and a native speaker's version is asked for on the side", provider.lastMessage, "see you at saturday then");
+
+reset();
+worker.postMessage({ payloads: [A.paidLocal("one more message for the club"), A.paidSend("one more message for the club")] });
+await settle();
+check("AI Learn: a paid message, drawn and then sent, is looked at once", provider.asked.length, 1);
+store.aiTranslateSettings.aiLearn = false;
+store.aiTranslateSettings.learnHistory = "";
+
 // --- what the worker answers
 
 readAnswer({ payloads: [A.history, A.updates] });

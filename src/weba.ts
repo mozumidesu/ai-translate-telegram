@@ -19,7 +19,7 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
-import { Held, translateOutgoing, wouldTranslate } from "./outgoing";
+import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
 import { page } from "./page";
 
 // --- entities, as Web A writes them (src/api/types/messages.ts)
@@ -162,6 +162,12 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
         }
     };
 
+    /** AI Learn's: at once, as written, with the writer's own markers off. */
+    const learned = (payload: any, found: Found) => {
+        const out = asWritten(found.chatId, found.text, found.entities);
+        return out ? carrying(payload, out.text, out.entities) : payload;
+    };
+
     worker.postMessage = function (message: any, ...rest: any[]) {
         const payloads = message?.payloads;
         if (!Array.isArray(payloads)) return send(message, ...(rest as [any]));
@@ -169,12 +175,18 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
         const now: any[] = [];
         for (const payload of payloads) {
             const found = typedIn(payload);
-            if (found && wouldTranslate(found.chatId, found.text, found.entities)) later(payload, translated(payload, found));
-            else if (queued && ORDERED.test(payload?.name ?? "") && !UNORDERED.has(payload.name)) later(payload, Promise.resolve(payload));
-            else now.push(payload);
+            const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
+            if (plan === "translate") {
+                later(payload, translated(payload, found!));
+                continue;
+            }
+
+            const going = plan === "learn" ? learned(payload, found!) : payload;
+            if (queued && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name)) later(going, Promise.resolve(going));
+            else now.push(going);
         }
 
-        if (now.length === payloads.length) return send(message, ...(rest as [any]));
+        if (now.length === payloads.length && now.every((payload, at) => payload === payloads[at])) return send(message, ...(rest as [any]));
         if (now.length) send({ ...message, payloads: now }, ...(rest as [any]));
     };
 
@@ -339,6 +351,17 @@ export const webA: TelegramClient = {
 
         const text = textOnScreen(element);
         return text ? { chatId, id, text, entities: [], mine: element.classList.contains("own"), element } : undefined;
+    },
+
+    ownMessages() {
+        return [...document.querySelectorAll(".Message.own[data-message-id]")]
+            .map(element => webA.shownAt(element))
+            .filter((shown): shown is Shown => !!shown?.mine);
+    },
+
+    // After the text and its time, before whatever else the bubble holds.
+    putUnder(element, line) {
+        element.querySelector(".text-content")?.after(line);
     },
 
     menu: {

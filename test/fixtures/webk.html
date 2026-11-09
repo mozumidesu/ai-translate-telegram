@@ -39,6 +39,26 @@
   window.apiManagerProxy = K.apiManagerProxy;
   window.appImManager = K.appImManager;
   window.rootScope = K.rootScope;
+  // What Web K does once a message is sent: keeps it in its mirror and draws its bubble.
+  K.drawSent = () => {
+    const { args: [sent] } = [...K.calls].reverse().find(c => c.payload.method === "sendText").payload;
+    const mid = 6000 + K.calls.length;
+    K.history[mid] = { _: "message", mid, peerId: sent.peerId, fromId: 4242, message: sent.text, pFlags: { out: true } };
+    const bubble = document.createElement("div");
+    bubble.className = "bubble is-out";
+    bubble.dataset.mid = mid;
+    bubble.dataset.peerId = sent.peerId;
+    bubble.innerHTML = '<div class="bubble-content-wrapper"><div class="bubble-content"><div class="message"></div></div></div>';
+    document.querySelector(".bubbles").append(bubble);
+    K.redraw(mid);
+    return mid;
+  };
+  // A bubble's text drawn again from nothing, as Web K does on an edit or a scroll back.
+  K.redraw = mid => {
+    const message = document.querySelector(`.bubble[data-mid="${mid}"] .message`);
+    message.innerHTML = '<span class="translatable-message"></span><span class="time">12:05</span>';
+    message.firstChild.textContent = K.history[mid]?.message ?? message.dataset.text;
+  };
   // Opening a chat asks the managers for its history before anything can be typed.
   K.managers.appMessagesManager.getHistory({ peerId: K.appImManager.chat.peerId, limit: 50 });
 

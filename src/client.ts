@@ -35,6 +35,10 @@ export interface TelegramClient {
     meId(): string | undefined;
     /** The message under a right click, or nothing when it was not on one. */
     shownAt(target: Element): Shown | undefined;
+    /** The person's own messages that are on the screen. */
+    ownMessages(): Shown[];
+    /** A line of ours under a message's text, inside its bubble. */
+    putUnder(element: Element, line: HTMLElement): void;
     /** The client's message menu as it is drawn: where items go, how one looks, how it is shut. */
     menu: {
         itemsIn(added: Element): Element | undefined;

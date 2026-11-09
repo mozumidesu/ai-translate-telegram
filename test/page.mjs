@@ -136,8 +136,9 @@ const fillOurs = (page, selector, value) => page.evaluate(([selector, value]) =>
 const settingsOrder = page => page.evaluate(() => {
     const sheet = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="settings"]');
     return [...(sheet?.querySelectorAll(".section, [data-setting], .providers, .keep-help, .foot") ?? [])].map(e =>
-        e.classList.contains("section") ? `# ${e.textContent}`
-            : e.dataset.setting ?? (e.classList.contains("providers") ? "providers" : e.classList.contains("keep-help") ? "keep" : e.classList[1]));
+        (e.classList.contains("section") ? `# ${e.textContent}`
+            : e.dataset.setting ?? (e.classList.contains("providers") ? "providers" : e.classList.contains("keep-help") ? "keep" : e.classList[1]))
+        + (e.hidden ? " (hidden)" : ""));
 });
 
 const waitOurs = (page, selector, text) => page.waitForFunction(([selector, text]) => {
@@ -217,7 +218,7 @@ await clickOurs(k, '.sheet[data-name="chat"] .button');
 check("Web K: which steps aside for the settings page", await ours(k, ".sheet .head h1"), ["AI Translate"]);
 check("Web K: in the plugin's order, under its section titles", await settingsOrder(k), [
     "providers",
-    "# Behaviour", "mode", "onError", "explain",
+    "# Behaviour", "mode", "onError", "explain", "aiLearn", "learn (hidden)",
     "# Translation", "gender", "formality", "useContext", "glossary", "extraInstructions", "keep",
     "# Appearance", "locale",
     "update", "logs"
@@ -363,6 +364,73 @@ await k.evaluate(() => __gm.menu.run());
 check("Web K: and opens the settings page", (await settingsOrder(k))[0], "providers");
 await k.keyboard.press("Escape");
 
+// --- AI Learn, in Web K
+
+/** The line of ours under a message, as its parts: the words, the ones a correction changed, and why. */
+const noteUnder = (page, selector) => page.evaluate(selector => {
+    const note = document.querySelector(`${selector} ai-translate-note`)?.shadowRoot?.querySelector(".note");
+    if (!note) return undefined;
+    const why = note.querySelector(".why")?.textContent ?? "";
+    return [note.textContent.slice(0, note.textContent.length - why.length), [...note.querySelectorAll(".fixed")].map(f => f.textContent), why];
+}, selector);
+const waitNote = (page, selector) => page.waitForFunction(selector => document.querySelector(`${selector} ai-translate-note`)?.shadowRoot?.querySelector(".note"),
+    selector, { timeout: 5000 }).then(() => true, () => false);
+
+await k.evaluate(() => __gm.menu.run());
+await clickOurs(k, '[data-setting="aiLearn"] input');
+check("Web K: switching AI Learn on brings Corrections up under it", (await settingsOrder(k)).slice(5, 7), ["aiLearn", "learn"]);
+await k.keyboard.press("Escape");
+
+await k.evaluate(() => {
+    __gm.reply = () => 'Shall we meet tomorrow at noon?\nwhy: "at noon", not "in noon"';
+    __k.calls.length = 0;
+    return __k.type("shall we meet tomorrow in noon?");
+});
+check("Web K: AI Learn: English typed in a chat that translates into English goes at once, as typed",
+    await k.evaluate(() => __k.calls.filter(c => c.payload.method === "sendText").map(c => c.payload.args[0].text)), ["shall we meet tomorrow in noon?"]);
+const learnt = await k.evaluate(() => __k.drawSent());
+const learntAt = `.bubble[data-mid="${learnt}"]`;
+await waitNote(k, learntAt);
+check("Web K: AI Learn: under it, only here, what a native speaker would have written, the changed word marked",
+    await noteUnder(k, learntAt), ["a native speaker would write: Shall we meet tomorrow at noon", ["at"], '"at noon", not "in noon"']);
+check("Web K: inside the bubble, after the text and its time",
+    await k.evaluate(s => document.querySelector(`${s} .message`).lastElementChild.tagName, learntAt), "AI-TRANSLATE-NOTE");
+await k.evaluate(mid => __k.redraw(mid), learnt);
+check("Web K: the client draws the bubble again without it", await k.evaluate(s => !document.querySelector(`${s} ai-translate-note`), learntAt), true);
+check("Web K: and it is back within a moment", await waitNote(k, learntAt), true);
+
+await k.click(".bubble[data-mid='4404']", { button: "right" });
+await k.waitForSelector("#bubble-contextmenu .ai-translate-item", { timeout: 5000 });
+check("Web K: somebody else's message has no AI Learn in its menu",
+    await k.evaluate(() => [...document.querySelectorAll("#bubble-contextmenu .ai-translate-item .btn-menu-item-text")].map(e => e.textContent)), ["AI Translate", "AI Explain"]);
+await k.mouse.click(5, 5);
+
+await k.evaluate(() => {
+    __gm.reply = text => text;
+});
+await k.click(".bubble[data-mid='4999']", { button: "right" });
+await k.waitForSelector("#bubble-contextmenu .ai-translate-item", { timeout: 5000 });
+check("Web K: your own has it, last",
+    await k.evaluate(() => [...document.querySelectorAll("#bubble-contextmenu .btn-menu-item-text")].map(e => e.textContent)), ["Reply", "AI Translate", "AI Explain", "AI Learn"]);
+await k.click("#bubble-contextmenu .ai-translate-item:last-child");
+await waitNote(k, ".bubble[data-mid='4999']");
+check("Web K: asked by hand, it answers even when there is nothing to correct",
+    await noteUnder(k, ".bubble[data-mid='4999']"), ["nothing to correct here", [], ""]);
+
+await k.evaluate(() => __gm.menu.run());
+check("Web K: Corrections counts what was kept", await ours(k, ".learn .button"), ["Corrections (1)"]);
+await clickOurs(k, ".learn .button");
+check("Web K: and lists it: what you wrote, the native version with the change marked, and why",
+    await k.evaluate(() => {
+        const entry = document.getElementById("ai-translate-telegram").shadowRoot.querySelector('.sheet[data-name="corrections"] .kept');
+        return [...entry.querySelectorAll("p")].slice(0, 3).map(p => p.textContent).concat([[...entry.querySelectorAll(".fixed")].map(f => f.textContent)]);
+    }), ["shall we meet tomorrow in noon?", "Shall we meet tomorrow at noon", '"at noon", not "in noon"', ["at"]]);
+await clickOurs(k, '.sheet[data-name="corrections"] .button');
+check("Web K: Clear empties it", await ours(k, '.sheet[data-name="corrections"] .kept-empty'), ["Nothing yet."]);
+await k.keyboard.press("Escape");
+check("Web K: and the count goes with them", await ours(k, ".learn .button"), ["Corrections"]);
+await k.keyboard.press("Escape");
+
 // --- Web A
 
 const a = await context.newPage();
@@ -428,6 +496,37 @@ await a.click("#portals .ai-translate-item");
 await waitOurs(a, ".card .text");
 check("Web A: a message from the client's own cache is read off the screen, without its time",
     await a.evaluate(() => __gm.asked.at(-1)), "из кэша самого клиента");
+
+// AI Learn, in Web A: the message goes as typed, and the line is under it once the client draws it.
+await a.evaluate(() => {
+    __gm.change("aiLearn", true);
+    __gm.reply = () => "See you on Saturday then.";
+    __a.echoes.length = 0;
+    __a.worker.postMessage({
+        payloads: [{ messageId: "m20", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "see you at saturday then", wasDrafted: false }] }]
+    });
+});
+await a.waitForFunction(() => __a.echoes.length >= 1, null, { timeout: 5000 }).catch(() => { });
+check("Web A: AI Learn: written in English, it goes at once, as typed", await a.evaluate(() => __a.echoes[0]?.payloads[0].args[0].text), "see you at saturday then");
+await a.evaluate(() => {
+    __a.worker.postMessage({
+        feed: {
+            payloads: [{
+                type: "updates", updates: [{
+                    "@type": "newMessage", chatId: "-1001234567890", id: 4420,
+                    message: { id: 4420, chatId: "-1001234567890", senderId: "4242", isOutgoing: true, content: { text: { text: "see you at saturday then" } } }
+                }]
+            }]
+        }
+    });
+    __a.drawOwn(4420, "see you at saturday then");
+});
+await waitNote(a, ".Message[data-message-id='4420']");
+check("Web A: AI Learn: under it, what a native speaker would have written",
+    await noteUnder(a, ".Message[data-message-id='4420']"), ["a native speaker would write: See you on Saturday then", ["on"], ""]);
+check("Web A: right after the text and its time",
+    await a.evaluate(() => document.querySelector(".Message[data-message-id='4420'] .text-content").nextElementSibling?.tagName), "AI-TRANSLATE-NOTE");
+await a.evaluate(() => __gm.change("aiLearn", false));
 
 await a.evaluate(() => {
     __gm.reply = () => 401;

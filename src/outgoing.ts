@@ -12,8 +12,10 @@
 import { isChannelEnabled } from "../ai-translate/core/chats";
 import { config } from "../ai-translate/core/host";
 import { keepPieces } from "../ai-translate/core/keep";
-import { aiTranslate, collectContext, isJustAName, isNotWorthTranslating, notify } from "../ai-translate/core/translate";
+import { looksLikeOwnAttempt } from "../ai-translate/core/learn";
+import { aiTranslate, collectContext, isJustAName, isNotWorthTranslating, notify, scriptShare } from "../ai-translate/core/translate";
 import { type Entity, type Formatted, toMarked } from "./formatted";
+import { askForCorrection } from "./learn";
 import { fresh } from "./storage";
 
 /** The message must not go: the translation failed and the settings say to hold it. */
@@ -45,18 +47,49 @@ const busy = (by: number) => {
     for (const watcher of watchers) watcher(working > 0);
 };
 
-/** Whether this message would be translated at all, before anything is asked. */
-export function wouldTranslate(chatId: string, text: string, entities: Entity[]) {
-    if (!text.trim() || BOT_COMMAND.test(text)) return false;
+/**
+ * What becomes of a message, before anything is asked: it goes as typed, or
+ * AI Learn takes it as the writer's own attempt, or it is translated.
+ */
+export function planFor(chatId: string, text: string, entities: Entity[]): "typed" | "learn" | "translate" {
+    if (!text.trim() || BOT_COMMAND.test(text)) return "typed";
 
     // Another tab may have switched the chat on: Web A sends every tab's messages from one.
     fresh();
-    if (!isChannelEnabled(chatId)) return false;
+    if (!isChannelEnabled(chatId)) return "typed";
 
     const { marked } = toMarked(text, entities);
     // "\:)\" has nothing to translate, but its backslashes still have to go.
-    if (isNotWorthTranslating(marked) && !keepPieces(marked, true).pieces.length) return false;
-    return !isJustAName(marked, chatId);
+    if (isNotWorthTranslating(marked) && !keepPieces(marked, true).pieces.length) return "typed";
+    if (isJustAName(marked, chatId)) return "typed";
+
+    // Written in the alphabet of the language it would be translated into: the writer having a go at it themselves.
+    if (config().aiLearn && looksLikeOwnAttempt(text, scriptShare(text, String(config().sentLanguage)))) return "learn";
+    return "translate";
+}
+
+/** Whether this message would be translated at all, before anything is asked. */
+export const wouldTranslate = (chatId: string, text: string, entities: Entity[]) => planFor(chatId, text, entities) === "translate";
+
+/**
+ * A message AI Learn takes goes at once, as typed but for the writer's own
+ * \markers\, which come off as they would in a translation; the chat waits
+ * on nothing, and the correction is asked for on the side. Undefined when
+ * what goes is exactly what was typed.
+ */
+export function asWritten(chatId: string, text: string, entities: Entity[]): Formatted | undefined {
+    const marked = toMarked(text, entities);
+    const kept = keepPieces(marked.marked, true);
+
+    let out: Formatted | undefined;
+    if (kept.pieces.length) {
+        const restored = kept.restore(kept.masked);
+        const back = restored == null ? undefined : marked.back(restored);
+        if (back && back.text !== text) out = back;
+    }
+
+    void askForCorrection(chatId, out?.text ?? text);
+    return out;
 }
 
 /**

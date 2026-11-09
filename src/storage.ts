@@ -45,6 +45,8 @@ export const DEFAULTS: Config = {
     onError: "hold",
     gender: "unset",
     explain: false,
+    aiLearn: false,
+    learnHistory: "",
     // Other people's messages would go to the provider with every request.
     useContext: false,
     formality: "match",

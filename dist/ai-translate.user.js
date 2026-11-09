@@ -3293,6 +3293,11 @@
     "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 17h-2v-2h2v2Zm2.07-7.75-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26A2 2 0 1 0 10 9H8a4 4 0 1 1 8 0c0 .88-.36 1.68-.93 2.25Z",
     size
   );
+  var correctIcon = (size = 20) => icon(
+    "0 0 24 24",
+    "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm-2 15-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9Z",
+    size
+  );
 
   // ai-translate/core/keep.ts
   var FORMS = [
@@ -3515,6 +3520,63 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       }
     };
   }
+
+  // ai-translate/core/learn.ts
+  var ENOUGH_WORDS = 4;
+  var WORDS = /[\p{L}\p{N}][\p{L}\p{N}'\u2019\u2010\u2011-]*/gu;
+  var wordsOf = (text) => text.match(WORDS) ?? [];
+  var compared = (text) => wordsOf(text).map((word) => word.toLowerCase().replace(/i\u0307/g, "i").replace(/[\u2019\u02bc]/g, "'").replace(/[\u2010\u2011]/g, "-"));
+  function looksLikeOwnAttempt(typed, share) {
+    return share >= 0.97 && wordsOf(typed).length >= ENOUGH_WORDS;
+  }
+  var WHY = /^\s*why\s*:\s*/i;
+  function splitCorrection(answer) {
+    const lines2 = answer.split("\n");
+    const last = lines2[lines2.length - 1] ?? "";
+    if (lines2.length > 1 && WHY.test(last))
+      return { native: lines2.slice(0, -1).join("\n").trimEnd(), why: last.replace(WHY, "").trim() };
+    return { native: answer, why: "" };
+  }
+  var KEPT = 50;
+  function keptCorrections() {
+    try {
+      const kept2 = JSON.parse(String(config().learnHistory || "[]"));
+      return Array.isArray(kept2) ? kept2.filter((c) => c?.typed && c?.native) : [];
+    } catch {
+      return [];
+    }
+  }
+  function keepCorrection(entry2) {
+    set("learnHistory", JSON.stringify([entry2, ...keptCorrections()].slice(0, KEPT)));
+  }
+  function forgetCorrections() {
+    set("learnHistory", "");
+  }
+  function changedWords(before, after) {
+    const a = compared(before);
+    const b = compared(after);
+    const shown = after.match(WORDS) ?? [];
+    const table = Array.from({ length: a.length + 1 }, () => new Array(b.length + 1).fill(0));
+    for (let i2 = a.length - 1; i2 >= 0; i2--)
+      for (let j2 = b.length - 1; j2 >= 0; j2--)
+        table[i2][j2] = a[i2] === b[j2] ? table[i2 + 1][j2 + 1] + 1 : Math.max(table[i2 + 1][j2], table[i2][j2 + 1]);
+    const parts = [];
+    let i = 0, j = 0;
+    while (j < b.length) {
+      if (i < a.length && a[i] === b[j]) {
+        parts.push({ text: shown[j], changed: false });
+        i++;
+        j++;
+      } else if (i < a.length && table[i + 1][j] >= table[i][j + 1]) {
+        i++;
+      } else {
+        parts.push({ text: shown[j], changed: true });
+        j++;
+      }
+    }
+    return parts;
+  }
+  var sameMessage = (before, after) => compared(before).join(" ") === compared(after).join(" ");
 
   // ai-translate/core/net.ts
   var noHeaders = () => null;
@@ -3929,7 +3991,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   }));
 
   // ai-translate/core/log.ts
-  var KEPT = 200;
+  var KEPT2 = 200;
   var DETAIL_LIMIT = 600;
   var SECRETS = [
     /\b(?:sk|gsk|xai|sk-ant|sk-proj)[-_][A-Za-z0-9_-]{8,}/g,
@@ -3952,7 +4014,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       text: masked(String(text ?? "")).slice(0, DETAIL_LIMIT),
       detail: detail ? masked(String(detail)).replace(/\s+/g, " ").trim().slice(0, DETAIL_LIMIT) : void 0
     });
-    if (kept.length > KEPT) kept.splice(0, kept.length - KEPT);
+    if (kept.length > KEPT2) kept.splice(0, kept.length - KEPT2);
   }
   var howMany = () => kept.length;
   function clear() {
@@ -3961,8 +4023,8 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   function asText() {
     if (!kept.length) return "";
     return kept.map((e) => {
-      const when = new Date(e.at).toISOString().replace("T", " ").slice(0, 19);
-      const head = `${when}  ${e.level === "error" ? "ERROR" : "info "}  ${e.what}  ${e.text}`;
+      const when2 = new Date(e.at).toISOString().replace("T", " ").slice(0, 19);
+      const head = `${when2}  ${e.level === "error" ? "ERROR" : "info "}  ${e.what}  ${e.text}`;
       return e.detail ? `${head}
 ${" ".repeat(21)}${e.detail}` : head;
     }).join("\n");
@@ -4085,8 +4147,8 @@ ${" ".repeat(21)}${e.detail}` : head;
   function glossaryRule() {
     const pairs = [];
     const keep2 = [];
-    for (const entry of config().glossary.split(",").map((e) => e.trim()).filter(Boolean)) {
-      const [from, to] = entry.split("=").map((part) => part.trim());
+    for (const entry2 of config().glossary.split(",").map((e) => e.trim()).filter(Boolean)) {
+      const [from, to] = entry2.split("=").map((part) => part.trim());
       if (to) pairs.push(`"${from}" as "${to}"`);
       else keep2.push(from);
     }
@@ -4096,7 +4158,7 @@ ${" ".repeat(21)}${e.detail}` : head;
     ].filter(Boolean).join("\n");
   }
   function glossaryKeeps() {
-    return String(config().glossary ?? "").split(",").map((entry) => entry.split("=").map((part) => part.trim())).filter(([from, to]) => !!from && !to).map(([from]) => from);
+    return String(config().glossary ?? "").split(",").map((entry2) => entry2.split("=").map((part) => part.trim())).filter(([from, to]) => !!from && !to).map(([from]) => from);
   }
   var linked = /* @__PURE__ */ new WeakMap();
   function idsAndLinks() {
@@ -4392,8 +4454,8 @@ ${" ".repeat(21)}${e.detail}` : head;
   var NOT_PROSE = /https?:\/\/\S+|www\.\S+|<[^>\s]+>/g;
   function applyGlossary(text) {
     const swaps = [];
-    for (const entry of config().glossary.split(",")) {
-      const [from, to] = entry.split("=").map((part) => part.trim());
+    for (const entry2 of config().glossary.split(",")) {
+      const [from, to] = entry2.split("=").map((part) => part.trim());
       if (!from || !to || !SINGLE_WORD.test(from)) continue;
       const word = from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       swaps.push([new RegExp(`(?<![\\p{L}\\p{N}])${word}(?![\\p{L}\\p{N}])`, "giu"), to]);
@@ -4562,7 +4624,7 @@ ${" ".repeat(21)}${e.detail}` : head;
   function readLanguageTag(out, original) {
     const lines2 = out.split("\n");
     const sourceLines = original.split("\n");
-    const tagged = lines2.map((line, index) => ({ index, match: line.match(BRACKETED) })).filter((entry) => entry.match && looksLikeLanguage(entry.match[1]) && leadingBrackets(lines2[entry.index]) > leadingBrackets(sourceLines[entry.index] ?? ""));
+    const tagged = lines2.map((line, index) => ({ index, match: line.match(BRACKETED) })).filter((entry2) => entry2.match && looksLikeLanguage(entry2.match[1]) && leadingBrackets(lines2[entry2.index]) > leadingBrackets(sourceLines[entry2.index] ?? ""));
     const language = tagged.length ? tagged[0].match[1].trim() : void 0;
     const repeated = tagged.length > 1 && !(tagged.length === lines2.length && lines2.length === sourceLines.length);
     let start = !tagged.length ? 0 : repeated ? Math.max(0, lines2.length - sourceLines.length) : tagged[0].index;
@@ -5215,123 +5277,91 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
     return { text, entities };
   }
 
-  // src/storage.ts
-  var KEY = "aiTranslateSettings";
-  var DEFAULTS = {
-    locale: "auto",
-    providerSlots: "",
-    provider: "groq",
-    geminiApiKey: "",
-    groqApiKey: "",
-    anthropicApiKey: "",
-    glmApiKey: "",
-    openaiApiKey: "",
-    geminiModel: "gemini-3.8-flash",
-    groqModel: "openai/gpt-oss-120b",
-    anthropicModel: "",
-    glmModel: "glm-4.5-flash",
-    openaiModel: "",
-    baseUrl: "",
-    fallbackProvider: "none",
-    sentLanguage: "English",
-    receivedLanguage: "English",
-    mode: "perChannel",
-    enabledChannels: "",
-    onError: "hold",
-    gender: "unset",
-    explain: false,
-    // Other people's messages would go to the provider with every request.
-    useContext: false,
-    formality: "match",
-    glossary: "",
-    extraInstructions: ""
-  };
-  var held;
-  function read() {
-    let saved = {};
-    try {
-      saved = (typeof GM_getValue === "function" ? GM_getValue(KEY, {}) : {}) ?? {};
-    } catch {
+  // src/notes.ts
+  var TAG = "ai-translate-note";
+  var CSS = `
+:host { display: block; }
+.note {
+    display: block;
+    margin-top: .35em;
+    font-style: italic;
+    font-size: .92em;
+    line-height: 1.35;
+    opacity: .75;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    user-select: text;
+}
+svg { vertical-align: text-bottom; margin-inline-end: .25em; }
+.fixed { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 2px; }
+.why { display: block; opacity: .85; }
+`;
+  var KEPT3 = 200;
+  var notes = /* @__PURE__ */ new Map();
+  var keyOf2 = (chatId, text) => `${chatId}
+${text.replace(/\s+/g, "")}`;
+  function noteUnder(chatId, text, note) {
+    if (notes.size >= KEPT3) notes.delete(notes.keys().next().value);
+    notes.set(keyOf2(chatId, text), note);
+    draw();
+  }
+  function render(note) {
+    const line = document.createElement("span");
+    line.className = "note";
+    line.append(correctIcon(16));
+    if (!note.parts.length) {
+      line.append(t("message.fine"));
+      return line;
     }
-    return { ...DEFAULTS, ...saved };
-  }
-  var settings = () => held ??= read();
-  function fresh() {
-    held = read();
-    return held;
-  }
-  function save(name, value) {
-    const all = settings();
-    all[name] = value;
-    try {
-      GM_setValue?.(KEY, all);
-    } catch {
-    }
-  }
-  try {
-    GM_addValueChangeListener?.(KEY, (_name, _before, _after, remote) => {
-      if (remote) held = void 0;
+    line.append(t("message.native"), " ");
+    note.parts.forEach((part, at) => {
+      if (at) line.append(" ");
+      if (!part.changed) return line.append(part.text);
+      const fixed = document.createElement("span");
+      fixed.className = "fixed";
+      fixed.textContent = part.text;
+      line.append(fixed);
     });
-  } catch {
-  }
-
-  // src/outgoing.ts
-  var Held = class extends Error {
-  };
-  var BOT_COMMAND = /^\/[A-Za-z0-9_]{1,32}(?:@[A-Za-z]\w{3,31})?(?:\s|$)/;
-  var REMEMBER_MS = 10 * 6e4;
-  var remembered = /* @__PURE__ */ new Map();
-  var inFlight = /* @__PURE__ */ new Map();
-  var remember = (key, what) => {
-    remembered.set(key, what);
-    setTimeout(() => remembered.delete(key), REMEMBER_MS);
-  };
-  var working = 0;
-  var watchers = /* @__PURE__ */ new Set();
-  var onBusy = (watcher) => watchers.add(watcher);
-  var busy = (by) => {
-    working += by;
-    for (const watcher of watchers) watcher(working > 0);
-  };
-  function wouldTranslate(chatId, text, entities) {
-    if (!text.trim() || BOT_COMMAND.test(text)) return false;
-    fresh();
-    if (!isChannelEnabled(chatId)) return false;
-    const { marked } = toMarked(text, entities);
-    if (isNotWorthTranslating(marked) && !keepPieces(marked, true).pieces.length) return false;
-    return !isJustAName(marked, chatId);
-  }
-  async function translateOutgoing(chatId, text, entities) {
-    if (!wouldTranslate(chatId, text, entities)) return void 0;
-    const key = `${chatId}
-${text}
-${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
-    const known = remembered.get(key);
-    if (known === "held") throw new Held("held back a moment ago");
-    if (known) return known;
-    let waiting = inFlight.get(key);
-    if (!waiting) {
-      waiting = (async () => {
-        const marked = toMarked(text, entities);
-        busy(1);
-        try {
-          const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
-          const back = marked.back(result.text);
-          remember(key, back);
-          return back;
-        } catch (e) {
-          notify(e, "failure");
-          if (config().onError === "sendAsTyped") return void 0;
-          remember(key, "held");
-          throw new Held(e instanceof Error ? e.message : String(e));
-        } finally {
-          busy(-1);
-        }
-      })();
-      inFlight.set(key, waiting);
-      void waiting.catch(() => void 0).finally(() => inFlight.delete(key));
+    if (note.why) {
+      const why = document.createElement("span");
+      why.className = "why";
+      why.textContent = note.why;
+      line.append(why);
     }
-    return waiting;
+    return line;
+  }
+  var placed = /* @__PURE__ */ new WeakMap();
+  function make(note) {
+    const host = document.createElement(TAG);
+    const root = host.attachShadow({ mode: "closed" });
+    const style = document.createElement("style");
+    style.textContent = CSS;
+    root.append(style, render(note));
+    placed.set(host, note);
+    return host;
+  }
+  function draw() {
+    const client2 = theClient();
+    if (!client2 || !notes.size && !document.querySelector(TAG)) return;
+    for (const message of client2.ownMessages()) {
+      const want = notes.get(keyOf2(message.chatId, message.text));
+      const there = message.element.querySelector(TAG);
+      if (there && placed.get(there) === want) continue;
+      there?.remove();
+      if (want) client2.putUnder(message.element, make(want));
+    }
+  }
+  var watching = false;
+  function installNotes() {
+    if (watching) return;
+    watching = true;
+    setInterval(() => {
+      try {
+        draw();
+      } catch (e) {
+        console.error("[AI Translate]", e);
+      }
+    }, 500);
   }
 
   // src/ui.ts
@@ -5443,7 +5473,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/sheet.ts
-  var CSS = `
+  var CSS2 = `
 .sheet {
     position: fixed;
     inset: 0;
@@ -5533,7 +5563,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
 `;
   var OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
   function openSheet(opening) {
-    addStyle(CSS);
+    addStyle(CSS2);
     shutSheet(opening.name);
     const sheet = document.createElement("div");
     sheet.className = "sheet";
@@ -5550,8 +5580,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       opening.onShut?.();
     };
     const body = document.createElement("div");
-    const made = { body, redraw: () => draw(), shut };
-    const draw = () => {
+    const made = { body, redraw: () => draw2(), shut };
+    const draw2 = () => {
       panel.textContent = "";
       panel.dir = isRightToLeft() ? "rtl" : "ltr";
       const head = document.createElement("div");
@@ -5577,7 +5607,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     shutters.set(sheet, shut);
     listenForEscape();
     ui().append(sheet);
-    draw().focus();
+    draw2().focus();
     return made;
   }
   var shutters = /* @__PURE__ */ new WeakMap();
@@ -5625,6 +5655,246 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     return title;
   }
 
+  // src/learn.ts
+  var ASKED_MS = 10 * 6e4;
+  var asked = /* @__PURE__ */ new Set();
+  async function askForCorrection(chatId, sent, byHand = false) {
+    const key = `${chatId}
+${sent}`;
+    if (!byHand) {
+      if (asked.has(key)) return;
+      asked.add(key);
+      setTimeout(() => asked.delete(key), ASKED_MS);
+    }
+    try {
+      const { text } = await aiTranslate("correct", sent, collectContext(chatId));
+      if (!text) return;
+      const { native, why } = splitCorrection(text);
+      if (sameMessage(sent, native)) {
+        if (byHand) noteUnder(chatId, sent, { kind: "correction", parts: [], why: "" });
+        return;
+      }
+      noteUnder(chatId, sent, { kind: "correction", parts: changedWords(sent, native), why });
+      keepCorrection({ typed: sent, native, why, at: Date.now() });
+    } catch (e) {
+      if (byHand) notify(e, "failure");
+    }
+  }
+  var CSS3 = `
+.kept-list { margin: .5rem 0 1rem; padding: 0; list-style: none; }
+.kept { padding: .65rem 0; border-top: 1px solid var(--line); }
+.kept p { margin: 0; }
+.kept-typed { color: var(--muted); font-size: .85rem; }
+.kept .kept-native { margin-top: .15rem; }
+.kept .kept-why { margin-top: .25rem; color: var(--muted); font-size: .8rem; }
+.kept .kept-when { margin-top: .25rem; color: var(--muted); font-size: .75rem; opacity: .8; }
+.kept-native .fixed { font-weight: 600; text-decoration: underline dotted; text-underline-offset: 2px; }
+.kept-empty { margin: .3rem 0 1rem; color: var(--muted); }
+`;
+  function when(at) {
+    try {
+      return new Date(at).toLocaleDateString(currentLocale(), { day: "numeric", month: "short" });
+    } catch {
+      return "";
+    }
+  }
+  function para(className, text = "") {
+    const p = document.createElement("p");
+    p.className = className;
+    p.textContent = text;
+    return p;
+  }
+  function entry(kept2) {
+    const item = document.createElement("li");
+    item.className = "kept";
+    const native = para("kept-native");
+    changedWords(kept2.typed, kept2.native).forEach((part, at) => {
+      if (at) native.append(" ");
+      if (!part.changed) return native.append(part.text);
+      const fixed = document.createElement("span");
+      fixed.className = "fixed";
+      fixed.textContent = part.text;
+      native.append(fixed);
+    });
+    item.append(para("kept-typed", kept2.typed), native);
+    if (kept2.why) item.append(para("kept-why", kept2.why));
+    item.append(para("kept-when", when(kept2.at)));
+    return item;
+  }
+  function openCorrections(onShut) {
+    addStyle(CSS3);
+    openSheet({
+      name: "corrections",
+      title: () => t("learn.title"),
+      onShut,
+      draw(body, sheet) {
+        const kept2 = keptCorrections();
+        body.append(hint(t("learn.panelDesc")));
+        if (kept2.length) {
+          const list = document.createElement("ul");
+          list.className = "kept-list";
+          list.append(...kept2.map(entry));
+          body.append(list);
+        } else body.append(para("kept-empty", t("learn.empty")));
+        const clear2 = button(t("learn.clear"), () => {
+          forgetCorrections();
+          sheet.redraw();
+        });
+        clear2.disabled = !kept2.length;
+        body.append(clear2);
+      }
+    });
+  }
+  function correctionsRow() {
+    const box2 = document.createElement("div");
+    box2.className = "foot learn";
+    const label = () => {
+      const kept2 = keptCorrections().length;
+      return kept2 ? `${t("learn.open")} (${kept2})` : t("learn.open");
+    };
+    const open2 = button(label(), () => openCorrections(() => {
+      open2.textContent = label();
+    }), { wide: true });
+    box2.append(open2);
+    return box2;
+  }
+
+  // src/storage.ts
+  var KEY = "aiTranslateSettings";
+  var DEFAULTS = {
+    locale: "auto",
+    providerSlots: "",
+    provider: "groq",
+    geminiApiKey: "",
+    groqApiKey: "",
+    anthropicApiKey: "",
+    glmApiKey: "",
+    openaiApiKey: "",
+    geminiModel: "gemini-3.8-flash",
+    groqModel: "openai/gpt-oss-120b",
+    anthropicModel: "",
+    glmModel: "glm-4.5-flash",
+    openaiModel: "",
+    baseUrl: "",
+    fallbackProvider: "none",
+    sentLanguage: "English",
+    receivedLanguage: "English",
+    mode: "perChannel",
+    enabledChannels: "",
+    onError: "hold",
+    gender: "unset",
+    explain: false,
+    aiLearn: false,
+    learnHistory: "",
+    // Other people's messages would go to the provider with every request.
+    useContext: false,
+    formality: "match",
+    glossary: "",
+    extraInstructions: ""
+  };
+  var held;
+  function read() {
+    let saved = {};
+    try {
+      saved = (typeof GM_getValue === "function" ? GM_getValue(KEY, {}) : {}) ?? {};
+    } catch {
+    }
+    return { ...DEFAULTS, ...saved };
+  }
+  var settings = () => held ??= read();
+  function fresh() {
+    held = read();
+    return held;
+  }
+  function save(name, value) {
+    const all = settings();
+    all[name] = value;
+    try {
+      GM_setValue?.(KEY, all);
+    } catch {
+    }
+  }
+  try {
+    GM_addValueChangeListener?.(KEY, (_name, _before, _after, remote) => {
+      if (remote) held = void 0;
+    });
+  } catch {
+  }
+
+  // src/outgoing.ts
+  var Held = class extends Error {
+  };
+  var BOT_COMMAND = /^\/[A-Za-z0-9_]{1,32}(?:@[A-Za-z]\w{3,31})?(?:\s|$)/;
+  var REMEMBER_MS = 10 * 6e4;
+  var remembered = /* @__PURE__ */ new Map();
+  var inFlight = /* @__PURE__ */ new Map();
+  var remember = (key, what) => {
+    remembered.set(key, what);
+    setTimeout(() => remembered.delete(key), REMEMBER_MS);
+  };
+  var working = 0;
+  var watchers = /* @__PURE__ */ new Set();
+  var onBusy = (watcher) => watchers.add(watcher);
+  var busy = (by) => {
+    working += by;
+    for (const watcher of watchers) watcher(working > 0);
+  };
+  function planFor(chatId, text, entities) {
+    if (!text.trim() || BOT_COMMAND.test(text)) return "typed";
+    fresh();
+    if (!isChannelEnabled(chatId)) return "typed";
+    const { marked } = toMarked(text, entities);
+    if (isNotWorthTranslating(marked) && !keepPieces(marked, true).pieces.length) return "typed";
+    if (isJustAName(marked, chatId)) return "typed";
+    if (config().aiLearn && looksLikeOwnAttempt(text, scriptShare(text, String(config().sentLanguage)))) return "learn";
+    return "translate";
+  }
+  var wouldTranslate = (chatId, text, entities) => planFor(chatId, text, entities) === "translate";
+  function asWritten(chatId, text, entities) {
+    const marked = toMarked(text, entities);
+    const kept2 = keepPieces(marked.marked, true);
+    let out;
+    if (kept2.pieces.length) {
+      const restored = kept2.restore(kept2.masked);
+      const back = restored == null ? void 0 : marked.back(restored);
+      if (back && back.text !== text) out = back;
+    }
+    void askForCorrection(chatId, out?.text ?? text);
+    return out;
+  }
+  async function translateOutgoing(chatId, text, entities) {
+    if (!wouldTranslate(chatId, text, entities)) return void 0;
+    const key = `${chatId}
+${text}
+${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
+    const known = remembered.get(key);
+    if (known === "held") throw new Held("held back a moment ago");
+    if (known) return known;
+    let waiting = inFlight.get(key);
+    if (!waiting) {
+      waiting = (async () => {
+        const marked = toMarked(text, entities);
+        busy(1);
+        try {
+          const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
+          const back = marked.back(result.text);
+          remember(key, back);
+          return back;
+        } catch (e) {
+          notify(e, "failure");
+          if (config().onError === "sendAsTyped") return void 0;
+          remember(key, "held");
+          throw new Held(e instanceof Error ? e.message : String(e));
+        } finally {
+          busy(-1);
+        }
+      })();
+      inFlight.set(key, waiting);
+      void waiting.catch(() => void 0).finally(() => inFlight.delete(key));
+    }
+    return waiting;
+  }
+
   // src/version.ts
   var VERSION = "0.1.0";
 
@@ -5635,7 +5905,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   var SUBJECT_LIMIT = 256;
   var COUNTER_FROM = 50;
   var MESSAGE_LIMIT = 3800;
-  var CSS2 = `
+  var CSS4 = `
 .links { display: flex; gap: .45rem; }
 .link {
     all: unset;
@@ -5769,7 +6039,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     return label;
   }
   function openFeedback() {
-    addStyle(CSS2);
+    addStyle(CSS4);
     let pasting;
     openSheet({
       name: "feedback",
@@ -5849,7 +6119,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         const centre = document.createElement("div");
         centre.className = "centre";
         centre.append(button(t("feedback.discord"), () => void window.open(SUPPORT_SERVER, "_blank")));
-        const draw = () => {
+        const draw2 = () => {
           const left = SUBJECT_LIMIT - subject.value.length;
           counter.textContent = left <= COUNTER_FROM ? t("feedback.charsLeft", { left }) : "";
           counter.classList.toggle("out", left <= 0);
@@ -5866,7 +6136,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             remove.setAttribute("aria-label", t("feedback.removeImage"));
             remove.onclick = () => {
               shots = shots.filter((_, n) => n !== at);
-              draw();
+              draw2();
             };
             box2.append(img, remove);
             thumbs.append(box2);
@@ -5903,7 +6173,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             slots--;
           }
           imageError.textContent = complaint;
-          draw();
+          draw2();
         };
         const sendIt = async () => {
           if (emailLooksWrong(email.value)) {
@@ -5912,7 +6182,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             return;
           }
           state = "sending";
-          draw();
+          draw2();
           const { status } = await postFeedback(pickNet(), FEEDBACK_ENDPOINT, {
             subject: subject.value.slice(0, SUBJECT_LIMIT),
             message: message.value.slice(0, MESSAGE_LIMIT),
@@ -5925,10 +6195,10 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
           });
           answered = status;
           state = status >= 200 && status < 300 ? "sent" : "failed";
-          draw();
+          draw2();
         };
-        subject.oninput = draw;
-        message.oninput = draw;
+        subject.oninput = draw2;
+        message.oninput = draw2;
         email.onblur = () => {
           const wrong = emailLooksWrong(email.value);
           emailWrong.textContent = wrong ? t("feedback.emailInvalid") : "";
@@ -5962,7 +6232,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
           void addImages(files);
         };
         addEventListener("paste", pasting, true);
-        draw();
+        draw2();
         body.append(alpha, head, subjectBox, messageBox, shotBox, emailBox, send, result, or, centre);
       }
     });
@@ -5978,7 +6248,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     return b;
   }
   function headerLinks() {
-    addStyle(CSS2);
+    addStyle(CSS4);
     const row2 = document.createElement("div");
     row2.className = "links";
     row2.append(
@@ -5989,7 +6259,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/logs.ts
-  var CSS3 = `
+  var CSS5 = `
 .log {
     margin: .8rem 0 0;
     padding: .6rem .7rem;
@@ -6042,7 +6312,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     }
   }
   function openLogs(onShut) {
-    addStyle(CSS3);
+    addStyle(CSS5);
     openSheet({
       name: "logs",
       title: () => t("logs.title"),
@@ -6134,7 +6404,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     box2.className = "foot update";
     let phase = "idle";
     const said = hint();
-    const draw = () => {
+    const draw2 = () => {
       go.textContent = LABEL[phase]();
       go.disabled = phase === "checking";
       said.textContent = NOTE[phase]?.() ?? "";
@@ -6145,19 +6415,19 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       if (phase === "found") {
         if (!window.open(SCRIPT_URL, "_blank")) location.assign(SCRIPT_URL);
         phase = "opened";
-        return draw();
+        return draw2();
       }
       phase = "checking";
-      draw();
+      draw2();
       try {
         phase = isNewer(await newestVersion(), VERSION) ? "found" : "current";
       } catch {
         phase = "offline";
       }
-      draw();
+      draw2();
     };
     const go = button("", () => void run(), { primary: true, wide: true });
-    draw();
+    draw2();
     box2.append(go, said);
     return box2;
   }
@@ -6183,6 +6453,9 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       options: () => [{ value: "hold", label: t("onError.hold") }, { value: "sendAsTyped", label: t("onError.send") }]
     },
     { kind: "switch", name: "explain", label: () => t("explain.name"), hint: () => t("explain.desc") },
+    { kind: "switch", name: "aiLearn", label: () => t("learn.name"), hint: () => t("learn.desc") },
+    // Nothing to look back over until the switch above is on.
+    { kind: "corrections", follows: "aiLearn" },
     { kind: "title", key: "section.translation" },
     {
       kind: "select",
@@ -6223,7 +6496,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     { kind: "update" },
     { kind: "logs" }
   ];
-  var CSS4 = `
+  var CSS6 = `
 .slot + .slot { margin-top: .9rem; padding-top: .9rem; border-top: 1px solid var(--line); }
 .slot > label { margin-top: .55rem; }
 .slot > label:first-child { margin-top: 0; }
@@ -6262,7 +6535,10 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       const tick = document.createElement("input");
       tick.type = "checkbox";
       tick.checked = value === true;
-      tick.onchange = () => set(name, tick.checked);
+      tick.onchange = () => {
+        set(name, tick.checked);
+        for (const follower of sheet.body.querySelectorAll(`[data-follows="${name}"]`)) follower.hidden = !tick.checked;
+      };
       label.prepend(tick);
       if (said) box2.append(said);
       return box2;
@@ -6316,14 +6592,14 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   function providers() {
     const list = document.createElement("div");
     list.className = "field providers";
-    const draw = () => {
+    const draw2 = () => {
       const slots = readSlots();
       list.textContent = "";
       const save2 = (next) => {
         writeSlots(next);
-        draw();
+        draw2();
       };
-      const change = (at, make) => save2(slots.map((slot, i) => i === at ? make(slot) : slot));
+      const change = (at, make2) => save2(slots.map((slot, i) => i === at ? make2(slot) : slot));
       slots.forEach((slot, at) => {
         const first = at === 0;
         const block = document.createElement("div");
@@ -6426,7 +6702,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         list.append(block);
       });
     };
-    draw();
+    draw2();
     return list;
   }
   async function offerModels(slot, list, refused) {
@@ -6469,7 +6745,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     box2.append(label, list);
     return box2;
   }
-  function render(item, sheet) {
+  function render2(item, sheet) {
     switch (item.kind) {
       case "title":
         return sectionTitle(item.key);
@@ -6477,6 +6753,12 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         return providers();
       case "keep":
         return keepHelp();
+      case "corrections": {
+        const box2 = correctionsRow();
+        box2.dataset.follows = item.follows;
+        box2.hidden = config()[item.follows] !== true;
+        return box2;
+      }
       case "update":
         return updateRow();
       case "logs":
@@ -6486,14 +6768,14 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     }
   }
   function openSettings() {
-    addStyle(CSS4);
+    addStyle(CSS6);
     openSheet({
       name: "settings",
       title: () => t("panel.title"),
       links: headerLinks,
       onShut: changed,
       draw(body, sheet) {
-        for (const item of ITEMS) body.append(render(item, sheet));
+        for (const item of ITEMS) body.append(render2(item, sheet));
       }
     });
   }
@@ -6576,7 +6858,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/composer.ts
-  var CSS5 = `
+  var CSS7 = `
 :host { all: initial; display: inline-flex; align-self: flex-end; flex: none; }
 button {
     all: unset;
@@ -6602,10 +6884,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     const show = () => {
       const chatId = client2.openChat();
       const on = !!chatId && isChannelEnabled(chatId);
-      for (const placed of buttons) {
-        const { host, button: button2, anchor } = placed;
+      for (const placed2 of buttons) {
+        const { host, button: button2, anchor } = placed2;
         if (!host.isConnected) {
-          buttons.delete(placed);
+          buttons.delete(placed2);
           continue;
         }
         button2.classList.toggle("on", on);
@@ -6616,12 +6898,12 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         host.style.color = getComputedStyle(anchor).color;
       }
     };
-    const make = (anchor) => {
+    const make2 = (anchor) => {
       const host = document.createElement("span");
       host.className = MARK;
       const root = host.attachShadow({ mode: "closed" });
       const style = document.createElement("style");
-      style.textContent = CSS5;
+      style.textContent = CSS7;
       const button2 = document.createElement("button");
       button2.type = "button";
       const size = Math.round(anchor.offsetHeight || 40);
@@ -6652,7 +6934,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     };
     const place = () => {
       for (const anchor of client2.composerAnchors())
-        if (!anchor.previousElementSibling?.classList.contains(MARK)) make(anchor);
+        if (!anchor.previousElementSibling?.classList.contains(MARK)) make2(anchor);
       show();
     };
     onBusy((now) => {
@@ -6706,7 +6988,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
 
   // src/menu.ts
-  var CSS6 = `
+  var CSS8 = `
 .card {
     position: fixed;
     z-index: 2147482500;
@@ -6747,7 +7029,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
   var open;
   function cardFor(shown, explaining) {
-    addStyle(CSS6);
+    addStyle(CSS8);
     open?.shut();
     const card = document.createElement("div");
     card.className = "card";
@@ -6853,6 +7135,17 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       };
       add(t("message.translate"), false);
       if (config().explain) add(t("message.explain"), true);
+      if (config().aiLearn && shown.mine) {
+        const item = client2.menu.item(t("message.correct"));
+        item.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          client2.menu.close();
+          const now = target && client2.shownAt(target) || shown;
+          void askForCorrection(now.chatId, now.text, true);
+        });
+        items.append(item);
+      }
     };
     const watch = (root, subtree) => new MutationObserver((records) => {
       for (const record2 of records)
@@ -6984,17 +7277,26 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         return void 0;
       }
     };
+    const learned = (payload, found) => {
+      const out = asWritten(found.chatId, found.text, found.entities);
+      return out ? carrying(payload, out.text, out.entities) : payload;
+    };
     worker.postMessage = function(message, ...rest) {
       const payloads = message?.payloads;
       if (!Array.isArray(payloads)) return send(message, ...rest);
       const now = [];
       for (const payload of payloads) {
         const found = typedIn(payload);
-        if (found && wouldTranslate(found.chatId, found.text, found.entities)) later(payload, translated(payload, found));
-        else if (queued && ORDERED.test(payload?.name ?? "") && !UNORDERED.has(payload.name)) later(payload, Promise.resolve(payload));
-        else now.push(payload);
+        const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
+        if (plan === "translate") {
+          later(payload, translated(payload, found));
+          continue;
+        }
+        const going = plan === "learn" ? learned(payload, found) : payload;
+        if (queued && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name)) later(going, Promise.resolve(going));
+        else now.push(going);
       }
-      if (now.length === payloads.length) return send(message, ...rest);
+      if (now.length === payloads.length && now.every((payload, at) => payload === payloads[at])) return send(message, ...rest);
       if (now.length) send({ ...message, payloads: now }, ...rest);
     };
     if (onAnswer) worker.addEventListener("message", (event) => {
@@ -7117,6 +7419,13 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       if (kept2) return { chatId, id: id2, text: kept2.text, entities: kept2.entities, mine: kept2.mine, element };
       const text = textOnScreen(element);
       return text ? { chatId, id: id2, text, entities: [], mine: element.classList.contains("own"), element } : void 0;
+    },
+    ownMessages() {
+      return [...document.querySelectorAll(".Message.own[data-message-id]")].map((element) => webA.shownAt(element)).filter((shown) => !!shown?.mine);
+    },
+    // After the text and its time, before whatever else the bubble holds.
+    putUnder(element, line) {
+      element.querySelector(".text-content")?.after(line);
     },
     menu: {
       // Anything drawn in or as the menu: Teact may draw its items after the menu itself.
@@ -7264,7 +7573,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       onCall?.();
       if (type !== "manager") return invoke.call(this, type, payload, ...rest);
       const found = typedIn2(payload);
-      if (found && wouldTranslate(found.chatId, found.text, found.entities)) {
+      const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
+      if (found && plan === "translate") {
         const ready = translateOutgoing(found.chatId, found.text, found.entities).then(
           (result) => result ? carrying2(payload, found, result.text, result.entities) : unmarked(payload),
           (e) => {
@@ -7283,7 +7593,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           return withAck ? { cached: false, result: Promise.resolve(void 0) } : void 0;
         });
       }
-      const plain = unmarked(payload);
+      let plain = unmarked(payload);
+      if (found && plan === "learn") {
+        const out = asWritten(found.chatId, found.text, found.entities);
+        if (out) plain = carrying2(payload, found, out.text, out.entities);
+      }
       if (queued && plain?.name === "appMessagesManager" && ORDERED2.test(plain.method ?? ""))
         return later(() => invoke.call(this, type, plain, ...rest));
       return invoke.call(this, type, plain, ...rest);
@@ -7409,6 +7723,13 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       const text = textOnScreen2(bubble);
       return text ? { chatId, id: id2, text, entities: [], mine: bubble.classList.contains("is-out"), element: bubble } : void 0;
     },
+    ownMessages() {
+      return [...document.querySelectorAll(".bubble.is-out[data-mid]")].map((bubble) => webK.shownAt(bubble)).filter((shown) => !!shown?.mine);
+    },
+    // The bubble's .message holds the text, then the time; the line goes after both.
+    putUnder(element, line) {
+      element.querySelector(".message")?.append(line);
+    },
     menu: {
       itemsIn(added2) {
         if (added2.id === "bubble-contextmenu") return added2;
@@ -7476,6 +7797,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       try {
         installMenu(client);
         installComposerButton(client);
+        installNotes();
       } catch (e) {
         console.error("[AI Translate]", e);
       }

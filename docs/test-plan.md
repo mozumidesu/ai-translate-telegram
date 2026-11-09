@@ -76,7 +76,40 @@ with a reply keyboard, any will do.
 2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
    menu now has **AI Explain** too, which names the language and explains it.
 
-## 6. When it fails
+## 6. AI Learn ★
+
+Both clients. A chat with your second account, switched on, "Translate my
+messages into" English.
+
+1. On the settings page, under Behaviour, turn on *AI Learn: correct what
+   I write myself*. A *Corrections* button appears under it; switched off,
+   it goes away again.
+2. Write in English yourself, four words or more, with a mistake:
+   `shall we meet tomorrow in noon?`. It goes at once, exactly as typed; the
+   phone shows exactly that.
+3. A moment later, under your message on this screen: a tick, then in
+   italics "a native speaker would write: Shall we meet tomorrow at noon",
+   with *at* in bold and underlined with dots, and a line saying why. The
+   phone shows nothing of it, and neither does the second account.
+4. Scroll the chat up and back, open another chat and come back: the line
+   is still under the message. Edit the message, react to it: the line
+   stays, the time and the reaction are where they were. After a reload it
+   is gone from under the message, and kept in Corrections.
+5. Write a message that is right, such as `see you tomorrow at noon`:
+   nothing appears under it, and no notice.
+6. Write `please keep \Book club\ the way it is`: it goes without the
+   backslashes.
+7. Write in Russian in the same chat: it is translated, as before.
+8. Right-click your own message: **AI Learn** is the last item. On a
+   message that was right it answers "nothing to correct here" under it.
+   Someone else's message has no AI Learn.
+9. *Corrections (n)* on the settings page lists each correction: what you
+   wrote, the native version with the changes marked, why, and the day.
+   *Clear* empties it, and the button goes back to *Corrections*.
+10. Put a wrong key in and write in English: the message goes, and nothing
+    is said. Put the right key back.
+
+## 7. When it fails
 
 1. Put a wrong key on the settings page and send in a switched-on chat. Nothing is
    sent, a red notice says why, and the text is back in the chat box.
@@ -89,7 +122,7 @@ with a reply keyboard, any will do.
    chat box. Right-click a message, AI Translate: the same notice. Put the
    key back.
 
-## 7. Check for updates ★
+## 8. Check for updates ★
 
 1. On the settings page, above Logs, press *Check for updates*. The first
    time, the manager asks to allow `raw.githubusercontent.com`: allow it.
@@ -106,7 +139,7 @@ with a reply keyboard, any will do.
 4. Offline (the browser's network off, or the address refused in the
    manager): "Could not reach GitHub…", in red.
 
-## 8. Feedback ★
+## 9. Feedback ★
 
 1. On the settings page, beside the title: a GitHub button (*Source code*)
    and an envelope (*Support*). GitHub opens this repository in a new tab.
@@ -128,7 +161,7 @@ with a reply keyboard, any will do.
    "telegram userscript" and the version.
 6. *Write on Discord* opens the support server's invite in a new tab.
 
-## 9. Nothing looks different to anyone else
+## 10. Nothing looks different to anyone else
 
 From the second account, open the profile of the account that used the
 script, and the chat where it sent: no warning about an unofficial or
@@ -136,7 +169,7 @@ third-party app, no "via" line, nothing that was not there before. In
 Settings → Devices on the phone, the session reads as Telegram Web, as
 before.
 
-## 10. Context, last
+## 11. Context, last
 
 Context is off: confirm on the settings page. Switch it on, send a short reply such
 as "да" after a question; the translation fits the question. Switch it off

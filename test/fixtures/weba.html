@@ -39,6 +39,16 @@
     else window.__a.answers.push(event.data);
   });
 
+  // What Web A draws for a message of the person's own, once the worker has built it.
+  window.__a.drawOwn = (id, text) => {
+    const message = document.createElement("div");
+    message.className = "Message message-list-item own";
+    message.dataset.messageId = id;
+    message.innerHTML = '<div class="message-content"><div class="content-inner"><div class="text-content clearfix with-meta"></div></div></div>';
+    message.querySelector(".text-content").append(text, Object.assign(document.createElement("span"), { className: "MessageMeta", textContent: "12:06" }));
+    document.querySelector(".MessageList").append(message);
+  };
+
   document.addEventListener("contextmenu", event => {
     const message = event.target.closest(".Message");
     if (!message) return;
