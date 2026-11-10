@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a
+// @version         0.2.1a.1
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -25,9 +25,8 @@
 // @compatible      edge Edge + Tampermonkey or Violentmonkey
 // ==/UserScript==
 
-// AI Translate for Telegram Web: web.telegram.org/a/ and web.telegram.org/k/.
-// Unofficial: not made, checked or endorsed by Telegram. Keys and settings
-// stay in your userscript manager's storage; requests go straight from your
-// browser to the AI provider you chose, and nowhere else.
+// AI Translate for Telegram: web.telegram.org/a/ and web.telegram.org/k/.
+// Keys and settings stay in your userscript manager's storage; requests go
+// out through the manager to the AI provider you chose.
 //
 // Source, in full, and the licence: https://github.com/mozumidesu/ai-translate-telegram

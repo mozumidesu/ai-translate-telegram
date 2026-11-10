@@ -1,12 +1,10 @@
 # AI Translate for Telegram - the checks that run on every push.
 #
 # In the same spirit as ai-translate's own workflows: no ready-made actions,
-# only git, node, npm and the cargo a runner comes with. The core comes from
-# the submodule at the commit this repository pins, and Playwright's Chromium
-# runs the built script in pages shaped like both clients. test/live.mjs,
-# which opens the real web.telegram.org, is not run here: it is for a person,
-# after a client moved. Nor is the desktop app built here: its bridge is
-# tested, in seconds, and the app itself is the Desktop workflow's.
+# only git, node and npm. The core comes from the submodule at the commit this
+# repository pins, and Playwright's Chromium runs the built script in pages
+# shaped like both clients. test/live.mjs, which opens the real
+# web.telegram.org, is not run here: it is for a person, after a client moved.
 
 name: Checks
 
@@ -57,17 +55,11 @@ jobs:
       - name: Every word, in sixteen languages, and the header
         run: node test/strings.mjs
 
-      - name: Which version is newer, the stage letter counting
+      - name: One version, and which build a userscript manager takes for newer
         run: node test/version.mjs
 
       - name: Whether dist/ is what the sources build
         run: node test/dist.mjs
-
-      - name: The desktop app's stand-in for a userscript manager, alone and in a page
-        run: REQUIRE_BROWSER=1 node test/shim.mjs
-
-      - name: The desktop app's limits, against the script and the core, and its bridge's own tests
-        run: REQUIRE_CARGO=1 node test/desktop.mjs
 
       - name: The built script in pages shaped like both clients
         run: REQUIRE_BROWSER=1 node test/page.mjs

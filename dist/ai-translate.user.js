@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a
+// @version         0.2.1a.1
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -25,10 +25,9 @@
 // @compatible      edge Edge + Tampermonkey or Violentmonkey
 // ==/UserScript==
 
-// AI Translate for Telegram Web: web.telegram.org/a/ and web.telegram.org/k/.
-// Unofficial: not made, checked or endorsed by Telegram. Keys and settings
-// stay in your userscript manager's storage; requests go straight from your
-// browser to the AI provider you chose, and nowhere else.
+// AI Translate for Telegram: web.telegram.org/a/ and web.telegram.org/k/.
+// Keys and settings stay in your userscript manager's storage; requests go
+// out through the manager to the AI provider you chose.
 //
 // Source, in full, and the licence: https://github.com/mozumidesu/ai-translate-telegram
 
@@ -5960,8 +5959,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/version.ts
-  var VERSION2 = "0.2.3a";
-  var CORE = "09710da";
+  var SCRIPT_VERSION = `${VERSION}.${1}`;
+  var BUILD_NAME = `${VERSION} (${"09710da"}-${1})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -6122,7 +6121,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         let answered = 0;
         const alpha = document.createElement("p");
         alpha.className = "alpha";
-        alpha.textContent = t("feedback.alpha", { version: VERSION2 });
+        alpha.textContent = t("feedback.alpha", { version: VERSION });
         const head = document.createElement("div");
         head.className = "feedback-head";
         const badge = document.createElement("div");
@@ -6260,7 +6259,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             telegram: telegramField(),
             locale: currentLocale(),
             images: shots,
-            build: `${VERSION2} (${CORE})`
+            build: BUILD_NAME
           });
           answered = status;
           state = status >= 200 && status < 300 ? "sent" : "failed";
@@ -6426,28 +6425,38 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const open2 = button(label(), () => openLogs(() => {
       open2.textContent = label();
     }), { wide: true });
-    box2.append(open2, hint(`AI Translate · ${VERSION2}`));
+    box2.append(open2, hint(`AI Translate · ${VERSION}`));
     return box2;
   }
 
   // src/update.ts
-  var app = typeof AI_TRANSLATE_APP !== "undefined" ? AI_TRANSLATE_APP : void 0;
   var DIST = "https://raw.githubusercontent.com/mozumidesu/ai-translate-telegram/main/dist";
   var META_URL = `${DIST}/ai-translate.meta.js`;
   var SCRIPT_URL = `${DIST}/ai-translate.user.js`;
   function readVersion(version) {
-    const [, numbers = "", stage = ""] = /^(\d+(?:\.\d+)*)([a-z]*)/i.exec(version.trim()) ?? [];
-    return { numbers: numbers.split(".").map(Number), stage: stage.toLowerCase() };
+    const [, numbers = "", stage = "", rest = ""] = /^(\d+(?:\.\d+)*)([a-z]*)((?:\.\d+)*)/i.exec(version.trim()) ?? [];
+    const all = numbers.split(".").map(Number);
+    return {
+      main: all.slice(0, 3),
+      stage: stage.toLowerCase(),
+      counter: [...all.slice(3), ...rest.split(".").filter(Boolean).map(Number)]
+    };
+  }
+  function order(a, b) {
+    for (let i = 0; i < Math.max(a.length, b.length); i++)
+      if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) > (b[i] ?? 0) ? 1 : -1;
+    return 0;
+  }
+  function stageOrder(a, b) {
+    if (a === b) return 0;
+    if (a === "") return 1;
+    if (b === "") return -1;
+    return a > b ? 1 : -1;
   }
   function isNewer(found, mine) {
     const a = readVersion(found);
     const b = readVersion(mine);
-    for (let i = 0; i < Math.max(a.numbers.length, b.numbers.length); i++)
-      if ((a.numbers[i] ?? 0) !== (b.numbers[i] ?? 0)) return (a.numbers[i] ?? 0) > (b.numbers[i] ?? 0);
-    if (a.stage === b.stage) return false;
-    if (a.stage === "") return true;
-    if (b.stage === "") return false;
-    return a.stage > b.stage;
+    return (order(a.main, b.main) || stageOrder(a.stage, b.stage) || order(a.counter, b.counter)) > 0;
   }
   async function newestVersion() {
     const res = await pickNet()({
@@ -6466,7 +6475,6 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     idle: () => t("update.check"),
     checking: () => t("update.checking"),
     found: () => t("update.browserInstall"),
-    installing: () => t("update.installing"),
     opened: () => t("update.reload"),
     current: () => t("update.check"),
     offline: () => t("update.check")
@@ -6481,30 +6489,14 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const box2 = document.createElement("div");
     box2.className = "foot update";
     let phase = "idle";
-    let found = "";
     const said = hint();
     const draw2 = () => {
       go.textContent = LABEL[phase]();
-      go.disabled = phase === "checking" || phase === "installing";
-      said.textContent = app && phase === "found" ? `AI Translate · ${found}` : NOTE[phase]?.() ?? "";
+      go.disabled = phase === "checking";
+      said.textContent = NOTE[phase]?.() ?? "";
       said.classList.toggle("bad", phase === "offline");
     };
-    const runInApp = async (app2) => {
-      const installing = phase === "found";
-      phase = installing ? "installing" : "checking";
-      draw2();
-      try {
-        if (installing) await app2.install();
-        found = await app2.newest() ?? "";
-        phase = found ? "found" : "current";
-        if (installing && found) phase = "offline";
-      } catch {
-        phase = "offline";
-      }
-      draw2();
-    };
     const run = async () => {
-      if (app) return runInApp(app);
       if (phase === "opened") return location.reload();
       if (phase === "found") {
         if (!window.open(SCRIPT_URL, "_blank")) location.assign(SCRIPT_URL);
@@ -6514,7 +6506,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       phase = "checking";
       draw2();
       try {
-        phase = isNewer(await newestVersion(), VERSION2) ? "found" : "current";
+        phase = isNewer(await newestVersion(), SCRIPT_VERSION) ? "found" : "current";
       } catch {
         phase = "offline";
       }

@@ -1,8 +1,7 @@
 {
   "name": "ai-translate-telegram",
-  "version": "0.2.3a",
   "private": true,
-  "description": "AI Translate as a userscript for Telegram Web, both clients. Unofficial.",
+  "description": "AI Translate for Telegram, a userscript that runs in Telegram Web, both clients.",
   "license": "GPL-3.0-or-later",
   "type": "module",
   "scripts": {
@@ -10,7 +9,6 @@
     "test": "node test/run.mjs"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "2.12.4",
     "esbuild": "0.25.12"
   }
 }

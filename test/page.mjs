@@ -21,7 +21,7 @@ import { mkdtemp, readFile } from "fs/promises";
 import { createRequire } from "module";
 import { tmpdir } from "os";
 import { join } from "path";
-import { check, coreCommit, done, ROOT, version } from "./lib.mjs";
+import { buildCounter, check, coreCommit, coreVersion, done, headerVersion, ROOT } from "./lib.mjs";
 
 let chromium;
 try {
@@ -319,9 +319,10 @@ check("Web K: the language setting names Telegram, not Discord",
 check("Web K: the backslashes explained, with their examples",
     await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
 
-check("Web K: under Logs, the version: this script's, as its header gives it to the manager",
-    await ours(k, ".logs .hint"), [`AI Translate · ${await version()}`]);
-check("Web K: which is the header's @version", script.match(/^\/\/ @version +(\S+)$/m)?.[1], await version());
+check("Web K: under Logs, the version: the plugin's, which is the core's, with no build counter",
+    await ours(k, ".logs .hint"), [`AI Translate · ${coreVersion()}`]);
+check("Web K: the header's @version is that with the build counter after it, which is what a manager compares",
+    script.match(/^\/\/ @version +(\S+)$/m)?.[1], headerVersion());
 
 // Check for updates: the header on main, asked through the manager.
 const header = name => script.match(new RegExp(`^// @${name} +(\\S+)$`, "m"))?.[1];
@@ -334,22 +335,31 @@ const press = async () => {
     await clickOurs(k, ".update .button");
     await k.waitForFunction(() => __ours().querySelector(".update .button").textContent !== "Checking…");
 };
+const FOUND = "A new version is available. Your userscript manager updates it by itself on its own schedule. To do it now, press the button.";
 
 check("Web K: Check for updates, before it is pressed, says nothing", await updateSays(), ["Check for updates", "", false]);
 await k.evaluate(([raw, mine]) => {
     __gm.routes[raw] = () => [200, `// ==UserScript==\n// @name            AI Translate\n// @version         ${mine}\n// ==/UserScript==\n`];
-}, [RAW, await version()]);
+}, [RAW, headerVersion()]);
 await press();
-check("Web K: the same version on main is the latest", await updateSays(), ["Check for updates", "You have the latest version.", false]);
+check("Web K: the same build on main is the latest", await updateSays(), ["Check for updates", "You have the latest version.", false]);
 check("Web K: asked of the header's own @updateURL, through the manager",
     await k.evaluate(() => __gm.requests.at(-1).url.split("?")[0]), header("updateURL"));
+
+// The counter is what makes a rebuilt script an update. A row that has offered something does not look again, so it is shut and opened afresh.
+await k.evaluate(([raw, next]) => {
+    __gm.routes[raw] = () => [200, `// ==UserScript==\n// @version         ${next}\n// ==/UserScript==\n`];
+}, [RAW, `${coreVersion()}.${buildCounter().counter + 1}`]);
+await press();
+check("Web K: the next build of the same version on main, one counter up, is an update", await updateSays(), ["Update now", FOUND, false]);
+await k.keyboard.press("Escape");
+await k.evaluate(() => __gm.menu.run());
 
 await k.evaluate(raw => {
     __gm.routes[raw] = () => [200, "// ==UserScript==\n// @version         9.10.0\n// ==/UserScript==\n"];
 }, RAW);
 await press();
-check("Web K: a newer one is offered", await updateSays(),
-    ["Update now", "A new version is available. Your userscript manager updates it by itself on its own schedule. To do it now, press the button.", false]);
+check("Web K: a newer one is offered", await updateSays(), ["Update now", FOUND, false]);
 await clickOurs(k, ".update .button");
 check("Web K: and pressing it hands the header's @downloadURL to the manager, from the click", await k.evaluate(() => __gm.opened), [header("downloadURL")]);
 check("Web K: then says to confirm it there and reload", await updateSays(),
@@ -378,8 +388,8 @@ check("Web K: the feedback form comes over the settings as a popup over a popup:
     await motion(k), { settings: STILL, feedback: K_IN });
 check("Web K: the envelope opens the feedback form, over the settings", await ours(k, ".sheet .head h1"), ["AI Translate", "Support and feedback"]);
 check("Web K: as wide as Discord's default modal, 480px", await widthOf(k, "feedback"), 480);
-check("Web K: the early-build line names this script's version",
-    (await ours(k, `${form} .alpha`))[0], `This is ${await version()}, an early build. Rough edges are expected, and what you write here is what gets them fixed.`);
+check("Web K: the early-build line names the plugin's version",
+    (await ours(k, `${form} .alpha`))[0], `This is ${coreVersion()}, an early build. Rough edges are expected, and what you write here is what gets them fixed.`);
 check("Web K: and says the Telegram name goes with it, not the Discord one",
     (await ours(k, `${form} .hint`)).includes("Your Telegram name is attached so I can reply."), true);
 const sendable = () => k.evaluate(form => !__ours().querySelector(`${form} .button.primary`).disabled, form);
@@ -425,12 +435,12 @@ await k.evaluate(relay => {
 await clickOurs(k, `${form} .button.primary`);
 check("Web K: sent, it says so", await waitOurs(k, `${form} .result`, "Sent. Thank you."), true);
 check("Web K: and Send cannot be pressed twice", await sendable(), false);
-check("Web K: what reaches the relay: the form, the Telegram name and the client, this script's version and its core, and no key", await k.evaluate(async version => {
+check("Web K: what reaches the relay: the form, the Telegram name and the client, the build, and no key", await k.evaluate(async () => {
     const { images, ...rest } = __gm.relayed;
     return [rest, images.map(i => [i.name, i.type, i.data.length > 0]), JSON.stringify(__gm.relayed).includes("test-key")];
 }), [{
     subject: "Ошибка в Web K", message: "Перевод не пришёл", replyTo: "reader@example.org", discord: "", telegram: "Mozumi (4242)\nWeb K",
-    locale: "en", build: `${await version()} (${coreCommit()})`
+    locale: "en", build: `${coreVersion()} (${coreCommit()}-${buildCounter().counter})`
 }, [["shot.png", "image/png", true]], false]);
 await clickOurs(k, `${form} .centre .button`);
 check("Web K: or, Write on Discord opens the support server", await k.evaluate(() => __gm.opened.at(-1)), "https://discord.gg/HKRc9FfK43");
@@ -765,8 +775,8 @@ await fillOurs(a, `${form} input[name="subject"]`, "Ошибка в Web A");
 await fillOurs(a, `${form} textarea[name="message"]`, "Перевод не пришёл");
 await clickOurs(a, `${form} .button.primary`);
 await waitOurs(a, `${form} .result`, "Sent. Thank you.");
-check("Web A: the report names the Telegram user and the client, then this script's version and its core",
-    await a.evaluate(() => [__gm.relayed.telegram, __gm.relayed.build]), ["Mozumi (4242)\nWeb A", `${await version()} (${coreCommit()})`]);
+check("Web A: the report names the Telegram user and the client, then the build: the plugin's version, the core's commit and the counter",
+    await a.evaluate(() => [__gm.relayed.telegram, __gm.relayed.build]), ["Mozumi (4242)\nWeb A", `${coreVersion()} (${coreCommit()}-${buildCounter().counter})`]);
 
 await watchMotion(a, "feedback", "closing");
 await watchLeaving(a, "feedback");

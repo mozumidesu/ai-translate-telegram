@@ -17,7 +17,7 @@ import { postFeedback } from "../ai-translate/core/providers";
 import { theClient } from "./client";
 import { button, hint, openSheet } from "./sheet";
 import { addStyle, UI_ID } from "./ui";
-import { CORE, VERSION } from "./version";
+import { BUILD_NAME, VERSION } from "./version";
 
 /** This script's own source: what the GitHub link opens. */
 export const PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -385,7 +385,7 @@ export function openFeedback() {
                     telegram: telegramField(),
                     locale: currentLocale(),
                     images: shots,
-                    build: `${VERSION} (${CORE})`
+                    build: BUILD_NAME
                 });
 
                 answered = status;

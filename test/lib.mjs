@@ -9,7 +9,8 @@
  */
 
 import { execFileSync } from "child_process";
-import { mkdtemp, readFile } from "fs/promises";
+import { readFileSync } from "fs";
+import { mkdtemp } from "fs/promises";
 import { tmpdir } from "os";
 import { dirname, join, resolve } from "path";
 import { fileURLToPath } from "url";
@@ -45,14 +46,58 @@ export async function built(exports) {
         platform: "node",
         outfile: file,
         logLevel: "error",
-        define: { SCRIPT_VERSION: JSON.stringify(await version()), CORE_COMMIT: JSON.stringify(coreCommit()) }
+        define: { BUILD_COUNTER: String(buildCounter().counter), CORE_COMMIT: JSON.stringify(coreCommit()) }
     });
 
     return import(file);
 }
 
-/** This script's version, as build.mjs puts it in the header and the code. */
-export const version = async () => JSON.parse(await readFile(join(ROOT, "package.json"), "utf8")).version;
+/** Said once, plainly, and the build stops: a missing or broken input is not something to build around. */
+function stop(message) {
+    console.error(message);
+    process.exit(2);
+}
+
+/**
+ * The plugin's version, the one people see: ai-translate/core/version.ts's,
+ * read from the submodule as it is pinned. There is one, and nothing here
+ * raises it.
+ */
+export function coreVersion() {
+    let text = "";
+    try {
+        text = readFileSync(join(ROOT, "ai-translate", "core", "version.ts"), "utf8");
+    } catch {
+        // Said below, with the other way it can fail.
+    }
+
+    const found = /^export const VERSION = "([^"]+)";$/m.exec(text);
+    if (!found) stop("No VERSION in ai-translate/core/version.ts: is the core checked out (git submodule update --init), and does that file still say `export const VERSION = \"...\";`?");
+    return found[1];
+}
+
+/**
+ * build-counter.json: the counter, and the plugin version it was last raised
+ * for. A userscript manager offers an update only when the header's @version
+ * has grown, so the counter is raised by hand when a change must reach
+ * installed copies, and with every move of the plugin's version, and it
+ * never goes down (test/version.mjs says why).
+ */
+export function buildCounter() {
+    let kept;
+    try {
+        kept = JSON.parse(readFileSync(join(ROOT, "build-counter.json"), "utf8"));
+    } catch (e) {
+        stop(`build-counter.json cannot be read: ${e.message}`);
+    }
+
+    if (!Number.isInteger(kept?.counter) || kept.counter < 1 || typeof kept.version !== "string")
+        stop("build-counter.json is {\"counter\": a whole number from 1, \"version\": the plugin version it was raised for}.");
+    return kept;
+}
+
+/** What build.mjs writes as the header's @version, and what a manager compares: the plugin's version, then the counter. */
+export const headerVersion = () => `${coreVersion()}.${buildCounter().counter}`;
 
 let commit;
 
