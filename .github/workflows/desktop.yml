@@ -101,6 +101,8 @@ jobs:
       - name: Fetch the script and the core it pins
         run: |
           git init -q .
+          # As committed, on Windows too: the script inside the app is dist's, byte for byte.
+          git config core.autocrlf false
           git remote add origin "https://github.com/$GITHUB_REPOSITORY"
           git fetch -q --depth 1 origin "$GITHUB_SHA"
           git checkout -q FETCH_HEAD

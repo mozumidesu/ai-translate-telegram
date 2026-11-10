@@ -24,10 +24,11 @@ export const APP = "AI_TRANSLATE_APP";
 
 /** The lines of a script's header, by name: `all("match")` is every @match. */
 export function readHeader(script) {
-    const block = /\/\/ ==UserScript==\n([\s\S]*?)\/\/ ==\/UserScript==/.exec(script)?.[1];
+    // A checkout on Windows may have turned every line end into \r\n.
+    const block = /\/\/ ==UserScript==\r?\n([\s\S]*?)\/\/ ==\/UserScript==/.exec(script)?.[1];
     if (block === undefined) throw new Error("the script has no header");
 
-    const lines = [...block.matchAll(/^\/\/ @(\S+)(?:[ \t]+(.*))?$/gm)].map(([, name, value]) => [name, (value ?? "").trim()]);
+    const lines = [...block.matchAll(/^\/\/ @(\S+)(?:[ \t]+(.*?))?\r?$/gm)].map(([, name, value]) => [name, (value ?? "").trim()]);
     const all = name => lines.filter(([n]) => n === name).map(([, value]) => value);
     return { all, one: name => all(name)[0], has: name => all(name).length > 0 };
 }

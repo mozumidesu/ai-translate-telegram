@@ -141,7 +141,9 @@ Sign in as in a browser, by QR code or phone number. Everything under
 
 ## Where your data goes
 
-In a browser, with a userscript manager:
+The first of these is the browser's; the app's own is under
+[Where the app keeps your data](#where-the-app-keeps-your-data). The rest is
+the same in both.
 
 - **API keys and settings** stay in your userscript manager's storage on
   this device. Telegram's page cannot read them.

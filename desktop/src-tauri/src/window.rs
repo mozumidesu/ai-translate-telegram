@@ -23,6 +23,7 @@ const INJECT: &str = include_str!("../../gen/inject.js");
 
 /// The first window is `main`; one the client opens beside it is numbered.
 static OPENED: AtomicU32 = AtomicU32::new(0);
+const MOST: usize = 8;
 
 pub fn is_telegram(url: &Url) -> bool {
     url.scheme() == "https" && url.host_str() == Some("web.telegram.org") && url.port_or_known_default() == Some(443)
@@ -50,6 +51,11 @@ pub fn open(app: &AppHandle, address: Option<&str>, link: Option<&Url>) -> Resul
     if let Some(link) = link {
         // As t.me hands a link to the web client: in the hash, as tgaddr.
         url.set_fragment(Some(&format!("?tgaddr={}", url::form_urlencoded::byte_serialize(link.as_str().as_bytes()).collect::<String>())));
+    }
+
+    // "Open in new window" is pressed by a person, a few times. A page that asks without end is not answered.
+    if app.webview_windows().len() >= MOST {
+        return Err("as many windows as there may be are open".into());
     }
 
     let label = match OPENED.fetch_add(1, Ordering::Relaxed) {
