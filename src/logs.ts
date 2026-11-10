@@ -134,7 +134,7 @@ export function logsRow() {
         open.textContent = label();
     }), { wide: true });
 
-    // The one place a person can read which version they run: this script's, not the Discord plugin's.
+    // The one place a person can read which version they run: the plugin's, with no build counter.
     box.append(open, hint(`AI Translate · ${VERSION}`));
     return box;
 }
