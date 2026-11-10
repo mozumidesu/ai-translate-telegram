@@ -75,8 +75,8 @@ jobs:
 
   build:
     needs: draft
-    # Without a tag there is no draft, and the build goes ahead all the same.
-    if: always() && (needs.draft.result == 'success' || needs.draft.result == 'skipped')
+    # Without a tag there is no draft, and the build goes ahead all the same. Not always(): that one cannot be cancelled.
+    if: ${{ !cancelled() && (needs.draft.result == 'success' || needs.draft.result == 'skipped') }}
     strategy:
       fail-fast: false
       matrix:
