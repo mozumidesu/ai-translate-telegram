@@ -1,6 +1,6 @@
 {
   "name": "ai-translate-telegram",
-  "version": "0.2.2a",
+  "version": "0.2.3a",
   "private": true,
   "description": "AI Translate as a userscript for Telegram Web, both clients. Unofficial.",
   "license": "GPL-3.0-or-later",

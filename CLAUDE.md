@@ -31,7 +31,7 @@ message's menu.
   `dist/` on `main`. The build is deterministic; `test/dist.mjs` fails when
   `npm run build` was forgotten. The version is `package.json`'s, raised when
   a change should reach installed copies. It has the plugin's shape, three
-  numbers and a stage letter, `a` while this is early (`0.2.2a`), which
+  numbers and a stage letter, `a` while this is early (`0.2.3a`), which
   `test/version.mjs` holds it to. Edit it by hand: `npm version` turns the
   letter into `-a`.
 
@@ -83,7 +83,9 @@ tsc --noEmit --strict --target es2022 --module esnext --moduleResolution bundler
 ```
 
 esbuild strips types without reading them; the `tsc` line reads them. Only
-`ai-translate/core/bridge.ts` may complain there, about Vencord's globals.
+the core's Vencord side may complain there: `ai-translate/core/bridge.ts`
+about Vencord's globals, and `ai-translate/native.ts`, which the bridge takes
+its types from, about Node's and Electron's.
 
 `test/page.mjs` needs Playwright's Chromium; without it, it skips unless
 `REQUIRE_BROWSER` is set, as CI sets it. A cloud session cannot sign in to

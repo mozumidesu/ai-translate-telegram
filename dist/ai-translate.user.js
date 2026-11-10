@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.2a
+// @version         0.2.3a
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -3833,6 +3833,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     return result;
   }
 
+  // ai-translate/core/version.ts
+  var VERSION = "0.2.1a";
+
   // ai-translate/core/bridge.ts
   function desktop() {
     try {
@@ -3846,10 +3849,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   function browserBuild() {
     const userscript = typeof IS_USERSCRIPT !== "undefined" && IS_USERSCRIPT;
     const extension = typeof IS_EXTENSION !== "undefined" && IS_EXTENSION;
+    const kind = userscript ? "userscript " : extension ? "extension " : "";
     const testing = BROWSER_CHANNEL === "testing" ? " testing" : "";
-    if (userscript) return `userscript ${BROWSER_BUILD}${testing}`;
-    if (extension) return `extension ${BROWSER_BUILD}${testing}`;
-    return `${BROWSER_BUILD}${testing}`;
+    return `${VERSION} (${kind}${BROWSER_BUILD}${testing})`;
   }
   var isPublishedUserscript = () => typeof IS_USERSCRIPT !== "undefined" && IS_USERSCRIPT && (BROWSER_CHANNEL === "release" || BROWSER_CHANNEL === "testing");
   var Bridge = {
@@ -4202,6 +4204,8 @@ ${" ".repeat(21)}${e.detail}` : head;
   var SHORT_NAME = /(?<![\p{L}\p{N}])(?:tik|ig|insta|fb|tw|twt|yt|sc|snap|dc|tg|vk|wa)(?![\p{L}\p{N}])/iu;
   var FRAGMENT_CASE_RULE = "A question mark ends a sentence, and grammar does not reach across it. A fragment with no verb of its own takes the case of the question word it answers, or the nominative when it answers none, and never a case that a verb in the sentence before or after it would give.";
   var SEVERAL_SENTENCES = /[.?!…？！。]\s+\S|\n\s*\S/u;
+  var CALLING_RULE = 'With a pronoun and a name straight after it, Russian "знать" is a slip for "звать", a letter away: "все знали её Маша" means "все звали её Маша", what she is called. Translate a verb of calling, never one of knowing: the pronoun is that person and the name the one they go by, never someone else.';
+  var KNOWN_BY_NAME = /(?<![\p{L}\p{N}])зна(?:ть|л|ла|ло|ли)\s+(?:меня|тебя|его|её|ее|нас|вас|их)\s+(?=\p{Lu}|\p{Script=Latin})/u;
   var ARABIC_COURTESY = 'Arabic عفوا is both "sorry" and "you are welcome": where the rest of the message says "my pleasure", the word before it is the answer to thanks, not an apology.';
   var VIETNAMESE_NEGATION = 'Vietnamese says no with a frame rather than with one word: "có … đâu" and "… gì đâu" around a verb deny it — "có cập nhật đâu" is "nothing was updated", not a question — and a final "đâu" is a denial, not "where".';
   function messageRules(kind, text, has) {
@@ -4214,6 +4218,7 @@ ${" ".repeat(21)}${e.detail}` : head;
       SHORT_NAME.test(plain) ? SHORT_NAMES_RULE : "",
       has.address ? ADDRESS_RULE : "",
       has.declines && SEVERAL_SENTENCES.test(plain) ? FRAGMENT_CASE_RULE : "",
+      KNOWN_BY_NAME.test(plain) ? CALLING_RULE : "",
       kind === "received" && has.vietnamese ? VIETNAMESE_NEGATION : "",
       has.arabic ? ARABIC_COURTESY : ""
     ].filter(Boolean);
@@ -5955,8 +5960,8 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/version.ts
-  var VERSION = "0.2.2a";
-  var CORE = "59d38e7";
+  var VERSION2 = "0.2.3a";
+  var CORE = "09710da";
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -6117,7 +6122,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         let answered = 0;
         const alpha = document.createElement("p");
         alpha.className = "alpha";
-        alpha.textContent = t("feedback.alpha", { version: VERSION });
+        alpha.textContent = t("feedback.alpha", { version: VERSION2 });
         const head = document.createElement("div");
         head.className = "feedback-head";
         const badge = document.createElement("div");
@@ -6255,7 +6260,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
             telegram: telegramField(),
             locale: currentLocale(),
             images: shots,
-            build: `${VERSION} (${CORE})`
+            build: `${VERSION2} (${CORE})`
           });
           answered = status;
           state = status >= 200 && status < 300 ? "sent" : "failed";
@@ -6421,7 +6426,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const open2 = button(label(), () => openLogs(() => {
       open2.textContent = label();
     }), { wide: true });
-    box2.append(open2, hint(`AI Translate · ${VERSION}`));
+    box2.append(open2, hint(`AI Translate · ${VERSION2}`));
     return box2;
   }
 
@@ -6491,7 +6496,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
       phase = "checking";
       draw2();
       try {
-        phase = isNewer(await newestVersion(), VERSION) ? "found" : "current";
+        phase = isNewer(await newestVersion(), VERSION2) ? "found" : "current";
       } catch {
         phase = "offline";
       }
