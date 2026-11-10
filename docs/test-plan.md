@@ -233,6 +233,122 @@ Context is off: confirm on the settings page. Switch it on, send a short reply s
 as "да" after a question; the translation fits the question. Switch it off
 again if you do not want other people's messages sent to the provider.
 
+## 14. The desktop app
+
+The app, not the script in a browser: Windows, macOS and Linux, each once.
+What a cloud session did already: it built the Linux app, started it under a
+display nobody watches and let it load the real `web.telegram.org/a/` up to
+the sign-in screen, with the script's hook in front of the worker
+(`node test/app.mjs`). Everything from signing in on is yours.
+
+The installers are in a release's Assets. A tag makes a **draft** release,
+which only you see: try from the draft, then publish it.
+
+### 14.1 Install
+
+1. **Windows**: run `AI-Translate_…_windows_x64-setup.exe`. SmartScreen says
+   "Windows protected your PC": *More info*, then *Run anyway*. The
+   installer asks for no administrator. The Start menu has **AI Translate**,
+   with our purple icon, and nothing named Telegram.
+2. **macOS**: open `AI-Translate_…_macos_universal.dmg`, drag the app to
+   Applications. Right-click it, *Open*, and *Open* again. On macOS 15 or
+   later there is no Open in that window: close it, then System Settings,
+   Privacy & Security, *Open Anyway*. It must never say the app "is damaged".
+   Try it on an Apple silicon Mac and, if you have one, an Intel one.
+3. **Linux**: `chmod +x AI-Translate_…_linux_x86_64.AppImage` and run it. On
+   another machine or account, `sudo apt install ./AI-Translate_…_linux_amd64.deb`
+   and start **AI Translate** from the applications menu.
+4. The window opens on Telegram's sign-in screen, titled **AI Translate**. On
+   a Mac the three window buttons sit inside Telegram's own header, level
+   with it, not over anything.
+
+### 14.2 Sign in and send
+
+1. Sign in by QR code from the phone. Close the app and open it again: you
+   are still signed in.
+2. A translate button is in the chat bar. Left-click it, *All plugin
+   settings*, pick Groq, paste the key. No dialog asks to allow an address,
+   as a userscript manager would: the model list loads by itself.
+3. Close the app and open it again: the key is still there. The file
+   `values.json` is in the data folder (`%APPDATA%\io.github.mozumidesu.aitranslate`,
+   `~/Library/Application Support/io.github.mozumidesu.aitranslate`,
+   `~/.local/share/io.github.mozumidesu.aitranslate`); on macOS and Linux
+   `ls -l` shows it as `-rw-------`.
+4. Switch a chat with your second account on and send `привет, как дела?`:
+   it goes in English. Sections 3, 5 and 8 of this plan, once each, here.
+5. Right-click a message, **AI Translate**: the card shows the translation.
+6. In Telegram's own menu, press *Reload* if it offers an update of
+   Telegram Web, or sign out and in again: afterwards the key and the chat
+   you switched on are still there. (The page starts again with the values
+   the window was made with and asks the app for the newer ones; this is the
+   step that would show it going wrong.)
+7. Type an address under *Any OpenAI-compatible*, such as
+   `http://localhost:11434/v1` with Ollama running, or OpenRouter's with its
+   key: the model list loads from it.
+
+### 14.3 Notifications and the tray
+
+1. Minimise the window. From the second account, send a message: the
+   system's own notification arrives, with the sender's name and the text,
+   under the name **AI Translate**. On Windows and macOS allow notifications
+   for the app if the system asks. Press the notification: nothing breaks.
+2. While that message is unread: the tray icon has a red dot (Windows,
+   Linux), the Dock icon a number (macOS), the taskbar button a dot
+   (Windows). Read the message: they go.
+3. Left-click the tray icon: the window comes to the front. Its menu has
+   **AI Translate** and *All plugin settings*, in the language of the
+   settings, and the second opens the settings page.
+4. Close the window. Windows and Linux: the app is gone, tray icon and all.
+   macOS: it stays in the Dock, and a click on the Dock icon brings the
+   window back; ⌘Q leaves.
+5. Start the app a second time while it is running: no second window, the
+   first one comes to the front.
+
+### 14.4 Links
+
+1. Press a link to another site in a chat: it opens in your browser, and the
+   app stays on Telegram.
+2. Right-click a chat in the list, *Open in new window*: a second window of
+   the app opens on that chat. Change a setting in one window and send in a
+   switched-on chat from the other: the change is already there.
+3. In a browser, open `tg://resolve?domain=telegram` (type it in the address
+   bar). The system offers AI Translate, or opens it, and the app shows the
+   Telegram channel. With the app not running, the same link starts it and
+   it opens there. With Telegram Desktop installed too, note which of the
+   two the system chose.
+4. Open a bot that has a web app (@DurgerKingBot will do) and press its
+   button: the web app opens inside Telegram's own window, as in a browser.
+5. A voice message plays. Record one: the system asks for the microphone
+   once, naming AI Translate, and it is sent. On Linux from the AppImage,
+   note whether sound plays at all.
+
+### 14.5 Update from one release to the next
+
+This needs the secret `TAURI_SIGNING_PRIVATE_KEY` in the repository, and two
+releases: publish the first (say `v0.3.0a`), install it everywhere, then
+raise the version, tag the second and publish it.
+
+1. Start the first one while the second is the latest release. Within a
+   minute it closes and starts again by itself; on Windows a small installer
+   window passes by. Settings, the line under Logs: the new version. You are
+   still signed in and the key is still there.
+2. From the `.deb` nothing happens by itself. Settings, *Check for updates*:
+   the button turns to *Update now* with "AI Translate · " and the new
+   version beside it. Press it: the system asks for your password, the button
+   reads *Updating…*, and the app starts again as the new version.
+3. With the newest installed: *Check for updates* says "You have the latest
+   version." With the network off: "Could not reach GitHub…", in red.
+4. A release published without the secret has no `latest.json`: the first
+   app says "You have the latest version." and stays as it is. That is the
+   workflow's warning, seen from the other side.
+
+### 14.6 Nothing looks different to anyone else
+
+As in section 11, from the second account: no warning about an unofficial
+or third-party app, no "via" line. On the phone, Settings → Devices: the
+session reads as Telegram Web, as a browser's does, with the system's
+webview as the browser (Edge on Windows, Safari on macOS and Linux).
+
 Write down for each step: client, browser, manager, and pass or what
-happened. Logs, at the foot of the settings page, Copy, is what to attach when something fails
+happened. For section 14: system and its version, and which installer. Logs, at the foot of the settings page, Copy, is what to attach when something fails
 without saying why.

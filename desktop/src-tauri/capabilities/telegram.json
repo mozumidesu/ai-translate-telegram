@@ -1,0 +1,30 @@
+{
+    "$schema": "../gen/schemas/desktop-schema.json",
+    "identifier": "telegram",
+    "description": "What a page at web.telegram.org may ask of the app, and nothing more: the userscript manager's commands and the updater's (gm_*, app_update_*), and what Telegram's own client asks of a desktop host, as it asks Telegram Air. No other page is granted anything. The whole origin and not /a/ alone: a call that arrives over Tauri's own protocol names its origin and no path.",
+    "local": false,
+    "remote": {
+        "urls": ["https://web.telegram.org/*"]
+    },
+    "windows": ["*"],
+    "permissions": [
+        "allow-gm-values",
+        "allow-gm-set-value",
+        "allow-gm-request",
+        "allow-gm-abort",
+        "allow-gm-menu-command",
+        "allow-app-update-check",
+        "allow-app-update-install",
+        "allow-mark-title-bar-overlay",
+        "allow-set-notifications-count",
+        "allow-set-window-title",
+        "allow-open-new-window-cmd",
+        "core:event:default",
+        "core:window:allow-is-fullscreen",
+        "core:window:allow-start-dragging",
+        "notification:allow-is-permission-granted",
+        "notification:allow-request-permission",
+        "notification:allow-notify",
+        "shell:allow-open"
+    ]
+}

@@ -1,0 +1,21 @@
+# AI Translate, the desktop app: the bridge on its own, and the app around it.
+#
+# bridge/ is plain Rust with no window in it, so its tests run anywhere in
+# seconds. src-tauri/ is the app, which needs a webview to build against.
+
+[workspace]
+resolver = "2"
+members = ["bridge", "src-tauri"]
+
+[workspace.package]
+edition = "2021"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/mozumidesu/ai-translate-telegram"
+authors = ["mozumidesu"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+panic = "abort"
+strip = true

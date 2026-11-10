@@ -1,0 +1,45 @@
+[package]
+name = "ai-translate-desktop"
+# The version people see is package.json's, which reaches the app through ../version.json.
+version = "0.0.0"
+description = "AI Translate: the official Telegram Web in a window, with the userscript in it. Unofficial."
+publish = false
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+name = "ai_translate_desktop"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ai-translate"
+path = "src/main.rs"
+
+[features]
+# For test/app.mjs alone: lets a test read what happened inside the page. Never in a release.
+probe = []
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+ai-translate-bridge = { path = "../bridge" }
+log = "0.4"
+reqwest = { version = "0.13", default-features = false, features = ["rustls-no-provider", "http2", "gzip", "system-proxy"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2.12", features = ["tray-icon", "image-png"] }
+tauri-plugin-deep-link = "2.6"
+tauri-plugin-notification = "2.8"
+tauri-plugin-shell = "2.6"
+tauri-plugin-single-instance = { version = "2.5", features = ["deep-link"] }
+tauri-plugin-updater = "2.14"
+tauri-plugin-window-state = "2.5"
+tokio = { version = "1", features = ["sync", "macros", "time"] }
+url = "2"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+os_info = { version = "3", default-features = false }

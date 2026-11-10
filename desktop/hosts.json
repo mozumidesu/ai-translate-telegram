@@ -1,0 +1,13 @@
+{
+    "providers": [
+        "api.groq.com",
+        "api.z.ai",
+        "generativelanguage.googleapis.com",
+        "api.anthropic.com"
+    ],
+    "update": {
+        "host": "raw.githubusercontent.com",
+        "under": "/mozumidesu/ai-translate-telegram/"
+    },
+    "feedback": "ai-translate-feedback.mozumidesu.workers.dev"
+}

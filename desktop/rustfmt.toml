@@ -1,0 +1,3 @@
+# Lines as long as the script's own.
+max_width = 160
+use_small_heuristics = "Max"

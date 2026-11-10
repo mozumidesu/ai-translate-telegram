@@ -6431,6 +6431,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
   }
 
   // src/update.ts
+  var app = typeof AI_TRANSLATE_APP !== "undefined" ? AI_TRANSLATE_APP : void 0;
   var DIST = "https://raw.githubusercontent.com/mozumidesu/ai-translate-telegram/main/dist";
   var META_URL = `${DIST}/ai-translate.meta.js`;
   var SCRIPT_URL = `${DIST}/ai-translate.user.js`;
@@ -6465,6 +6466,7 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     idle: () => t("update.check"),
     checking: () => t("update.checking"),
     found: () => t("update.browserInstall"),
+    installing: () => t("update.installing"),
     opened: () => t("update.reload"),
     current: () => t("update.check"),
     offline: () => t("update.check")
@@ -6479,14 +6481,30 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const box2 = document.createElement("div");
     box2.className = "foot update";
     let phase = "idle";
+    let found = "";
     const said = hint();
     const draw2 = () => {
       go.textContent = LABEL[phase]();
-      go.disabled = phase === "checking";
-      said.textContent = NOTE[phase]?.() ?? "";
+      go.disabled = phase === "checking" || phase === "installing";
+      said.textContent = app && phase === "found" ? `AI Translate · ${found}` : NOTE[phase]?.() ?? "";
       said.classList.toggle("bad", phase === "offline");
     };
+    const runInApp = async (app2) => {
+      const installing = phase === "found";
+      phase = installing ? "installing" : "checking";
+      draw2();
+      try {
+        if (installing) await app2.install();
+        found = await app2.newest() ?? "";
+        phase = found ? "found" : "current";
+        if (installing && found) phase = "offline";
+      } catch {
+        phase = "offline";
+      }
+      draw2();
+    };
     const run = async () => {
+      if (app) return runInApp(app);
       if (phase === "opened") return location.reload();
       if (phase === "found") {
         if (!window.open(SCRIPT_URL, "_blank")) location.assign(SCRIPT_URL);

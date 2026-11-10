@@ -11,16 +11,22 @@
  * change. Beside the script goes its header on its own, which is what a
  * userscript manager reads to decide whether there is an update.
  *
+ * The desktop app is built from the same script: desktop/gen/inject.js is the
+ * script as the app runs it (desktop/assemble.mjs), and desktop/version.json
+ * is the version as an installer wants it written. With --out, both go there.
+ *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { mkdir, readFile, writeFile } from "fs/promises";
 import { dirname, isAbsolute, join } from "path";
 import { fileURLToPath } from "url";
+import { assemble, toSemver } from "./desktop/assemble.mjs";
 import { coreCommit, findEsbuild } from "./test/lib.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const out = process.argv.find(a => a.startsWith("--out="))?.slice("--out=".length) ?? join(here, "dist");
+const elsewhere = process.argv.find(a => a.startsWith("--out="))?.slice("--out=".length);
+const out = elsewhere ?? join(here, "dist");
 
 const esbuild = await findEsbuild();
 const { version } = JSON.parse(await readFile(join(here, "package.json"), "utf8"));
@@ -59,5 +65,12 @@ await mkdir(out, { recursive: true });
 const script = built.outputFiles[0].text;
 await writeFile(join(out, "ai-translate.user.js"), script);
 await writeFile(join(out, "ai-translate.meta.js"), header);
+
+// The app's two: the script as it runs it, which git does not keep, and its version, which it does.
+const shim = await readFile(join(here, "desktop", "shim.js"), "utf8");
+const gen = elsewhere ?? join(here, "desktop", "gen");
+await mkdir(gen, { recursive: true });
+await writeFile(join(gen, "inject.js"), assemble({ shim, script }));
+await writeFile(join(elsewhere ?? join(here, "desktop"), "version.json"), JSON.stringify({ version: toSemver(version) }) + "\n");
 
 console.log(`AI Translate for Telegram ${version} (${core}): ${Math.round(script.length / 1024)} KB`);

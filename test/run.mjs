@@ -12,7 +12,7 @@ import { spawnSync } from "child_process";
 import { join } from "path";
 import { ROOT } from "./lib.mjs";
 
-const TESTS = ["formatted", "weba", "webk", "defaults", "strings", "version", "dist", "page"];
+const TESTS = ["formatted", "weba", "webk", "defaults", "strings", "version", "dist", "shim", "desktop", "page"];
 
 const failed = [];
 for (const name of TESTS) {

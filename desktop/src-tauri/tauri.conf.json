@@ -1,0 +1,57 @@
+{
+    "$schema": "https://schema.tauri.app/config/2",
+    "productName": "AI Translate",
+    "identifier": "io.github.mozumidesu.aitranslate",
+    "version": "../version.json",
+    "app": {
+        "windows": [],
+        "security": {
+            "csp": null
+        }
+    },
+    "bundle": {
+        "active": true,
+        "targets": ["nsis", "app", "dmg", "appimage", "deb"],
+        "createUpdaterArtifacts": false,
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "category": "SocialNetworking",
+        "publisher": "mozumidesu",
+        "homepage": "https://github.com/mozumidesu/ai-translate-telegram",
+        "license": "GPL-3.0-or-later",
+        "licenseFile": "../../LICENSE",
+        "shortDescription": "Unofficial. The official Telegram Web with AI Translate in it",
+        "longDescription": "Unofficial: not made, checked or endorsed by Telegram. The official Telegram Web in a window of its own, with AI Translate: your messages translated before they are sent, and other people's when you ask, with an AI provider and your own API key.",
+        "macOS": {
+            "signingIdentity": "-",
+            "minimumSystemVersion": "10.15"
+        },
+        "windows": {
+            "nsis": {
+                "installMode": "currentUser"
+            }
+        }
+    },
+    "plugins": {
+        "deep-link": {
+            "desktop": {
+                "schemes": ["tg"]
+            }
+        },
+        "shell": {
+            "open": true
+        },
+        "updater": {
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IERFODg1QkIwQjhFNTlBRkYKUldUL211VzRzRnVJM2xmWXdoKzVXa0EySmF1TUh5eXovZ29kdjZKS3F5ODBreTFCcFhJSk1Jc08K",
+            "endpoints": ["https://github.com/mozumidesu/ai-translate-telegram/releases/latest/download/latest.json"],
+            "windows": {
+                "installMode": "passive"
+            }
+        }
+    }
+}
