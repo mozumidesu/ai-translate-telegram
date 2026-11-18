@@ -13,6 +13,13 @@ declare const unsafeWindow: Window | undefined;
 /** What the client's own code sees as its window. */
 export const page: any = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
 
+/** Whether the person is typing into a field other than the chat box: a message put back then waits, and takes no focus. */
+export function typingElsewhere(isBox: (element: Element) => boolean) {
+    const active = typeof document === "undefined" ? undefined : document.activeElement as HTMLElement | null | undefined;
+    if (!active || active === document.body || isBox(active)) return false;
+    return active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
+}
+
 /** Web A lives under /a/, Web K under /k/; anything else is neither. */
 export type Client = "a" | "k";
 

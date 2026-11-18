@@ -289,6 +289,22 @@ check("Web K: a message that could not be translated is not sent", await k.evalu
 check("Web K: and is back in the chat box", await k.evaluate(() => __k.restored.map(r => r.text)), ["не переводится"]);
 check("Web K: and the reason is shown", await waitOurs(k, ".toast.bad"), true);
 
+// The next message typed while the first was translated: the box cannot take the first back yet, and it waits.
+await k.evaluate(async () => {
+    __gm.reply = () => 401;
+    __k.calls.length = 0;
+    __k.restored.length = 0;
+    await __k.type("первое, не переведётся");
+    __k.appImManager.chat.input.messageInputField.input.value = "второе";
+});
+await k.waitForTimeout(1500);
+check("Web K: a message held back while the next one is typed is not put over it", await k.evaluate(() => __k.restored.length), 0);
+await k.evaluate(() => {
+    __k.appImManager.chat.input.messageInputField.input.value = "";
+});
+await k.waitForFunction(() => __k.restored.length > 0, null, { timeout: 5000 }).catch(() => { });
+check("Web K: and goes back into the box once it is empty", await k.evaluate(() => __k.restored.map(r => r.text)), ["первое, не переведётся"]);
+
 await settled(k);
 await watchMotion(k, "chat", "open");
 await k.click(".ai-translate-button");
@@ -616,6 +632,8 @@ check("Web K: and AI Learn's stays", await noteUnder(k, learntAt).then(n => n?.[
 
 // --- Web A
 
+// Shut first: both clients are one origin and their tabs share one channel, so Web K's would take Web A's held messages.
+await k.close();
 const a = await context.newPage();
 await a.goto("https://web.telegram.org/a/");
 await a.waitForFunction(() => window.__a);
@@ -752,6 +770,24 @@ await a.waitForFunction(() => document.getElementById("editable-message-text").t
 check("Web A: a message that could not be translated never reaches the worker", await a.evaluate(() => __a.echoes.length), 0);
 check("Web A: the app is told the call is over", await a.evaluate(() => __a.answers.some(d => d.payloads?.[0]?.messageId === "m9")), true);
 check("Web A: and the text is back in the chat box", await a.evaluate(() => document.getElementById("editable-message-text").textContent), "не переводится");
+
+// Another chat opened while the message was translated: its box is not that chat's, so the text waits for its own.
+const box = () => a.evaluate(() => document.getElementById("editable-message-text").textContent);
+await a.evaluate(() => {
+    document.getElementById("editable-message-text").textContent = "";
+    __a.echoes.length = 0;
+    __a.worker.postMessage({
+        payloads: [{ messageId: "m10", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "пока не переведётся", wasDrafted: false }] }]
+    });
+    location.hash = "#777000";
+});
+await a.waitForTimeout(1500);
+check("Web A: a message held back after another chat was opened is not put into that chat's box", await box(), "");
+await a.evaluate(() => {
+    location.hash = "#-1001234567890";
+});
+await a.waitForFunction(() => document.getElementById("editable-message-text").textContent, null, { timeout: 5000 }).catch(() => { });
+check("Web A: and goes back into its own chat's box once that chat is open again", await box(), "пока не переведётся");
 
 // The report from Web A, once the worker has said who the person is.
 await a.evaluate(relay => {

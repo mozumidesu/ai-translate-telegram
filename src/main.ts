@@ -13,6 +13,7 @@ import { useHost } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
 import { type TelegramClient, useClient } from "./client";
 import { installComposerButton } from "./composer";
+import { taken } from "./held";
 import { telegramHost } from "./host";
 import { installMenu } from "./menu";
 import { installNotes } from "./notes";
@@ -20,8 +21,8 @@ import { whichClient } from "./page";
 import { onWord, seen, tellOthers } from "./relay";
 import { openSettings } from "./settings";
 import { toast } from "./ui";
-import { setRestoreElsewhere as restoreFromA, webA } from "./weba";
-import { setRestoreElsewhere as restoreFromK, webK } from "./webk";
+import { webA } from "./weba";
+import { webK } from "./webk";
 
 declare const GM_registerMenuCommand: ((name: string, run: () => void) => unknown) | undefined;
 
@@ -40,14 +41,11 @@ if (client) {
         console.error("[AI Translate]", e);
     }
 
-    // A message held back in the tab that sends goes back into the box of the tab it was typed in.
-    const elsewhere = (chatId: string, text: string, entities: any[]) => tellOthers({ type: "restore", chatId, text, entities });
-    restoreFromA(elsewhere);
-    restoreFromK(elsewhere);
-
     onWord(word => {
         if (word.type === "notice" && seen()) toast(word.text, word.kind);
-        if (word.type === "restore") client.restore(word.chatId, word.text, word.entities);
+        // A message held back in the tab that sends goes back into the box of whichever tab can take it.
+        if (word.type === "restore" && client.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
+        if (word.type === "restored") taken(word.id);
     });
 
     const start = () => {

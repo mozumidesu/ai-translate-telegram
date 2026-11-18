@@ -22,8 +22,9 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
+import { giveBack } from "./held";
 import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
-import { page } from "./page";
+import { page, typingElsewhere } from "./page";
 
 // --- entities, as the layer writes them
 
@@ -320,19 +321,11 @@ function whenProxy(found: (proxy: any) => void) {
     }
 }
 
-let tellRestore: Restore = () => { };
-/** How a message held back here reaches the chat box of another tab, set by main.ts. */
-export const setRestoreElsewhere = (restore: Restore) => {
-    tellRestore = restore;
-};
-
 export const webK: TelegramClient = {
     name: "k",
 
     install() {
-        whenProxy(proxy => wrapInvoke(proxy, (chatId, text, entities) => {
-            if (!webK.restore(chatId, text, entities)) tellRestore(chatId, text, entities);
-        }, patchWhenReachable));
+        whenProxy(proxy => wrapInvoke(proxy, (chatId, text, entities) => giveBack(webK, chatId, text, entities), patchWhenReachable));
 
         if (!patchWhenReachable()) {
             const timer = setInterval(() => patchWhenReachable() && clearInterval(timer), 250);
@@ -460,6 +453,7 @@ export const webK: TelegramClient = {
 
         const editor = input.messageInputEditor;
         if (editor && !editor.isEmpty?.()) return false;
+        if (typingElsewhere(element => !!element.closest(".chat-input"))) return false;
 
         try {
             if (typeof editor?.replaceAllText === "function") return editor.replaceAllText(text, entities.map(toK)) !== false;

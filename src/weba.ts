@@ -19,8 +19,9 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
+import { giveBack } from "./held";
 import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
-import { page } from "./page";
+import { page, typingElsewhere } from "./page";
 
 // --- entities, as Web A writes them (src/api/types/messages.ts)
 
@@ -167,8 +168,8 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
                 return payload;
             }
 
-            // An edit that did not go leaves the message as it was; a new one goes back into the box.
-            if (!found.edit && payload.name === "sendMessage") restore(found.chatId, found.text, found.entities);
+            // An edit that did not go leaves the message as it was; a new one goes back into the box, a paid one drawn first too.
+            if (!found.edit) restore(found.chatId, found.text, found.entities);
             return undefined;
         }
     };
@@ -324,7 +325,7 @@ export const webA: TelegramClient = {
             construct(target, args, newTarget) {
                 const worker = Reflect.construct(target, args, newTarget);
                 try {
-                    watchWorker(worker, (chatId, text, entities) => webA.restore(chatId, text, entities) || tellRestore(chatId, text, entities), readAnswer);
+                    watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
                 } catch (e) {
                     console.error("[AI Translate]", e);
                 }
@@ -426,7 +427,7 @@ export const webA: TelegramClient = {
 
         const box = document.querySelector<HTMLElement>(".messages-layout .Transition_slide-active #editable-message-text")
             ?? document.querySelector<HTMLElement>("#editable-message-text");
-        if (!box || (box.textContent ?? "").trim()) return false;
+        if (!box || (box.textContent ?? "").trim() || typingElsewhere(element => element === box)) return false;
 
         box.focus();
         // The editor takes typing from the browser's own command, as it would from the keyboard.
@@ -434,8 +435,3 @@ export const webA: TelegramClient = {
     }
 };
 
-let tellRestore: Restore = () => { };
-/** How a message held back here reaches the chat box of another tab, set by main.ts. */
-export const setRestoreElsewhere = (restore: Restore) => {
-    tellRestore = restore;
-};

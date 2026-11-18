@@ -13,7 +13,8 @@ import type { Entity } from "./formatted";
 
 export type Word =
     | { type: "notice"; text: string; kind: "message" | "failure"; }
-    | { type: "restore"; chatId: string; text: string; entities: Entity[]; };
+    | { type: "restore"; id: string; chatId: string; text: string; entities: Entity[]; }
+    | { type: "restored"; id: string; };
 
 const listeners = new Set<(word: Word) => void>();
 

@@ -215,6 +215,12 @@ check("the app's own promise is settled with nothing", answered.at(-1)?.payloads
 check("the text goes back into the chat box", restored, [{ chatId: A.chat.id, text: "не переводится", entities: [] }]);
 check("and the person is told why", notices.length > 0 && notices[0][0], "failure");
 
+reset();
+provider.reply = () => 401;
+worker.postMessage({ payloads: [A.paidLocal("платное не переводится")] });
+await settle();
+check("a paid message held back goes back into the box too: Web A sends nothing on after it", restored.map(r => r.text), ["платное не переводится"]);
+
 // Held once by a busy provider, the same text sent again once it answers goes, translated.
 reset();
 provider.reply = () => 429;

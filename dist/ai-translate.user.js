@@ -3268,6 +3268,48 @@
     return on;
   }
 
+  // src/relay.ts
+  var listeners = /* @__PURE__ */ new Set();
+  var channel = (() => {
+    try {
+      return typeof BroadcastChannel === "function" ? new BroadcastChannel("ai-translate-telegram") : void 0;
+    } catch {
+      return void 0;
+    }
+  })();
+  if (channel) channel.onmessage = (event) => {
+    for (const listener of listeners) listener(event.data);
+  };
+  var onWord = (listener) => {
+    listeners.add(listener);
+  };
+  function tellOthers(word) {
+    try {
+      channel?.postMessage(word);
+    } catch {
+    }
+  }
+  var seen = () => typeof document === "undefined" || document.visibilityState !== "hidden";
+
+  // src/held.ts
+  var waiting = [];
+  var tab = Math.random().toString(36).slice(2);
+  var next = 0;
+  function giveBack(client2, chatId, text, entities) {
+    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities });
+    offerHeld(client2);
+  }
+  function offerHeld(client2) {
+    for (const kept2 of [...waiting]) {
+      if (client2.restore(kept2.chatId, kept2.text, kept2.entities)) taken(kept2.id);
+      else tellOthers({ type: "restore", ...kept2 });
+    }
+  }
+  function taken(id2) {
+    const at = waiting.findIndex((kept2) => kept2.id === id2);
+    if (at !== -1) waiting.splice(at, 1);
+  }
+
   // src/icons.ts
   var SVG = "http://www.w3.org/2000/svg";
   function icon(viewBox, d, size) {
@@ -3372,10 +3414,10 @@
           i++;
           continue;
         }
-        const next = text[i + 1] ?? "";
+        const next2 = text[i + 1] ?? "";
         const prev = i > lineStart ? text[i - 1] : "";
         const atLineStart = chat.lineStart.test(text.slice(lineStart, i));
-        const opens = (atLineStart || /\s/.test(prev) || OPENERS.has(prev)) && next !== "" && next !== "\n" && !chat.escapes.has(next) && (!/\s/.test(next) || atLineStart);
+        const opens = (atLineStart || /\s/.test(prev) || OPENERS.has(prev)) && next2 !== "" && next2 !== "\n" && !chat.escapes.has(next2) && (!/\s/.test(next2) || atLineStart);
         if (!opens) {
           i++;
           continue;
@@ -3428,10 +3470,10 @@
     return spans;
   }
   var NOT_WORDS = /https?:\/\/\S+|www\.\S+|<[^>\s]+>|:[\w~-]+:/g;
-  function findWords(text, words, taken) {
+  function findWords(text, words, taken2) {
     const spans = [];
     const blocked = [...text.matchAll(NOT_WORDS)].map((m) => ({ start: m.index, end: m.index + m[0].length }));
-    const overlaps = (start, end) => [...taken, ...spans, ...blocked].some((s) => start < s.end && end > s.start);
+    const overlaps = (start, end) => [...taken2, ...spans, ...blocked].some((s) => start < s.end && end > s.start);
     const sorted = [...new Set(words.map((w) => w.trim()).filter(Boolean))].sort((a, b) => b.length - a.length);
     for (const word of sorted) {
       const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -4437,8 +4479,8 @@ ${" ".repeat(21)}${e.detail}` : head;
     if (from.length === to.length) return translated;
     const written = to.filter((line) => line.trim() !== "");
     if (written.length !== from.filter((line) => line.trim() !== "").length) return translated;
-    let next = 0;
-    return from.map((line) => line.trim() === "" ? "" : written[next++]).join("\n");
+    let next2 = 0;
+    return from.map((line) => line.trim() === "" ? "" : written[next2++]).join("\n");
   }
   function restoreLinePrefixes(original, translated) {
     const marked = dialect().lineMark;
@@ -5693,10 +5735,10 @@ ${text.replace(/\s+/g, "")}`;
     const open2 = ui().querySelector(`${STAYING}[data-name="${name}"]`);
     if (open2) shutters.get(open2)?.();
   }
-  var listeners = /* @__PURE__ */ new Set();
-  var onChange = (listener) => listeners.add(listener);
+  var listeners2 = /* @__PURE__ */ new Set();
+  var onChange = (listener) => listeners2.add(listener);
   var changed = () => {
-    for (const listener of listeners) listener();
+    for (const listener of listeners2) listener();
   };
   function button(label, act, { primary = false, wide = false } = {}) {
     const b = document.createElement("button");
@@ -5951,9 +5993,9 @@ ${sent}`;
     ]);
     const known = remembered.get(key);
     if (known) return known;
-    let waiting = inFlight.get(key);
-    if (!waiting) {
-      waiting = (async () => {
+    let waiting2 = inFlight.get(key);
+    if (!waiting2) {
+      waiting2 = (async () => {
         const marked = toMarked(text, entities);
         busy(1);
         try {
@@ -5970,10 +6012,10 @@ ${sent}`;
           busy(-1);
         }
       })();
-      inFlight.set(key, waiting);
-      void waiting.catch(() => void 0).finally(() => inFlight.delete(key));
+      inFlight.set(key, waiting2);
+      void waiting2.catch(() => void 0).finally(() => inFlight.delete(key));
     }
-    return waiting;
+    return waiting2;
   }
 
   // src/version.ts
@@ -6700,8 +6742,8 @@ ${sent}`;
     const draw2 = () => {
       const slots = readSlots();
       list.textContent = "";
-      const save2 = (next) => {
-        writeSlots(next);
+      const save2 = (next2) => {
+        writeSlots(next2);
         draw2();
       };
       const change = (at, make2) => save2(slots.map((slot, i) => i === at ? make2(slot) : slot));
@@ -7048,31 +7090,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     });
     onChange(show);
     place();
-    setInterval(place, 1e3);
+    setInterval(() => {
+      place();
+      offerHeld(client2);
+    }, 1e3);
   }
-
-  // src/relay.ts
-  var listeners2 = /* @__PURE__ */ new Set();
-  var channel = (() => {
-    try {
-      return typeof BroadcastChannel === "function" ? new BroadcastChannel("ai-translate-telegram") : void 0;
-    } catch {
-      return void 0;
-    }
-  })();
-  if (channel) channel.onmessage = (event) => {
-    for (const listener of listeners2) listener(event.data);
-  };
-  var onWord = (listener) => {
-    listeners2.add(listener);
-  };
-  function tellOthers(word) {
-    try {
-      channel?.postMessage(word);
-    } catch {
-    }
-  }
-  var seen = () => typeof document === "undefined" || document.visibilityState !== "hidden";
 
   // src/host.ts
   function telegramHost(client2) {
@@ -7280,6 +7302,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
 
   // src/page.ts
   var page = typeof unsafeWindow !== "undefined" && unsafeWindow ? unsafeWindow : window;
+  function typingElsewhere(isBox) {
+    const active = typeof document === "undefined" ? void 0 : document.activeElement;
+    if (!active || active === document.body || isBox(active)) return false;
+    return active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
+  }
   function whichClient(path = location.pathname) {
     if (/^\/a(\/|$)/.test(path)) return "a";
     if (/^\/k(\/|$)/.test(path)) return "k";
@@ -7386,7 +7413,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           console.error("[AI Translate]", e);
           return payload;
         }
-        if (!found.edit && payload.name === "sendMessage") restore(found.chatId, found.text, found.entities);
+        if (!found.edit) restore(found.chatId, found.text, found.entities);
         return void 0;
       }
     };
@@ -7505,7 +7532,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         construct(target, args, newTarget) {
           const worker = Reflect.construct(target, args, newTarget);
           try {
-            watchWorker(worker, (chatId, text, entities) => webA.restore(chatId, text, entities) || tellRestore(chatId, text, entities), readAnswer);
+            watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
           } catch (e) {
             console.error("[AI Translate]", e);
           }
@@ -7584,15 +7611,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     restore(chatId, text) {
       if (chatInHash() !== chatId || document.visibilityState === "hidden") return false;
       const box2 = document.querySelector(".messages-layout .Transition_slide-active #editable-message-text") ?? document.querySelector("#editable-message-text");
-      if (!box2 || (box2.textContent ?? "").trim()) return false;
+      if (!box2 || (box2.textContent ?? "").trim() || typingElsewhere((element) => element === box2)) return false;
       box2.focus();
       return document.execCommand("insertText", false, text);
     }
-  };
-  var tellRestore = () => {
-  };
-  var setRestoreElsewhere = (restore) => {
-    tellRestore = restore;
   };
 
   // src/webk.ts
@@ -7725,8 +7747,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         );
         const withAck = rest[0] === true;
         return later(found.chatId, async () => {
-          const next = await ready;
-          if (next) return invoke.call(this, type, next, ...rest);
+          const next2 = await ready;
+          if (next2) return invoke.call(this, type, next2, ...rest);
           return withAck ? { cached: false, result: Promise.resolve(void 0) } : void 0;
         });
       }
@@ -7807,17 +7829,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       }, 200);
     }
   }
-  var tellRestore2 = () => {
-  };
-  var setRestoreElsewhere2 = (restore) => {
-    tellRestore2 = restore;
-  };
   var webK = {
     name: "k",
     install() {
-      whenProxy((proxy) => wrapInvoke(proxy, (chatId, text, entities) => {
-        if (!webK.restore(chatId, text, entities)) tellRestore2(chatId, text, entities);
-      }, patchWhenReachable));
+      whenProxy((proxy) => wrapInvoke(proxy, (chatId, text, entities) => giveBack(webK, chatId, text, entities), patchWhenReachable));
       if (!patchWhenReachable()) {
         const timer = setInterval(() => patchWhenReachable() && clearInterval(timer), 250);
       }
@@ -7918,6 +7933,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       if (!input || !chat.peerId || chatIdOf(chat.peerId) !== chatId || document.visibilityState === "hidden") return false;
       const editor = input.messageInputEditor;
       if (editor && !editor.isEmpty?.()) return false;
+      if (typingElsewhere((element) => !!element.closest(".chat-input"))) return false;
       try {
         if (typeof editor?.replaceAllText === "function") return editor.replaceAllText(text, entities.map(toK)) !== false;
         input.setInputValue(text);
@@ -7940,12 +7956,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     } catch (e) {
       console.error("[AI Translate]", e);
     }
-    const elsewhere = (chatId, text, entities) => tellOthers({ type: "restore", chatId, text, entities });
-    setRestoreElsewhere(elsewhere);
-    setRestoreElsewhere2(elsewhere);
     onWord((word) => {
       if (word.type === "notice" && seen()) toast(word.text, word.kind);
-      if (word.type === "restore") client.restore(word.chatId, word.text, word.entities);
+      if (word.type === "restore" && client.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
+      if (word.type === "restored") taken(word.id);
     });
     const start = () => {
       try {

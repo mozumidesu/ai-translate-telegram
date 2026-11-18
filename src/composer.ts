@@ -13,6 +13,7 @@
 import { isChannelEnabled, toggleChannel } from "../ai-translate/core/chats";
 import { t } from "../ai-translate/core/locales";
 import type { TelegramClient } from "./client";
+import { offerHeld } from "./held";
 import { translateIcon } from "./icons";
 import { onBusy } from "./outgoing";
 import { openPanel } from "./panel";
@@ -118,6 +119,9 @@ export function installComposerButton(client: TelegramClient) {
     onChange(show);
 
     place();
-    // A chat opened, a chat bar redrawn, a theme changed: all of it is caught within a second.
-    setInterval(place, 1000);
+    // A chat opened, a chat bar redrawn, a theme changed, a box emptied for a message held back: all caught within a second.
+    setInterval(() => {
+        place();
+        offerHeld(client);
+    }, 1000);
 }
