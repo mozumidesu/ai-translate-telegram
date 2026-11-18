@@ -632,11 +632,18 @@ check("Web K: and AI Learn's stays", await noteUnder(k, learntAt).then(n => n?.[
 
 // --- Web A
 
-// Shut first: both clients are one origin and their tabs share one channel, so Web K's would take Web A's held messages.
-await k.close();
+// Web K stays open, on the same chat: both clients are one origin and their tabs share one channel, so what Web A
+// holds back reaches it too, and has to be left to Web A first.
 const a = await context.newPage();
 await a.goto("https://web.telegram.org/a/");
 await a.waitForFunction(() => window.__a);
+await k.evaluate(() => {
+    __k.restored.length = 0;
+    // Each message Web K's box takes, stamped as it comes, to say when.
+    const push = __k.restored.push.bind(__k.restored);
+    __k.restored.push = entry => push({ ...entry, at: Date.now() });
+});
+const kRestored = () => k.evaluate(() => __k.restored.map(r => r.text));
 
 check("Web A: the button is in the chat bar, before the attachment button",
     await a.waitForSelector(".message-input-wrapper .ai-translate-button", { timeout: 5000 }).then(() =>
@@ -770,24 +777,78 @@ await a.waitForFunction(() => document.getElementById("editable-message-text").t
 check("Web A: a message that could not be translated never reaches the worker", await a.evaluate(() => __a.echoes.length), 0);
 check("Web A: the app is told the call is over", await a.evaluate(() => __a.answers.some(d => d.payloads?.[0]?.messageId === "m9")), true);
 check("Web A: and the text is back in the chat box", await a.evaluate(() => document.getElementById("editable-message-text").textContent), "не переводится");
+check("Web A: and Web K, open on the same chat, is not given it", await kRestored(), []);
 
-// Another chat opened while the message was translated: its box is not that chat's, so the text waits for its own.
+// A message held back while another chat is open in Web A, which cannot take it then. With `back`, the chat is
+// open again the moment the message is held. Done in the page, and the time it was held at is what comes back.
 const box = () => a.evaluate(() => document.getElementById("editable-message-text").textContent);
-await a.evaluate(() => {
+const holdAt = (id, text, back) => a.evaluate(async ([id, text, back]) => {
     document.getElementById("editable-message-text").textContent = "";
     __a.echoes.length = 0;
     __a.worker.postMessage({
-        payloads: [{ messageId: "m10", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "пока не переведётся", wasDrafted: false }] }]
+        payloads: [{ messageId: id, type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text, wasDrafted: false }] }]
     });
     location.hash = "#777000";
-});
-await a.waitForTimeout(1500);
-check("Web A: a message held back after another chat was opened is not put into that chat's box", await box(), "");
-await a.evaluate(() => {
+    // The app is told the call is over once the message is held.
+    while (!__a.answers.some(d => d.payloads?.[0]?.messageId === id)) await new Promise(done => setTimeout(done, 5));
+    const heldAt = Date.now();
+    if (back) location.hash = "#-1001234567890";
+    return heldAt;
+}, [id, text, back]);
+const comeBack = () => a.evaluate(() => {
     location.hash = "#-1001234567890";
 });
-await a.waitForFunction(() => document.getElementById("editable-message-text").textContent, null, { timeout: 5000 }).catch(() => { });
+const boxFilled = () => a.waitForFunction(() => document.getElementById("editable-message-text").textContent, null, { timeout: 5000 }).catch(() => { });
+
+// Another chat opened while the message was translated: its box is not that chat's, so the text waits for its own.
+// Web K, open on the same chat, has the next message typed into its box, so it cannot take it either.
+await k.evaluate(() => {
+    __k.appImManager.chat.input.messageInputField.input.value = "второе";
+});
+await holdAt("m10", "пока не переведётся", false);
+await a.waitForTimeout(1500);
+check("Web A: a message held back after another chat was opened is not put into that chat's box", await box(), "");
+check("Web A: nor into Web K's, which has the next message in its box", await kRestored(), []);
+await comeBack();
+await boxFilled();
 check("Web A: and goes back into its own chat's box once that chat is open again", await box(), "пока не переведётся");
+
+// Web K's box is empty now, and Web A has its chat open again at once: the message is Web A's, though Web K could take it.
+await k.evaluate(() => {
+    __k.restored.length = 0;
+    __k.appImManager.chat.input.messageInputField.input.value = "";
+});
+await holdAt("m11", "сначала в Web A", true);
+await boxFilled();
+check("Web A: with Web K open on the same chat, a message held back goes into Web A's own box", await box(), "сначала в Web A");
+await a.waitForTimeout(2500);
+check("Web A: and is never put into Web K's, which could have taken it", await kRestored(), []);
+
+// Web A stays in the other chat: no tab of Web A can take it, and Web K, with the chat open and its box empty, can.
+await k.evaluate(() => {
+    __k.restored.length = 0;
+});
+const heldAt = await holdAt("m12", "потом в Web K", false);
+await k.waitForFunction(() => __k.restored.length > 0, null, { timeout: 5000 }).catch(() => { });
+check("Web A: when no tab of Web A can take it, Web K's box does", await kRestored(), ["потом в Web K"]);
+check("Web A: but only after Web A has had a second to", await k.evaluate(heldAt => __k.restored[0]?.at - heldAt >= 950, heldAt), true);
+await comeBack();
+await a.waitForTimeout(1500);
+check("Web A: and nothing is put into Web A's box afterwards", await box(), "");
+
+// The other way round: what Web K holds back is Web K's own first, with Web A open on the same chat and its box empty.
+await k.evaluate(async () => {
+    __gm.reply = () => 401;
+    __k.restored.length = 0;
+    await __k.type("сначала в Web K");
+    __k.appImManager.chat.input.messageInputField.input.value = "второе";
+    await new Promise(done => setTimeout(done, 300));
+    __k.appImManager.chat.input.messageInputField.input.value = "";
+});
+await k.waitForFunction(() => __k.restored.length > 0, null, { timeout: 5000 }).catch(() => { });
+check("Web K: a message held back goes back into Web K's own box once it is empty", await kRestored(), ["сначала в Web K"]);
+await a.waitForTimeout(1500);
+check("Web K: and is never put into Web A's, open on the same chat", await box(), "");
 
 // The report from Web A, once the worker has said who the person is.
 await a.evaluate(relay => {

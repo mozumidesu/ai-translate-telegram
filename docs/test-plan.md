@@ -176,6 +176,15 @@ Both clients, in a switched-on chat that translates into English.
    Open another chat and come back, or start typing to your second account:
    within a second the button turns blue, and a message sent now goes
    translated. Put Run at back to its default and reload.
+9. A held message is left to its own client first. Set the address from 6
+   again, and open the same chat in Web A and in Web K, in two tabs. In Web
+   A, send `первое` and open another chat right after Enter. When the notice
+   comes, `первое` is in Web K's box within two seconds, and Web A's box is
+   empty when you go back to the chat. Again, but stay in the chat in Web A:
+   `первое` is back in Web A's own box, and never in Web K's. The other way
+   round: in Web K, send `второе`, type `третье` into its box and wait for
+   the notice, then delete it: `второе` is in Web K's box, and Web A's stays
+   empty. Put Groq and its key back.
 
 ## 9. Check for updates ★
 

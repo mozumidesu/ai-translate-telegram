@@ -84,7 +84,7 @@ a dash, the counter.
 | `src/webk.ts` | Web K: wraps `apiManagerProxy.invoke`, marks what was typed into a field through `ChatInput.sendMessageWithForward` |
 | `src/client.ts`, `src/page.ts` | What each client has to answer, one shape for both; the page's own window and which client it is |
 | `src/outgoing.ts` | Whether a message is translated, and what happens when that fails |
-| `src/held.ts` | A message held back, offered every second to the boxes of every tab until one takes it |
+| `src/held.ts` | A message held back, offered every second to the boxes of the tabs of the client it was typed in, and to the other client's only once a second has gone by with none of them taking it |
 | `src/formatted.ts` | Telegram's entities as the core's marks on the way to the model, and back |
 | `src/menu.ts` | The items in a message's menu, and the card with the answer |
 | `src/learn.ts`, `src/notes.ts` | AI Learn and its Corrections window, and the line of ours under your own messages: a correction, or what you typed |

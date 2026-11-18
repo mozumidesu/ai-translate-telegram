@@ -10,10 +10,22 @@
  */
 
 import type { Entity } from "./formatted";
+import type { Client } from "./page";
+
+/** A message held back, offered to whichever box can take it: `client` is the one it was typed in, and `anyClient` says the other may have it too. */
+export interface Restore {
+    type: "restore";
+    id: string;
+    client: Client;
+    anyClient: boolean;
+    chatId: string;
+    text: string;
+    entities: Entity[];
+}
 
 export type Word =
     | { type: "notice"; text: string; kind: "message" | "failure"; }
-    | { type: "restore"; id: string; chatId: string; text: string; entities: Entity[]; }
+    | Restore
     | { type: "restored"; id: string; };
 
 const listeners = new Set<(word: Word) => void>();

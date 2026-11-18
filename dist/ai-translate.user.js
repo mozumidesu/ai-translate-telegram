@@ -3336,18 +3336,23 @@ ${" ".repeat(21)}${e.detail}` : head;
   var seen = () => typeof document === "undefined" || document.visibilityState !== "hidden";
 
   // src/held.ts
+  var OWN_FIRST = 1e3;
   var waiting = [];
   var tab = Math.random().toString(36).slice(2);
   var next = 0;
   function giveBack(client2, chatId, text, entities) {
-    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities });
+    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities, since: Date.now() });
     offerHeld(client2);
   }
   function offerHeld(client2) {
-    for (const kept2 of [...waiting]) {
+    for (const { since, ...kept2 } of [...waiting]) {
       if (client2.restore(kept2.chatId, kept2.text, kept2.entities)) taken(kept2.id);
-      else tellOthers({ type: "restore", ...kept2 });
+      else tellOthers({ type: "restore", ...kept2, client: client2.name, anyClient: Date.now() - since >= OWN_FIRST });
     }
+  }
+  function offered(client2, word) {
+    if (word.client !== client2.name && !word.anyClient) return;
+    if (client2.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
   }
   function taken(id2) {
     const at = waiting.findIndex((kept2) => kept2.id === id2);
@@ -8118,7 +8123,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     }
     onWord((word) => {
       if (word.type === "notice" && seen()) toast(word.text, word.kind);
-      if (word.type === "restore" && client.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
+      if (word.type === "restore") offered(client, word);
       if (word.type === "restored") taken(word.id);
     });
     const start = () => {

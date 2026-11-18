@@ -13,12 +13,12 @@ import { useHost } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
 import { type TelegramClient, useClient } from "./client";
 import { installComposerButton } from "./composer";
-import { taken } from "./held";
+import { offered, taken } from "./held";
 import { telegramHost } from "./host";
 import { installMenu } from "./menu";
 import { installNotes } from "./notes";
 import { whichClient } from "./page";
-import { onWord, seen, tellOthers } from "./relay";
+import { onWord, seen } from "./relay";
 import { openSettings } from "./settings";
 import { toast } from "./ui";
 import { webA } from "./weba";
@@ -43,8 +43,8 @@ if (client) {
 
     onWord(word => {
         if (word.type === "notice" && seen()) toast(word.text, word.kind);
-        // A message held back in the tab that sends goes back into the box of whichever tab can take it.
-        if (word.type === "restore" && client.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
+        // A message held back in the tab that sends goes back into the box of a tab that can take it.
+        if (word.type === "restore") offered(client, word);
         if (word.type === "restored") taken(word.id);
     });
 

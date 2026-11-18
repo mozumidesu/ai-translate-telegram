@@ -7,19 +7,29 @@
  * offered again every second, here and to the other tabs, until one of them
  * has its chat open with an empty box.
  *
+ * Web A and Web K share one channel, so a Web K tab on the same chat would
+ * take what was typed in Web A. The tabs of the client it was typed in are
+ * asked first; the other client's only once a second has gone by with none
+ * of them taking it.
+ *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import type { TelegramClient } from "./client";
 import type { Entity } from "./formatted";
-import { tellOthers } from "./relay";
+import { type Restore, tellOthers } from "./relay";
 
 interface Kept {
     id: string;
     chatId: string;
     text: string;
     entities: Entity[];
+    /** When it was first offered. */
+    since: number;
 }
+
+/** How long a message is offered to its own client's tabs alone. */
+const OWN_FIRST = 1000;
 
 const waiting: Kept[] = [];
 
@@ -29,16 +39,22 @@ let next = 0;
 
 /** Puts what was typed back, here or in another tab, now or as soon as a box can take it. */
 export function giveBack(client: TelegramClient, chatId: string, text: string, entities: Entity[]) {
-    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities });
+    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities, since: Date.now() });
     offerHeld(client);
 }
 
 /** Every message still waiting, offered again: the chat bar's tick calls this. */
 export function offerHeld(client: TelegramClient) {
-    for (const kept of [...waiting]) {
+    for (const { since, ...kept } of [...waiting]) {
         if (client.restore(kept.chatId, kept.text, kept.entities)) taken(kept.id);
-        else tellOthers({ type: "restore", ...kept });
+        else tellOthers({ type: "restore", ...kept, client: client.name, anyClient: Date.now() - since >= OWN_FIRST });
     }
+}
+
+/** Another tab holds a message back and offers it: put into a box here when it is ours to take and the box can. */
+export function offered(client: TelegramClient, word: Restore) {
+    if (word.client !== client.name && !word.anyClient) return;
+    if (client.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
 }
 
 /** Another tab put it into its box. */
