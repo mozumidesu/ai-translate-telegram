@@ -39,7 +39,7 @@ the chats switched on, and incoming ones from a message's menu.
 
 ## The version
 
-There is one, the plugin's: `ai-translate/core/version.ts`, `0.2.1a` today,
+There is one, the plugin's: `ai-translate/core/version.ts`, `0.2.2a` today,
 read from the submodule when the script is built. It is what a person sees: the
 line under Logs, the early-build line of the feedback form, and what Check for
 updates takes the installed script to be. Nothing here raises it. It moves when
