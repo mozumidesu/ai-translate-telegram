@@ -50,6 +50,13 @@ check("and only a link where the core would not take the fence", toMarked("пр�
 check("code in backticks", toMarked("run ls -la now", [e("code", 4, 6)]).marked, "run `ls -la` now");
 check("a code block with its language", toMarked("look:\nlet a = 1", [e("pre", 6, 9, { language: "js" })]).marked,
     "look:\n```js\nlet a = 1\n```");
+// Line breaks are cut points for marks, and were cutting code blocks too, down to their first line.
+const block = "look:\nlet a = 1\nlet b = 2\nlet c = 3";
+check("a code block of several lines goes whole", toMarked(block, [e("pre", 6, 29, { language: "js" })]).marked,
+    "look:\n```js\nlet a = 1\nlet b = 2\nlet c = 3\n```");
+check("and inline code that holds a line break keeps all of it", toMarked("run a\nb now", [e("code", 4, 3)]).marked, "run `a\nb` now");
+check("and a block in a message that is only read", toMarked(block, [e("pre", 6, 29)], { readOnly: true }).marked,
+    "look:\n```\nlet a = 1\nlet b = 2\nlet c = 3\n```");
 check("a mark never runs across a line break", toMarked("раз\nдва", [e("bold", 0, 7)]).marked, "**раз**\n**два**");
 check("nested marks nest", toMarked("very bold text", [e("bold", 0, 14), e("italic", 5, 4)]).marked, "**very __bold__ text**");
 check("overlapping ones are split so they nest", toMarked("abcdef", [e("bold", 0, 4), e("italic", 2, 4)]).marked,
@@ -92,6 +99,9 @@ check("code comes back verbatim", back("run ls -la now", [e("code", 4, 6)], "з�
 check("a code block keeps its language",
     toMarked("look:\nlet a = 1", [e("pre", 6, 9, { language: "js" })]).back("смотри:\n```js\nlet a = 1\n```").entities,
     [{ kind: "pre", offset: 8, length: 9, language: "js" }]);
+check("a code block of several lines comes back whole",
+    toMarked(block, [e("pre", 6, 29, { language: "js" })]).back("смотри:\n```js\nlet a = 1\nlet b = 2\nlet c = 3\n```"),
+    { text: "смотри:\nlet a = 1\nlet b = 2\nlet c = 3", entities: [{ kind: "pre", offset: 8, length: 29, language: "js" }] });
 check("marks inside code are code", back("say a**b ok", [e("code", 4, 4), e("bold", 9, 2)], "скажи `a**b` **ладно**"),
     drawn({ text: "скажи a**b ладно", entities: [e("code", 6, 4), e("bold", 11, 5)] }));
 

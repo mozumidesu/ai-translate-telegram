@@ -5132,7 +5132,8 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
       const atom = atoms.find((a) => a.offset === from);
       if (atom) {
         shut(0);
-        marked += (atom.kind === "pre" ? fencedBlock(piece, atom.language) : fencedCode(piece)) ?? piece;
+        const body = text.slice(atom.offset, atom.offset + atom.length);
+        marked += (atom.kind === "pre" ? fencedBlock(body, atom.language) : fencedCode(body)) ?? body;
         continue;
       }
       if (atoms.some((a) => from > a.offset && from < a.offset + a.length)) continue;
