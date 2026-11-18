@@ -44,7 +44,7 @@ with a reply keyboard, any will do.
    does not take the keys, and Escape shuts only the window.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
    without the build counter: 0.2.1a, where the manager's dashboard, column
-   Version, shows 0.2.1a.1.
+   Version, shows 0.2.1a.2.
    Press Logs: a window opens over the settings with Copy, Save .txt and
    Clear. Escape shuts it and leaves the settings; Escape again shuts them,
    and the chat stays open.
@@ -146,6 +146,37 @@ Both clients, in a switched-on chat that translates into English.
    red notice says no API key is set for Groq, and the text is back in the
    chat box. Right-click a message, AI Translate: the same notice. Put the
    key back.
+5. A message held back is asked about again. With a wrong key, send
+   `привет, как дела сегодня`: nothing is sent, and the text is back in the
+   box. Put the right key back and press Enter on that same text at once: it
+   goes, translated.
+6. A provider that does not answer holds up its own chat only, and a minute
+   at most. On the settings page choose OpenAI-compatible, with Base URL
+   `https://10.255.255.1/v1`, an address that never answers, and any key and
+   model; allow the address when the manager asks. Send `ты тут?` in a chat
+   that is switched on. While it waits, in a chat that is switched off: send
+   a message, react to one, and forward one there. Each goes at once. A
+   sticker sent meanwhile in the first chat waits. After a minute a red
+   notice says "Network error: timed out", `ты тут?` is back in its box, and
+   the sticker goes. Web A: once more with a second tab of `/a/` open,
+   waiting in one tab and sending in the other.
+7. A held message waits for a box that can take it. Still with that
+   address, send `первое`, then type `второе` and leave it. When the notice
+   comes, nothing is added to the box. Delete `второе`: within a second
+   `первое` is in the box. Again, but open another chat right after Enter and
+   wait there for the notice: that chat's box stays empty. Go back to the
+   first chat: `первое` is in its box within a second. Put Groq and its key
+   back.
+8. Web A, Tampermonkey: a script that lands too late. In the script's
+   Settings tab in the manager, set Run at to document-idle, save, and reload
+   `/a/` with a switched-on chat open. The button is not blue, though the
+   chat is on, and its tooltip says "AI Translate: not working in this tab.
+   It could not reach the way Telegram sends messages, so they go as typed.
+   Reload the page". Logs has a line saying no call to Telegram's worker has
+   crossed the script's hook. No notice appears. Open another chat and come
+   back, or start typing to your second account: within a second the button
+   turns blue, and a message sent now goes translated. Put Run at back to
+   its default and reload.
 
 ## 9. Check for updates ★
 
@@ -185,7 +216,7 @@ Both clients, in a switched-on chat that translates into English.
    do. Its Telegram field is two lines: the name and id, then the client,
    "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is the plugin's
    version and, in brackets, the core it was built with and the build
-   counter, "0.2.1a (09710da-1)" for example: the first seven characters of
+   counter, "0.2.1a (606d8f3-2)" for example: the first seven characters of
    the commit that `git submodule status` shows for `ai-translate`, a dash,
    and the counter of `build-counter.json`.
 6. *Write on Discord* opens the support server's invite in a new tab.
