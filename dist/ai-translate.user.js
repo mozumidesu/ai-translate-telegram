@@ -5083,14 +5083,11 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
     })();
     const codeSafe = !outsideCode.includes("`");
     const plain = codeSafe ? outsideCode : text;
-    const safe = {
-      wraps: WRAPS.filter(([, mark]) => !plain.includes(mark)),
-      link: !plain.includes("]("),
-      code: codeSafe
-    };
-    const marks = new Map(safe.wraps);
+    const usable = WRAPS.filter(([, mark]) => !plain.includes(mark));
+    const linkSafe = !plain.includes("](");
+    const marks = new Map(usable);
     const atoms = codeSafe ? blocks.filter((block, i) => !blocks.slice(0, i).some((b) => block.offset < b.offset + b.length)) : [];
-    const spans = readOnly ? [] : entities.filter((e) => (marks.has(e.kind) || (e.kind === "link" || e.kind === "mention") && safe.link) && !atoms.some((a) => e.offset >= a.offset && e.offset + e.length <= a.offset + a.length));
+    const spans = readOnly ? [] : entities.filter((e) => (marks.has(e.kind) || (e.kind === "link" || e.kind === "mention") && linkSafe) && !atoms.some((a) => e.offset >= a.offset && e.offset + e.length <= a.offset + a.length));
     const cuts = /* @__PURE__ */ new Set([0, text.length]);
     for (const e of [...spans, ...atoms]) {
       cuts.add(e.offset);
@@ -5101,6 +5098,11 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
       cuts.add(i + 1);
     }
     const points = [...cuts].sort((a, b) => a - b);
+    const safe = {
+      wraps: usable.filter(([kind]) => spans.some((e) => e.kind === kind)),
+      link: spans.some((e) => e.kind === "link" || e.kind === "mention"),
+      code: atoms.length > 0
+    };
     const open2 = [];
     let marked = "";
     const opening = (e) => e.kind === "link" || e.kind === "mention" ? "[" : marks.get(e.kind);

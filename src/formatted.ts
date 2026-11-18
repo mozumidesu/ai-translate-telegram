@@ -16,6 +16,8 @@
  * kind it was, a quote by its lines. Underline has neither and is left out.
  * A mark the writer typed as a character of their own would be read back as
  * formatting, so a kind of mark that already occurs in the text is not used.
+ * Nor is one the model wrote of a kind the message never had: only the kinds
+ * the message went with are read back.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -56,7 +58,7 @@ export interface Marked {
 const WRAPS: [Kind, string][] = [["bold", "**"], ["italic", "__"], ["strike", "~~"], ["spoiler", "||"]];
 const WRAPPED = new Set<Kind>(WRAPS.map(([kind]) => kind));
 
-/** Which marks can be read back, because the writer typed none of them. */
+/** Which marks can be read back: the kinds the message was written with, of those the writer typed none of. */
 interface Safe {
     wraps: [Kind, string][];
     link: boolean;
@@ -146,19 +148,15 @@ export function toMarked(text: string, given: Entity[], { readOnly = false } = {
     const codeSafe = !outsideCode.includes("`");
     const plain = codeSafe ? outsideCode : text;
 
-    const safe: Safe = {
-        wraps: WRAPS.filter(([, mark]) => !plain.includes(mark)),
-        link: !plain.includes("]("),
-        code: codeSafe
-    };
-
-    const marks = new Map(safe.wraps);
+    const usable = WRAPS.filter(([, mark]) => !plain.includes(mark));
+    const linkSafe = !plain.includes("](");
+    const marks = new Map(usable);
 
     // Code is written whole, and nothing else is open across it.
     const atoms = codeSafe ? blocks.filter((block, i) => !blocks.slice(0, i).some(b => block.offset < b.offset + b.length)) : [];
 
     const spans = readOnly ? [] : entities.filter(e =>
-        (marks.has(e.kind) || ((e.kind === "link" || e.kind === "mention") && safe.link))
+        (marks.has(e.kind) || ((e.kind === "link" || e.kind === "mention") && linkSafe))
         && !atoms.some(a => e.offset >= a.offset && e.offset + e.length <= a.offset + a.length));
 
     // Every place where what is open changes, and every line break: a mark never runs past one.
@@ -172,6 +170,13 @@ export function toMarked(text: string, given: Entity[], { readOnly = false } = {
         cuts.add(i + 1);
     }
     const points = [...cuts].sort((a, b) => a - b);
+
+    // A mark the model wrote of a kind the message never had is the model's own: "~~" for a long vowel, "||" for "or".
+    const safe: Safe = {
+        wraps: usable.filter(([kind]) => spans.some(e => e.kind === kind)),
+        link: spans.some(e => e.kind === "link" || e.kind === "mention"),
+        code: atoms.length > 0
+    };
 
     const open: Entity[] = [];
     let marked = "";

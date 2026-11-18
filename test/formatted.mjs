@@ -105,6 +105,14 @@ check("a code block of several lines comes back whole",
 check("marks inside code are code", back("say a**b ok", [e("code", 4, 4), e("bold", 9, 2)], "скажи `a**b` **ладно**"),
     drawn({ text: "скажи a**b ладно", entities: [e("code", 6, 4), e("bold", 11, 5)] }));
 
+// A mark is read back only when the message itself had that kind of formatting.
+for (const answer of ["그래~~ 알았어~~ 고마워", "a || b, c || d", "2**3 is **eight**", "call __init__ first", "see [1](a) and [2](b)", "run `ls` now", "```\nblock\n```"])
+    check(`a plain message's answer keeps marks it never used: ${JSON.stringify(answer)}`, toMarked("plain", []).back(answer), { text: answer, entities: [] });
+check("and a message that had one kind keeps the others",
+    toMarked("это очень важно", [e("bold", 4, 5)]).back("that is **very** ~~important~~ || ok ||"),
+    { text: "that is very ~~important~~ || ok ||", entities: [e("bold", 8, 4)] });
+check("a message that is only read is shown its answer's marks as they are",
+    toMarked("ура, да", [e("bold", 5, 2)], { readOnly: true }).back("hooray, **yes** ~~no~~").text, "hooray, **yes** ~~no~~");
 check("a custom emoji comes back on the same one of its kind",
     back("👍 сначала, потом 👍", [e("emoji", 18, 2, { documentId: "77" })], "👍 first, then 👍"),
     drawn({ text: "👍 first, then 👍", entities: [e("emoji", 15, 2, { documentId: "77" })] }));
