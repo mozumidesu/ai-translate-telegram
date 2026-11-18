@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.1a.4
+// @version         0.2.1a.5
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -372,7 +372,7 @@
     "button.on": "AI Translate: здесь включён",
     "button.off": "AI Translate: здесь выключен",
     "button.hint": "левый клик — панель, правый — включить или выключить",
-    "button.unhooked": "AI Translate не работает в этой вкладке, поэтому сообщения уходят как набраны. Перезагрузите страницу.",
+    "button.unhooked": "AI Translate не работает в этой вкладке, поэтому сообщения уходят так, как вы их набрали. Перезагрузите страницу.",
     "error.noKey": "Не указан ключ API для {provider}. Откройте настройки плагина",
     "error.noModel": "Не указана модель для {provider}. Откройте настройки плагина",
     "error.unknown": "Что-то пошло не так, но не сказало что. Подробности в разделе «Логи» в настройках плагина",
@@ -563,7 +563,7 @@
     "button.on": "AI Translate: тут увімкнено",
     "button.off": "AI Translate: тут вимкнено",
     "button.hint": "лівий клік — панель, правий — увімкнути або вимкнути",
-    "button.unhooked": "AI Translate не працює в цій вкладці, тому повідомлення йдуть як набрані. Перезавантажте сторінку.",
+    "button.unhooked": "AI Translate не працює в цій вкладці, тому повідомлення надсилаються так, як ви їх набрали. Перезавантажте сторінку.",
     "error.noKey": "Не вказано ключ API для {provider}. Відкрийте налаштування плагіна",
     "error.noModel": "Не вказано модель для {provider}. Відкрийте налаштування плагіна",
     "error.unknown": "Щось пішло не так, але не сказало що. Подробиці в розділі «Логи» у налаштуваннях плагіна",
@@ -754,7 +754,7 @@
     "button.on": "AI Translate: pornit aici",
     "button.off": "AI Translate: oprit aici",
     "button.hint": "clic stânga deschide panoul, clic dreapta pornește sau oprește",
-    "button.unhooked": "AI Translate nu funcționează în această filă, așa că mesajele pleacă așa cum sunt scrise. Reîncarcă pagina.",
+    "button.unhooked": "AI Translate nu funcționează în această filă, deci mesajele pleacă exact cum le-ai scris. Reîncarcă pagina.",
     "error.noKey": "Nicio cheie API pentru {provider}. Deschide setările pluginului",
     "error.noModel": "Niciun model ales pentru {provider}. Deschide setările pluginului",
     "error.unknown": "Ceva nu a mers, dar nu a spus ce. Detaliile sunt în secțiunea Jurnal din setările pluginului",
@@ -1136,7 +1136,7 @@
     "button.on": "AI Translate: activo aquí",
     "button.off": "AI Translate: inactivo aquí",
     "button.hint": "clic izquierdo abre, clic derecho activa o desactiva",
-    "button.unhooked": "AI Translate no funciona en esta pestaña, así que los mensajes salen tal como se escriben. Recarga la página.",
+    "button.unhooked": "AI Translate no funciona en esta pestaña, así que los mensajes salen tal como los escribes. Recarga la página.",
     "error.noKey": "No hay clave de API para {provider}. Abre los ajustes del plugin",
     "error.noModel": "No hay modelo elegido para {provider}. Abre los ajustes del plugin",
     "error.unknown": "Algo salió mal sin decir qué. Los detalles están en Registros, en los ajustes del plugin",
@@ -1327,7 +1327,7 @@
     "button.on": "AI Translate : actif ici",
     "button.off": "AI Translate : inactif ici",
     "button.hint": "clic gauche pour ouvrir, clic droit pour activer ou désactiver",
-    "button.unhooked": "AI Translate ne fonctionne pas dans cet onglet, donc les messages partent tels qu'écrits. Rechargez la page.",
+    "button.unhooked": "AI Translate ne fonctionne pas dans cet onglet, donc les messages partent tels que vous les avez écrits. Rechargez la page.",
     "error.noKey": "Aucune clé API pour {provider}. Ouvrez les réglages du plugin",
     "error.noModel": "Aucun modèle choisi pour {provider}. Ouvrez les réglages du plugin",
     "error.unknown": "Quelque chose a échoué sans dire quoi. Les détails sont dans Journaux, dans les réglages du plugin",
@@ -6149,8 +6149,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${4}`;
-  var BUILD_NAME = `${VERSION} (${"51e2b9e"}-${4})`;
+  var SCRIPT_VERSION = `${VERSION}.${5}`;
+  var BUILD_NAME = `${VERSION} (${"7cc69fb"}-${5})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
