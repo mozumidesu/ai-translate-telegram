@@ -27,6 +27,8 @@ export interface TelegramClient {
     name: "a" | "k";
     /** Hooks that have to be in place before the client's own code runs. */
     install(): void;
+    /** Why the hooks are not in front of the client's sending, for the log, or nothing once they are: until then messages go as typed. */
+    unhooked(): string | undefined;
     /** The chat that is open, as a Bot API id: users as they are, groups negative, channels -100… */
     openChat(): string | undefined;
     chatTitle(chatId: string): string | undefined;

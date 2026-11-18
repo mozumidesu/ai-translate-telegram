@@ -174,6 +174,7 @@ type Restore = (chatId: string, text: string, entities: Entity[]) => void;
  */
 export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
     const invoke = proxy?.invoke;
+    if (invoke?.aiTranslate) invoked = true;
     if (typeof invoke !== "function" || invoke.aiTranslate) return;
 
     // One line per chat: a slow translation in one holds up nothing in another.
@@ -235,7 +236,11 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
 
     wrapped.aiTranslate = true;
     proxy.invoke = wrapped;
+    invoked = true;
 }
+
+/** Whether apiManagerProxy.invoke is the script's. */
+let invoked = false;
 
 /** Marks what a field sends, and counts the chat bar's edits. Once per page: the class is shared. */
 export function patchChatInput(ChatInput: any) {
@@ -335,6 +340,14 @@ export const webK: TelegramClient = {
     openChat() {
         const peerId = page.appImManager?.chat?.peerId;
         return peerId ? chatIdOf(peerId) : undefined;
+    },
+
+    unhooked() {
+        if (!invoked) return "Web K: apiManagerProxy.invoke has not been reached";
+        if (patchWhenReachable()) return undefined;
+        return page.appImManager?.chat?.input
+            ? "Web K: the chat bar's class has no sendMessageWithForward, so nothing typed can be marked"
+            : "Web K: no chat bar has been reached yet";
     },
 
     chatTitle: chatId => nameOfPeer(peerIdOf(chatId)),

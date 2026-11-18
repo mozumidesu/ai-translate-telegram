@@ -179,6 +179,8 @@
     "button.on": "AI Translate: on here",
     "button.off": "AI Translate: off here",
     "button.hint": "click to open, right-click to toggle",
+    // For a host that names its app, when its hook into sending is not in: {app} is that name.
+    "button.unhooked": "AI Translate: not working in this tab. It could not reach the way {app} sends messages, so they go as typed. Reload the page",
     "error.noKey": "No API key set for {provider}. Open the plugin settings",
     "error.noModel": "No model set for {provider}. Open the plugin settings",
     "error.unknown": "Something went wrong without saying what. Logs, in the plugin settings, has the details",
@@ -371,6 +373,7 @@
     "button.on": "AI Translate: здесь включён",
     "button.off": "AI Translate: здесь выключен",
     "button.hint": "левый клик — панель, правый — включить или выключить",
+    "button.unhooked": "AI Translate: в этой вкладке не работает. Не удалось встроиться туда, где {app} отправляет сообщения, поэтому они уходят как написаны. Перезагрузите страницу",
     "error.noKey": "Не указан ключ API для {provider}. Откройте настройки плагина",
     "error.noModel": "Не указана модель для {provider}. Откройте настройки плагина",
     "error.unknown": "Что-то пошло не так, но не сказало что. Подробности в разделе «Логи» в настройках плагина",
@@ -562,6 +565,7 @@
     "button.on": "AI Translate: тут увімкнено",
     "button.off": "AI Translate: тут вимкнено",
     "button.hint": "лівий клік — панель, правий — увімкнути або вимкнути",
+    "button.unhooked": "AI Translate: у цій вкладці не працює. Не вдалося вбудуватися туди, де {app} надсилає повідомлення, тож вони йдуть як написані. Перезавантажте сторінку",
     "error.noKey": "Не вказано ключ API для {provider}. Відкрийте налаштування плагіна",
     "error.noModel": "Не вказано модель для {provider}. Відкрийте налаштування плагіна",
     "error.unknown": "Щось пішло не так, але не сказало що. Подробиці в розділі «Логи» у налаштуваннях плагіна",
@@ -753,6 +757,7 @@
     "button.on": "AI Translate: pornit aici",
     "button.off": "AI Translate: oprit aici",
     "button.hint": "clic stânga deschide panoul, clic dreapta pornește sau oprește",
+    "button.unhooked": "AI Translate: nu funcționează în această filă. Nu a putut ajunge la locul unde {app} trimite mesajele, așa că pleacă așa cum sunt scrise. Reîncarcă pagina",
     "error.noKey": "Nicio cheie API pentru {provider}. Deschide setările pluginului",
     "error.noModel": "Niciun model ales pentru {provider}. Deschide setările pluginului",
     "error.unknown": "Ceva nu a mers, dar nu a spus ce. Detaliile sunt în secțiunea Jurnal din setările pluginului",
@@ -944,6 +949,7 @@
     "button.on": "AI Translate: hier an",
     "button.off": "AI Translate: hier aus",
     "button.hint": "Linksklick öffnet, Rechtsklick schaltet um",
+    "button.unhooked": "AI Translate: funktioniert in diesem Tab nicht. Es kommt nicht an die Stelle, an der {app} Nachrichten sendet, also gehen sie so hinaus, wie sie geschrieben sind. Lade die Seite neu",
     "error.noKey": "Kein API-Schlüssel für {provider} hinterlegt. Öffne die Plugin-Einstellungen",
     "error.noModel": "Kein Modell für {provider} gewählt. Öffne die Plugin-Einstellungen",
     "error.unknown": "Etwas ging schief, ohne zu sagen was. Einzelheiten stehen unter Protokoll in den Plugin-Einstellungen",
@@ -1135,6 +1141,7 @@
     "button.on": "AI Translate: activo aquí",
     "button.off": "AI Translate: inactivo aquí",
     "button.hint": "clic izquierdo abre, clic derecho activa o desactiva",
+    "button.unhooked": "AI Translate: no funciona en esta pestaña. No pudo llegar a donde {app} envía los mensajes, así que salen tal como se escriben. Recarga la página",
     "error.noKey": "No hay clave de API para {provider}. Abre los ajustes del plugin",
     "error.noModel": "No hay modelo elegido para {provider}. Abre los ajustes del plugin",
     "error.unknown": "Algo salió mal sin decir qué. Los detalles están en Registros, en los ajustes del plugin",
@@ -1326,6 +1333,7 @@
     "button.on": "AI Translate : actif ici",
     "button.off": "AI Translate : inactif ici",
     "button.hint": "clic gauche pour ouvrir, clic droit pour activer ou désactiver",
+    "button.unhooked": "AI Translate : ne fonctionne pas dans cet onglet. Il n'a pas pu atteindre l'endroit où {app} envoie les messages, qui partent donc tels qu'écrits. Rechargez la page",
     "error.noKey": "Aucune clé API pour {provider}. Ouvrez les réglages du plugin",
     "error.noModel": "Aucun modèle choisi pour {provider}. Ouvrez les réglages du plugin",
     "error.unknown": "Quelque chose a échoué sans dire quoi. Les détails sont dans Journaux, dans les réglages du plugin",
@@ -1517,6 +1525,7 @@
     "button.on": "AI Translate: ligado aqui",
     "button.off": "AI Translate: desligado aqui",
     "button.hint": "clique esquerdo abre, clique direito liga ou desliga",
+    "button.unhooked": "AI Translate: não funciona nesta aba. Não conseguiu chegar ao ponto em que o {app} envia as mensagens, então elas saem como foram escritas. Recarregue a página",
     "error.noKey": "Nenhuma chave de API para {provider}. Abra as configurações do plugin",
     "error.noModel": "Nenhum modelo escolhido para {provider}. Abra as configurações do plugin",
     "error.unknown": "Algo deu errado sem dizer o quê. Os detalhes estão em Registros, nas configurações do plugin",
@@ -1708,6 +1717,7 @@
     "button.on": "AI Translate: ここではオン",
     "button.off": "AI Translate: ここではオフ",
     "button.hint": "左クリックで開く、右クリックで切り替え",
+    "button.unhooked": "AI Translate: このタブでは動作していません。{app} がメッセージを送る仕組みに入り込めなかったため、メッセージは入力したまま送信されます。ページを再読み込みしてください",
     "error.noKey": "{provider} の API キーが未設定です。プラグイン設定を開いてください",
     "error.noModel": "{provider} のモデルが未設定です。プラグイン設定を開いてください",
     "error.unknown": "原因を告げないまま失敗しました。詳しくはプラグイン設定の 「ログ」 にあります",
@@ -1899,6 +1909,7 @@
     "button.on": "AI Translate：此处已开启",
     "button.off": "AI Translate：此处已关闭",
     "button.hint": "左键打开，右键开关",
+    "button.unhooked": "AI Translate：在此标签页中未生效。无法接入 {app} 发送消息的环节，消息将按原文发送。请刷新页面",
     "error.noKey": "尚未设置 {provider} 的 API 密钥。请打开插件设置",
     "error.noModel": "尚未设置 {provider} 的模型。请打开插件设置",
     "error.unknown": "出错了，却没说是什么。详情在插件设置的 “日志” 里",
@@ -2104,6 +2115,7 @@
     "button.on": "AI Translate: เปิดอยู่ที่นี่",
     "button.off": "AI Translate: ปิดอยู่ที่นี่",
     "button.hint": "คลิกซ้ายเพื่อเปิดแผง คลิกขวาเพื่อเปิดหรือปิด",
+    "button.unhooked": "AI Translate: ไม่ทำงานในแท็บนี้ เข้าถึงส่วนที่ {app} ใช้ส่งข้อความไม่ได้ ข้อความจึงถูกส่งตามที่พิมพ์ โหลดหน้าใหม่",
     "error.noKey": "ยังไม่ได้ตั้งคีย์ API สำหรับ {provider} เปิดการตั้งค่าปลั๊กอิน",
     "error.noModel": "ยังไม่ได้เลือกโมเดลสำหรับ {provider} เปิดการตั้งค่าปลั๊กอิน",
     "error.unknown": "มีบางอย่างผิดพลาดแต่ไม่ได้บอกว่าอะไร รายละเอียดอยู่ในหัวข้อ บันทึกการทำงาน ในการตั้งค่าปลั๊กอิน",
@@ -2295,6 +2307,7 @@
     "button.on": "AI Translate: đang bật ở đây",
     "button.off": "AI Translate: đang tắt ở đây",
     "button.hint": "chuột trái để mở, chuột phải để bật/tắt",
+    "button.unhooked": "AI Translate: không hoạt động trong thẻ này. Không thể can thiệp vào cách {app} gửi tin nhắn, nên tin nhắn được gửi nguyên văn. Hãy tải lại trang",
     "error.noKey": "Chưa đặt khoá API cho {provider}. Hãy mở cài đặt tiện ích",
     "error.noModel": "Chưa chọn mô hình cho {provider}. Hãy mở cài đặt tiện ích",
     "error.unknown": "Có gì đó hỏng mà không nói là gì. Chi tiết nằm ở mục Nhật ký trong cài đặt plugin",
@@ -2486,6 +2499,7 @@
     "button.on": "AI Translate: burada açık",
     "button.off": "AI Translate: burada kapalı",
     "button.hint": "sol tık açar, sağ tık açıp kapatır",
+    "button.unhooked": "AI Translate: bu sekmede çalışmıyor. {app} uygulamasının mesaj gönderdiği yere ulaşamadı, bu yüzden mesajlar yazıldığı gibi gidiyor. Sayfayı yenileyin",
     "error.noKey": "{provider} için API anahtarı ayarlanmamış. Eklenti ayarlarını açın",
     "error.noModel": "{provider} için model seçilmemiş. Eklenti ayarlarını açın",
     "error.unknown": "Bir şey ters gitti ama ne olduğunu söylemedi. Ayrıntılar eklenti ayarlarındaki Günlükler bölümünde",
@@ -2663,6 +2677,7 @@
     "button.on": "AI Translate: aktif di sini",
     "button.off": "AI Translate: nonaktif di sini",
     "button.hint": "klik untuk membuka, klik kanan untuk mengalihkan",
+    "button.unhooked": "AI Translate: tidak berfungsi di tab ini. Tidak dapat menjangkau cara {app} mengirim pesan, jadi pesan terkirim apa adanya. Muat ulang halaman",
     "error.noKey": "Kunci API untuk {provider} belum diatur. Buka pengaturan plugin",
     "error.noModel": "Model untuk {provider} belum diatur. Buka pengaturan plugin",
     "error.unknown": "Ada yang gagal tanpa menyebutkan apa. Rinciannya ada di bagian Catatan log pada pengaturan plugin",
@@ -2854,6 +2869,7 @@
     "button.on": "AI Translate: مفعّل هنا",
     "button.off": "AI Translate: متوقف هنا",
     "button.hint": "انقر للفتح، وانقر بالزر الأيمن للتبديل",
+    "button.unhooked": "AI Translate: لا يعمل في هذا التبويب. تعذّر الوصول إلى الطريقة التي يرسل بها {app} الرسائل، لذا تُرسل كما كُتبت. أعد تحميل الصفحة",
     "error.noKey": "لم يُضبط مفتاح API لـ {provider}. افتح إعدادات الإضافة",
     "error.noModel": "لم يُضبط نموذج لـ {provider}. افتح إعدادات الإضافة",
     "error.unknown": "حدث خطأ دون أن يذكر ما هو. التفاصيل في قسم السجلات داخل إعدادات الإضافة",
@@ -3045,6 +3061,7 @@
     "button.on": "AI Translate: 여기서 켜짐",
     "button.off": "AI Translate: 여기서 꺼짐",
     "button.hint": "클릭하면 열리고, 오른쪽 클릭하면 켜고 꺼집니다",
+    "button.unhooked": "AI Translate: 이 탭에서는 작동하지 않습니다. {app}이(가) 메시지를 보내는 부분에 연결하지 못해 메시지가 입력한 그대로 전송됩니다. 페이지를 새로 고쳐 주세요",
     "error.noKey": "{provider}의 API 키가 없습니다. 플러그인 설정을 열어 주세요",
     "error.noModel": "{provider}의 모델이 지정되지 않았습니다. 플러그인 설정을 열어 주세요",
     "error.unknown": "무엇이 잘못됐는지 말하지 않고 실패했습니다. 자세한 내용은 플러그인 설정의 로그에 있습니다",
@@ -3266,6 +3283,46 @@
     const on = !isChannelEnabled(channelId);
     setChannelEnabled(channelId, on);
     return on;
+  }
+
+  // ai-translate/core/log.ts
+  var KEPT = 200;
+  var DETAIL_LIMIT = 600;
+  var SECRETS = [
+    /\b(?:sk|gsk|xai|sk-ant|sk-proj)[-_][A-Za-z0-9_-]{8,}/g,
+    /\bAIza[A-Za-z0-9_-]{10,}/g,
+    /\b[A-Fa-f0-9]{32}\.[A-Za-z0-9_-]{8,}/g,
+    /("(?:api_?key|authorization|token)"\s*:\s*")[^"]+/gi
+  ];
+  function masked(text) {
+    let out = text;
+    for (const pattern of SECRETS)
+      out = out.replace(pattern, (whole, keep2) => keep2 ? `${keep2}***` : "***");
+    return out;
+  }
+  var kept = [];
+  function record(level, what, text, detail) {
+    kept.push({
+      at: Date.now(),
+      level,
+      what,
+      text: masked(String(text ?? "")).slice(0, DETAIL_LIMIT),
+      detail: detail ? masked(String(detail)).replace(/\s+/g, " ").trim().slice(0, DETAIL_LIMIT) : void 0
+    });
+    if (kept.length > KEPT) kept.splice(0, kept.length - KEPT);
+  }
+  var howMany = () => kept.length;
+  function clear() {
+    kept.length = 0;
+  }
+  function asText() {
+    if (!kept.length) return "";
+    return kept.map((e) => {
+      const when2 = new Date(e.at).toISOString().replace("T", " ").slice(0, 19);
+      const head = `${when2}  ${e.level === "error" ? "ERROR" : "info "}  ${e.what}  ${e.text}`;
+      return e.detail ? `${head}
+${" ".repeat(21)}${e.detail}` : head;
+    }).join("\n");
   }
 
   // src/relay.ts
@@ -3578,7 +3635,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       return { native: lines2.slice(0, -1).join("\n").trimEnd(), why: last.replace(WHY, "").trim() };
     return { native: answer, why: "" };
   }
-  var KEPT = 50;
+  var KEPT2 = 50;
   function keptCorrections() {
     try {
       const kept2 = JSON.parse(String(config().learnHistory || "[]"));
@@ -3588,7 +3645,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     }
   }
   function keepCorrection(entry2) {
-    set("learnHistory", JSON.stringify([entry2, ...keptCorrections()].slice(0, KEPT)));
+    set("learnHistory", JSON.stringify([entry2, ...keptCorrections()].slice(0, KEPT2)));
   }
   function forgetCorrections() {
     set("learnHistory", "");
@@ -4032,46 +4089,6 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     code,
     label: value === native ? value : `${value} — ${native}`
   }));
-
-  // ai-translate/core/log.ts
-  var KEPT2 = 200;
-  var DETAIL_LIMIT = 600;
-  var SECRETS = [
-    /\b(?:sk|gsk|xai|sk-ant|sk-proj)[-_][A-Za-z0-9_-]{8,}/g,
-    /\bAIza[A-Za-z0-9_-]{10,}/g,
-    /\b[A-Fa-f0-9]{32}\.[A-Za-z0-9_-]{8,}/g,
-    /("(?:api_?key|authorization|token)"\s*:\s*")[^"]+/gi
-  ];
-  function masked(text) {
-    let out = text;
-    for (const pattern of SECRETS)
-      out = out.replace(pattern, (whole, keep2) => keep2 ? `${keep2}***` : "***");
-    return out;
-  }
-  var kept = [];
-  function record(level, what, text, detail) {
-    kept.push({
-      at: Date.now(),
-      level,
-      what,
-      text: masked(String(text ?? "")).slice(0, DETAIL_LIMIT),
-      detail: detail ? masked(String(detail)).replace(/\s+/g, " ").trim().slice(0, DETAIL_LIMIT) : void 0
-    });
-    if (kept.length > KEPT2) kept.splice(0, kept.length - KEPT2);
-  }
-  var howMany = () => kept.length;
-  function clear() {
-    kept.length = 0;
-  }
-  function asText() {
-    if (!kept.length) return "";
-    return kept.map((e) => {
-      const when2 = new Date(e.at).toISOString().replace("T", " ").slice(0, 19);
-      const head = `${when2}  ${e.level === "error" ? "ERROR" : "info "}  ${e.what}  ${e.text}`;
-      return e.detail ? `${head}
-${" ".repeat(21)}${e.detail}` : head;
-    }).join("\n");
-  }
 
   // ai-translate/core/slots.ts
   var PROVIDERS = ["groq", "gemini", "glm", "anthropic", "openai"];
@@ -6020,7 +6037,7 @@ ${sent}`;
 
   // src/version.ts
   var SCRIPT_VERSION = `${VERSION}.${1}`;
-  var BUILD_NAME = `${VERSION} (${"09710da"}-${1})`;
+  var BUILD_NAME = `${VERSION} (${"606d8f3"}-${1})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7028,9 +7045,16 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   function installComposerButton(client2) {
     const buttons = /* @__PURE__ */ new Set();
     let busy2 = false;
+    let reported;
     const show = () => {
       const chatId = client2.openChat();
-      const on = !!chatId && isChannelEnabled(chatId);
+      const missing2 = client2.unhooked();
+      const on = !missing2 && !!chatId && isChannelEnabled(chatId);
+      if (buttons.size && missing2 !== reported) {
+        if (missing2) record("error", "hook", missing2);
+        else record("info", "hook", "the hook is in front of the client's sending now");
+        reported = missing2;
+      }
       for (const placed2 of buttons) {
         const { host, button: button2, anchor } = placed2;
         if (!host.isConnected) {
@@ -7039,7 +7063,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         }
         button2.classList.toggle("on", on);
         button2.classList.toggle("busy", busy2);
-        button2.title = `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
+        button2.title = missing2 ? t("button.unhooked", { app: appName() }) : `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
         button2.setAttribute("aria-pressed", String(on));
         button2.setAttribute("aria-label", t("panel.title"));
         host.style.color = getComputedStyle(anchor).color;
@@ -7424,6 +7448,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     worker.postMessage = function(message, ...rest) {
       const payloads = message?.payloads;
       if (!Array.isArray(payloads)) return send(message, ...rest);
+      crossed = true;
       const now = [];
       for (const payload of payloads) {
         const found = typedIn(payload);
@@ -7449,6 +7474,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       }
     });
   }
+  var crossed = false;
+  var missing = "Web A: the script has not been installed";
   var PER_CHAT = 200;
   var messages = /* @__PURE__ */ new Map();
   var names = /* @__PURE__ */ new Map();
@@ -7527,19 +7554,36 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     name: "a",
     install() {
       const Native = page.Worker;
-      if (typeof Native !== "function") return;
+      if (typeof Native !== "function") {
+        missing = "Web A: the page has no Worker to hook";
+        return;
+      }
+      const watched = /* @__PURE__ */ new WeakSet();
+      const watch = (worker) => {
+        watched.add(worker);
+        try {
+          watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
+        } catch (e) {
+          console.error("[AI Translate]", e);
+        }
+      };
       page.Worker = new Proxy(Native, {
         construct(target, args, newTarget) {
           const worker = Reflect.construct(target, args, newTarget);
-          try {
-            watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
-          } catch (e) {
-            console.error("[AI Translate]", e);
-          }
+          watch(worker);
           return worker;
         }
       });
+      const native = Native.prototype?.postMessage;
+      if (typeof native === "function")
+        Native.prototype.postMessage = function(message, ...rest) {
+          if (watched.has(this) || !Array.isArray(message?.payloads)) return native.call(this, message, ...rest);
+          watch(this);
+          return this.postMessage(message, ...rest);
+        };
+      missing = "Web A: no call to Telegram's worker has crossed the script's hook";
     },
+    unhooked: () => crossed ? void 0 : missing,
     openChat: () => chatInHash(),
     chatTitle(chatId) {
       return names.get(chatId) ?? (chatId === chatInHash() ? document.querySelector(".MiddleHeader .fullName")?.textContent?.trim() : void 0) ?? void 0;
@@ -7716,6 +7760,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
   function wrapInvoke(proxy, restore, onCall) {
     const invoke = proxy?.invoke;
+    if (invoke?.aiTranslate) invoked = true;
     if (typeof invoke !== "function" || invoke.aiTranslate) return;
     const queues = /* @__PURE__ */ new Map();
     const later = (chatId, run) => {
@@ -7763,7 +7808,9 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     };
     wrapped.aiTranslate = true;
     proxy.invoke = wrapped;
+    invoked = true;
   }
+  var invoked = false;
   function patchChatInput(ChatInput) {
     if (!ChatInput || ChatInput.aiTranslate) return;
     ChatInput.aiTranslate = true;
@@ -7840,6 +7887,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     openChat() {
       const peerId = page.appImManager?.chat?.peerId;
       return peerId ? chatIdOf(peerId) : void 0;
+    },
+    unhooked() {
+      if (!invoked) return "Web K: apiManagerProxy.invoke has not been reached";
+      if (patchWhenReachable()) return void 0;
+      return page.appImManager?.chat?.input ? "Web K: the chat bar's class has no sendMessageWithForward, so nothing typed can be marked" : "Web K: no chat bar has been reached yet";
     },
     chatTitle: (chatId) => nameOfPeer(peerIdOf(chatId)),
     recent(chatId) {

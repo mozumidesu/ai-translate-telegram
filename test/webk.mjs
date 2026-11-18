@@ -38,9 +38,11 @@ useHost({ ...telegramHost(webK), notice: (text, kind) => notices.push([kind, tex
 // Before Web K's own code: the proxy is not there yet.
 webK.install();
 check("the script waits for the proxy rather than missing it", typeof globalThis.apiManagerProxy, "undefined");
+check("and says until then that it is not in front of the sending", webK.unhooked(), "Web K: apiManagerProxy.invoke has not been reached");
 globalThis.apiManagerProxy = K.apiManagerProxy;
 check("and wraps its invoke the moment it is mounted", K.apiManagerProxy.invoke.aiTranslate, true);
 check("the chat bar's class is marked once it can be reached", K.ChatInput.aiTranslate, true);
+check("and then the hooks are in", webK.unhooked(), undefined);
 
 const sent = () => K.calls.filter(c => c.payload.name === "appMessagesManager").map(c => c.payload);
 const reset = () => {

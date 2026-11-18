@@ -105,9 +105,10 @@ Both clients change often. Read again before relying on any of this:
 
 - **Web A**: `src/api/gramjs/worker/connector.ts` posts
   `{ payloads: [{ type: "callMethod", name, args, messageId }] }` to the GramJS
-  worker, created with `new Worker(...)` after the script has wrapped it. The
-  local message is built inside the worker, so holding `sendMessage` holds
-  everything. The chat bar's sends carry `wasDrafted`; a bot's button does
+  worker, created with `new Worker(...)` after the script has wrapped it; a
+  worker made before the script landed is caught on its next call, through
+  `Worker.prototype.postMessage`. The local message is built inside the
+  worker, so holding `sendMessage` holds everything. The chat bar's sends carry `wasDrafted`; a bot's button does
   not. Other tabs reach the worker through the tab that runs it.
 - **Web K**: `src/config/debug.ts` mounts objects on the window;
   `apiManagerProxy.invoke("manager", { name, method, args })` is the one call
@@ -118,7 +119,10 @@ Both clients change often. Read again before relying on any of this:
   written. Edits come from `saveEditedMessage`.
 
 `node test/live.mjs` opens the real sites, without signing in, and says
-whether the hooks still go in front of those lines.
+whether the hooks still go in front of those lines. In a page where they did
+not, each client's `unhooked()` says why: the chat bar button is not coloured,
+its tooltip says messages go as typed, and the log names the reason. No
+notice: nobody asked for one.
 
 ## Our own interface
 

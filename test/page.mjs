@@ -856,6 +856,47 @@ await clickOurs(a, '.sheet[data-name="settings"] .head .link:last-child');
 check("Web A: on a narrow screen, the wide window and the narrow one both leave 16px a side",
     [await widthOf(a, "settings"), await widthOf(a, "feedback")], [368, 368]);
 
+// --- a script that lands after Web A made its worker
+
+const late = await browser.newContext();
+await late.route("https://web.telegram.org/**", async route => {
+    const file = FILES[new URL(route.request().url()).pathname];
+    if (!file) return route.fulfill({ status: 404, body: "" });
+    await route.fulfill({ status: 200, contentType: file[1], body: await readFile(join(ROOT, "test", file[0])) });
+});
+const lateA = await late.newPage();
+await lateA.goto("https://web.telegram.org/a/");
+await lateA.waitForFunction(() => window.__a);
+// Only once the page has made its worker, as a slow manager can put a script in.
+await lateA.addScriptTag({ content: `${manager(SETTINGS)}\n${script}` });
+await lateA.waitForSelector(".message-input-wrapper .ai-translate-button", { timeout: 5000 });
+
+const lateButton = () => lateA.evaluate(() => {
+    const button = __shadow(document.querySelector(".ai-translate-button")).querySelector("button");
+    return [button.classList.contains("on"), button.title];
+});
+check("Web A, the script late: until a call crosses its hook, the button of a chat that is on is not coloured, and says why",
+    await lateButton(), [false, "AI Translate: not working in this tab. It could not reach the way Telegram sends messages, so they go as typed. Reload the page"]);
+await lateA.evaluate(() => __gm.menu.run());
+await clickOurs(lateA, ".logs .button");
+check("Web A, the script late: and the log says why",
+    (await ours(lateA, '.sheet[data-name="logs"] .log'))[0]?.includes("Web A: no call to Telegram's worker has crossed the script's hook"), true);
+await lateA.keyboard.press("Escape");
+await lateA.keyboard.press("Escape");
+
+await lateA.evaluate(() => {
+    __gm.reply = () => "[ru] see you on saturday";
+    __a.worker.postMessage({
+        payloads: [{ messageId: "l1", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "до субботы", wasDrafted: false }] }]
+    });
+});
+await lateA.waitForFunction(() => __a.echoes.length >= 1, null, { timeout: 5000 }).catch(() => { });
+check("Web A, the script late: the worker made before it is still caught on its next call, and the message goes translated",
+    await lateA.evaluate(() => __a.echoes.map(e => e.payloads[0].args[0].text)), ["see you on saturday"]);
+await lateA.waitForFunction(() => __shadow(document.querySelector(".ai-translate-button")).querySelector("button.on"), null, { timeout: 3000 }).catch(() => { });
+check("Web A, the script late: and from then on the button is coloured as usual", (await lateButton())[0], true);
+await late.close();
+
 // --- a fresh install, with no key yet
 
 const bare = await browser.newContext();

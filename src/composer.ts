@@ -11,7 +11,9 @@
  */
 
 import { isChannelEnabled, toggleChannel } from "../ai-translate/core/chats";
+import { appName } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
+import { record } from "../ai-translate/core/log";
 import type { TelegramClient } from "./client";
 import { offerHeld } from "./held";
 import { translateIcon } from "./icons";
@@ -44,10 +46,19 @@ const MARK = "ai-translate-button";
 export function installComposerButton(client: TelegramClient) {
     const buttons = new Set<{ host: HTMLElement; button: HTMLButtonElement; anchor: Element; }>();
     let busy = false;
+    let reported: string | undefined;
 
     const show = () => {
         const chatId = client.openChat();
-        const on = !!chatId && isChannelEnabled(chatId);
+        // Not in front of the client's sending: messages go as typed, so the button is not coloured, and says why.
+        const missing = client.unhooked();
+        const on = !missing && !!chatId && isChannelEnabled(chatId);
+
+        if (buttons.size && missing !== reported) {
+            if (missing) record("error", "hook", missing);
+            else record("info", "hook", "the hook is in front of the client's sending now");
+            reported = missing;
+        }
 
         for (const placed of buttons) {
             const { host, button, anchor } = placed;
@@ -57,7 +68,7 @@ export function installComposerButton(client: TelegramClient) {
             }
             button.classList.toggle("on", on);
             button.classList.toggle("busy", busy);
-            button.title = `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
+            button.title = missing ? t("button.unhooked", { app: appName() }) : `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
             button.setAttribute("aria-pressed", String(on));
             button.setAttribute("aria-label", t("panel.title"));
             // The client's own buttons say what grey is in this theme.

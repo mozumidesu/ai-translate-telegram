@@ -183,6 +183,7 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
     worker.postMessage = function (message: any, ...rest: any[]) {
         const payloads = message?.payloads;
         if (!Array.isArray(payloads)) return send(message, ...(rest as [any]));
+        crossed = true;
 
         const now: any[] = [];
         for (const payload of payloads) {
@@ -212,6 +213,10 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
         }
     });
 }
+
+/** Whether a batch has crossed a worker the script watches: until one has, nothing typed would be caught. */
+let crossed = false;
+let missing: string | undefined = "Web A: the script has not been installed";
 
 // --- what the worker answers: messages and names
 
@@ -319,20 +324,42 @@ export const webA: TelegramClient = {
 
     install() {
         const Native = page.Worker;
-        if (typeof Native !== "function") return;
+        if (typeof Native !== "function") {
+            missing = "Web A: the page has no Worker to hook";
+            return;
+        }
+
+        const watched = new WeakSet<Worker>();
+        const watch = (worker: Worker) => {
+            watched.add(worker);
+            try {
+                watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
+            } catch (e) {
+                console.error("[AI Translate]", e);
+            }
+        };
 
         page.Worker = new Proxy(Native, {
             construct(target, args, newTarget) {
                 const worker = Reflect.construct(target, args, newTarget);
-                try {
-                    watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
-                } catch (e) {
-                    console.error("[AI Translate]", e);
-                }
+                watch(worker);
                 return worker;
             }
         });
+
+        // A script that lands after Web A made its worker still catches that worker's next call, and every one after.
+        const native = Native.prototype?.postMessage;
+        if (typeof native === "function")
+            Native.prototype.postMessage = function (this: Worker, message: any, ...rest: any[]) {
+                if (watched.has(this) || !Array.isArray(message?.payloads)) return native.call(this, message, ...rest);
+                watch(this);
+                return this.postMessage(message, ...rest);
+            };
+
+        missing = "Web A: no call to Telegram's worker has crossed the script's hook";
     },
+
+    unhooked: () => (crossed ? undefined : missing),
 
     openChat: () => chatInHash(),
 
