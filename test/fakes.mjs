@@ -27,8 +27,8 @@ export function fakeManager(saved = SETTINGS) {
 
 /**
  * A provider in OpenAI's shape, which is Groq's. `reply` is handed the
- * message it was sent and gives back the answer, or a number for an HTTP
- * failure with that status.
+ * message it was sent and gives back the answer, a number for an HTTP
+ * failure with that status, or null for a provider that never answers.
  */
 export function fakeProvider() {
     const provider = {
@@ -45,6 +45,7 @@ export function fakeProvider() {
         const body = JSON.parse(options.data);
         provider.asked.push(body);
         const answer = provider.reply(body.messages?.at(-1)?.content ?? "", body);
+        if (answer === null) return { abort() { } };
 
         setTimeout(() => options.onload(typeof answer === "number"
             ? { status: answer, responseText: JSON.stringify({ error: { message: "refused for the test" } }), responseHeaders: "" }

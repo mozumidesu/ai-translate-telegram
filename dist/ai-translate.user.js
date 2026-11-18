@@ -5897,6 +5897,20 @@ ${sent}`;
     remembered.set(key, what);
     setTimeout(() => remembered.delete(key), REMEMBER_MS);
   };
+  var MESSAGE_MS = 6e4;
+  function translateInTime(text, context) {
+    const stop = new AbortController();
+    const asked2 = aiTranslate("sent", text, context, false, stop.signal);
+    let timer;
+    const late = new Promise((_, refuse) => {
+      timer = setTimeout(() => {
+        stop.abort();
+        refuse(new Error("AI Translate: " + t("error.network", { details: "timed out" })));
+      }, MESSAGE_MS);
+    });
+    void asked2.catch(() => void 0);
+    return Promise.race([asked2, late]).finally(() => clearTimeout(timer));
+  }
   var working = 0;
   var watchers = /* @__PURE__ */ new Set();
   var onBusy = (watcher) => watchers.add(watcher);
@@ -5943,7 +5957,7 @@ ${sent}`;
         const marked = toMarked(text, entities);
         busy(1);
         try {
-          const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
+          const result = await translateInTime(marked.marked, collectContext(chatId));
           const back = marked.back(result.text);
           remember(key, back);
           noteUnder(chatId, back.text, { kind: "original", text, entities });
@@ -7318,6 +7332,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   var CARRIES_TEXT = /* @__PURE__ */ new Set(["sendMessage", "sendMessageLocal", "editMessage"]);
   var ORDERED = /^(send|forward|edit)/;
   var UNORDERED = /* @__PURE__ */ new Set(["sendMessageAction"]);
+  function chatOf(payload) {
+    const params = payload?.args?.[0];
+    const id2 = (params?.toChat ?? params?.chat ?? params?.peer)?.id;
+    return id2 === void 0 || id2 === null ? void 0 : String(id2);
+  }
   function typedIn(payload) {
     if (payload?.type !== "callMethod" || !CARRIES_TEXT.has(payload.name)) return void 0;
     const params = payload.args?.[0];
@@ -7337,23 +7356,26 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
   function watchWorker(worker, restore, onAnswer) {
     const send = worker.postMessage.bind(worker);
-    let tail = Promise.resolve();
-    let queued = 0;
+    const queues = /* @__PURE__ */ new Map();
     const answerNothing = (messageId) => {
       const Event = page.MessageEvent ?? MessageEvent;
       worker.dispatchEvent(new Event("message", {
         data: { payloads: [{ type: "methodResponse", messageId, response: void 0 }] }
       }));
     };
-    const later = (payload, ready) => {
-      queued++;
-      tail = tail.then(() => ready).then((final) => {
+    const later = (chatId, payload, ready) => {
+      const queue = queues.get(chatId) ?? { tail: Promise.resolve(), count: 0 };
+      queues.set(chatId, queue);
+      queue.count++;
+      queue.tail = queue.tail.then(() => ready).then((final) => {
         if (final) send({ payloads: [final] });
         else answerNothing(payload.messageId);
       }).catch((e) => {
         console.error("[AI Translate]", e);
         answerNothing(payload.messageId);
-      }).finally(() => queued--);
+      }).finally(() => {
+        if (--queue.count === 0 && queues.get(chatId) === queue) queues.delete(chatId);
+      });
     };
     const translated = async (payload, found) => {
       try {
@@ -7380,11 +7402,13 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         const found = typedIn(payload);
         const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
         if (plan === "translate") {
-          later(payload, translated(payload, found));
+          later(found.chatId, payload, translated(payload, found));
           continue;
         }
         const going = plan === "learn" ? learned(payload, found) : payload;
-        if (queued && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name)) later(going, Promise.resolve(going));
+        const chatId = chatOf(going);
+        if (chatId !== void 0 && queues.has(chatId) && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name))
+          later(chatId, going, Promise.resolve(going));
         else now.push(going);
       }
       if (now.length === payloads.length && now.every((payload, at) => payload === payloads[at])) return send(message, ...rest);
@@ -7663,15 +7687,23 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     return { ...payload, args: [options, ...payload.args.slice(1)] };
   }
   var ORDERED2 = /^(send|forward)/;
+  function chatOf2(payload) {
+    const first = payload?.args?.[0];
+    const peerId = typeof first === "object" ? first?.peerId : first;
+    return typeof peerId === "number" || typeof peerId === "string" && /^-?\d+$/.test(peerId) ? chatIdOf(peerId) : void 0;
+  }
   function wrapInvoke(proxy, restore, onCall) {
     const invoke = proxy?.invoke;
     if (typeof invoke !== "function" || invoke.aiTranslate) return;
-    let tail = Promise.resolve();
-    let queued = 0;
-    const later = (run) => {
-      queued++;
-      const done = tail.then(run);
-      tail = done.catch(() => void 0).finally(() => queued--);
+    const queues = /* @__PURE__ */ new Map();
+    const later = (chatId, run) => {
+      const queue = queues.get(chatId) ?? { tail: Promise.resolve(), count: 0 };
+      queues.set(chatId, queue);
+      queue.count++;
+      const done = queue.tail.then(run);
+      queue.tail = done.catch(() => void 0).finally(() => {
+        if (--queue.count === 0 && queues.get(chatId) === queue) queues.delete(chatId);
+      });
       return done;
     };
     const wrapped = function(type, payload, ...rest) {
@@ -7692,7 +7724,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           }
         );
         const withAck = rest[0] === true;
-        return later(async () => {
+        return later(found.chatId, async () => {
           const next = await ready;
           if (next) return invoke.call(this, type, next, ...rest);
           return withAck ? { cached: false, result: Promise.resolve(void 0) } : void 0;
@@ -7703,8 +7735,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         const out = asWritten(found.chatId, found.text, found.entities);
         if (out) plain = carrying2(payload, found, out.text, out.entities);
       }
-      if (queued && plain?.name === "appMessagesManager" && ORDERED2.test(plain.method ?? ""))
-        return later(() => invoke.call(this, type, plain, ...rest));
+      const chatId = plain?.name === "appMessagesManager" && ORDERED2.test(plain.method ?? "") ? chatOf2(plain) : void 0;
+      if (chatId !== void 0 && queues.has(chatId)) return later(chatId, () => invoke.call(this, type, plain, ...rest));
       return invoke.call(this, type, plain, ...rest);
     };
     wrapped.aiTranslate = true;

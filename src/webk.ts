@@ -153,8 +153,15 @@ function unmarked(payload: any) {
     return { ...payload, args: [options, ...payload.args.slice(1)] };
 }
 
-/** Manager calls that make messages keep their order behind one being translated. */
+/** Manager calls that make messages keep their order behind one being translated in their chat. */
 const ORDERED = /^(send|forward)/;
+
+/** The chat a manager call is about: its options' peerId, or the peer it is handed first. */
+export function chatOf(payload: any): string | undefined {
+    const first = payload?.args?.[0];
+    const peerId = typeof first === "object" ? first?.peerId : first;
+    return typeof peerId === "number" || (typeof peerId === "string" && /^-?\d+$/.test(peerId)) ? chatIdOf(peerId) : undefined;
+}
 
 type Restore = (chatId: string, text: string, entities: Entity[]) => void;
 
@@ -168,13 +175,17 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
     const invoke = proxy?.invoke;
     if (typeof invoke !== "function" || invoke.aiTranslate) return;
 
-    let tail: Promise<unknown> = Promise.resolve();
-    let queued = 0;
+    // One line per chat: a slow translation in one holds up nothing in another.
+    const queues = new Map<string, { tail: Promise<unknown>; count: number; }>();
 
-    const later = (run: () => Promise<any>) => {
-        queued++;
-        const done = tail.then(run);
-        tail = done.catch(() => undefined).finally(() => queued--);
+    const later = (chatId: string, run: () => Promise<any>) => {
+        const queue = queues.get(chatId) ?? { tail: Promise.resolve(), count: 0 };
+        queues.set(chatId, queue);
+        queue.count++;
+        const done = queue.tail.then(run);
+        queue.tail = done.catch(() => undefined).finally(() => {
+            if (--queue.count === 0 && queues.get(chatId) === queue) queues.delete(chatId);
+        });
         return done;
     };
 
@@ -200,7 +211,7 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
             );
 
             const withAck = rest[0] === true;
-            return later(async () => {
+            return later(found.chatId, async () => {
                 const next = await ready;
                 if (next) return invoke.call(this, type, next, ...rest);
                 // What the caller is told when nothing is sent: nothing, as sendText says when it has no text.
@@ -215,8 +226,8 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
             if (out) plain = carrying(payload, found, out.text, out.entities);
         }
 
-        if (queued && plain?.name === "appMessagesManager" && ORDERED.test(plain.method ?? ""))
-            return later(() => invoke.call(this, type, plain, ...rest));
+        const chatId = plain?.name === "appMessagesManager" && ORDERED.test(plain.method ?? "") ? chatOf(plain) : undefined;
+        if (chatId !== undefined && queues.has(chatId)) return later(chatId, () => invoke.call(this, type, plain, ...rest));
 
         return invoke.call(this, type, plain, ...rest);
     };

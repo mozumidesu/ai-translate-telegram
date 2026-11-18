@@ -11,6 +11,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { mock } from "node:test";
 import * as A from "./fixtures/weba.mjs";
 import { fakeManager, fakeProvider, settle, SETTINGS } from "./fakes.mjs";
 import { built, check, done } from "./lib.mjs";
@@ -125,6 +126,28 @@ worker.postMessage({ payloads: [A.typed("первое")] });
 worker.postMessage({ payloads: [A.typed("второе")] });
 await settle();
 check("two messages sent quickly arrive in the order they were typed", worker.sent.map(m => m.payloads[0].args[0].text), ["first", "second"]);
+
+// --- a provider that does not answer
+
+// Order is kept within a chat; a slow translation in one holds nothing in another.
+mock.timers.enable({ apis: ["setTimeout"] });
+reset();
+provider.reply = () => null;
+const slow = A.typed("ты тут?");
+worker.postMessage({ payloads: [slow] });
+worker.postMessage({ payloads: [A.typed("привет", undefined, { into: A.otherChat }), A.reaction(A.otherChat), A.forward(A.otherChat)] });
+worker.postMessage({ payloads: [A.photo()] });
+for (let i = 0; i < 20; i++) await new Promise(next => setImmediate(next));
+check("while a message waits for a provider that does not answer, a send, a reaction and a forward in another chat go at once",
+    sentNames(), ["sendMessage", "sendReaction", "forwardMessages"]);
+worker.sent.length = 0;
+mock.timers.tick(60_000);
+mock.timers.reset();
+await settle();
+check("and the message is given up on after a minute, whatever the provider does, and goes back into the box",
+    [restored.map(r => r.text), answered.at(-1)?.payloads?.[0].messageId], [["ты тут?"], slow.messageId]);
+check("with the reason", notices.at(-1), ["failure", "AI Translate: Network error: timed out"]);
+check("and what was waiting behind it in its chat goes then", sentNames(), ["sendMessage"]);
 
 // --- edits and paid messages
 

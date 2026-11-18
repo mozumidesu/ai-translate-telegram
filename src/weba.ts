@@ -72,9 +72,16 @@ const entitiesOf = (list: unknown) => (Array.isArray(list) ? list : []).map(from
 /** The calls that carry a message someone typed. */
 const CARRIES_TEXT = new Set(["sendMessage", "sendMessageLocal", "editMessage"]);
 
-/** Calls that make or change messages wait behind one being translated, so messages keep their order. */
+/** Calls that make or change messages wait behind one being translated in their chat, so messages keep their order. */
 const ORDERED = /^(send|forward|edit)/;
 const UNORDERED = new Set(["sendMessageAction"]);
+
+/** The chat a call is about, when it names one: for a forward, the one it goes to. */
+export function chatOf(payload: any): string | undefined {
+    const params = payload?.args?.[0];
+    const id = (params?.toChat ?? params?.chat ?? params?.peer)?.id;
+    return id === undefined || id === null ? undefined : String(id);
+}
 
 interface Found {
     chatId: string;
@@ -115,12 +122,12 @@ type Restore = (chatId: string, text: string, entities: Entity[]) => void;
 /**
  * Wraps one worker's postMessage. Every call goes through untouched unless it
  * carries typed text in a chat that is switched on; that one waits for its
- * translation, and every message call after it waits behind it.
+ * translation, and every message call in its chat after it waits behind it.
  */
 export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: any) => void) {
     const send = worker.postMessage.bind(worker);
-    let tail: Promise<unknown> = Promise.resolve();
-    let queued = 0;
+    // One line per chat: a slow translation in one holds up nothing in another, nor in another tab.
+    const queues = new Map<string, { tail: Promise<unknown>; count: number; }>();
 
     /** The app's own promise for a call that is never sent, settled as if the worker had nothing to say. */
     const answerNothing = (messageId: string) => {
@@ -130,9 +137,11 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
         }));
     };
 
-    const later = (payload: any, ready: Promise<any>) => {
-        queued++;
-        tail = tail
+    const later = (chatId: string, payload: any, ready: Promise<any>) => {
+        const queue = queues.get(chatId) ?? { tail: Promise.resolve(), count: 0 };
+        queues.set(chatId, queue);
+        queue.count++;
+        queue.tail = queue.tail
             .then(() => ready)
             .then(final => {
                 if (final) send({ payloads: [final] });
@@ -142,7 +151,9 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
                 console.error("[AI Translate]", e);
                 answerNothing(payload.messageId);
             })
-            .finally(() => queued--);
+            .finally(() => {
+                if (--queue.count === 0 && queues.get(chatId) === queue) queues.delete(chatId);
+            });
     };
 
     const translated = async (payload: any, found: Found) => {
@@ -177,12 +188,14 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
             const found = typedIn(payload);
             const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
             if (plan === "translate") {
-                later(payload, translated(payload, found!));
+                later(found!.chatId, payload, translated(payload, found!));
                 continue;
             }
 
             const going = plan === "learn" ? learned(payload, found!) : payload;
-            if (queued && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name)) later(going, Promise.resolve(going));
+            const chatId = chatOf(going);
+            if (chatId !== undefined && queues.has(chatId) && ORDERED.test(going?.name ?? "") && !UNORDERED.has(going.name))
+                later(chatId, going, Promise.resolve(going));
             else now.push(going);
         }
 

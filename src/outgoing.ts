@@ -13,6 +13,7 @@ import { isChannelEnabled } from "../ai-translate/core/chats";
 import { config } from "../ai-translate/core/host";
 import { keepPieces } from "../ai-translate/core/keep";
 import { looksLikeOwnAttempt } from "../ai-translate/core/learn";
+import { t } from "../ai-translate/core/locales";
 import { aiTranslate, collectContext, isJustAName, isNotWorthTranslating, notify, scriptShare } from "../ai-translate/core/translate";
 import { type Entity, type Formatted, toMarked } from "./formatted";
 import { askForCorrection } from "./learn";
@@ -38,6 +39,28 @@ const remember = (key: string, what: Formatted) => {
     remembered.set(key, what);
     setTimeout(() => remembered.delete(key), REMEMBER_MS);
 };
+
+/**
+ * However many providers and retries a message takes, it waits no longer than
+ * the core gives one provider: its chat waits behind it.
+ */
+const MESSAGE_MS = 60_000;
+
+/** The translation, or a refusal once the deadline has passed; the core stops asking at once. */
+function translateInTime(text: string, context: string) {
+    const stop = new AbortController();
+    const asked = aiTranslate("sent", text, context, false, stop.signal);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const late = new Promise<never>((_, refuse) => {
+        timer = setTimeout(() => {
+            stop.abort();
+            refuse(new Error("AI Translate: " + t("error.network", { details: "timed out" })));
+        }, MESSAGE_MS);
+    });
+    // What the core says after the deadline is nobody's to hear.
+    void asked.catch(() => undefined);
+    return Promise.race([asked, late]).finally(() => clearTimeout(timer));
+}
 
 /** How many translations are under way, for the chat bar button to show. */
 let working = 0;
@@ -112,7 +135,7 @@ export async function translateOutgoing(chatId: string, text: string, entities: 
             const marked = toMarked(text, entities);
             busy(1);
             try {
-                const result = await aiTranslate("sent", marked.marked, collectContext(chatId));
+                const result = await translateInTime(marked.marked, collectContext(chatId));
                 const back = marked.back(result.text);
                 remember(key, back);
                 // What was typed, for the line under the sent message while Show the original is on.

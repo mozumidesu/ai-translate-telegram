@@ -11,6 +11,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { mock } from "node:test";
 import { CHANNEL, GROUP, makeWebK } from "./fixtures/webk.mjs";
 import { fakeManager, fakeProvider, settle } from "./fakes.mjs";
 import { built, check, done } from "./lib.mjs";
@@ -130,6 +131,36 @@ await sticker;
 await settle();
 check("and everything arrives in the order it was sent", sent().map(p => p.method + ":" + (p.args[0].text ?? "sticker")),
     ["sendText:first", "sendText:second", "sendOther:sticker"]);
+
+// --- a provider that does not answer
+
+// Order is kept within a chat; a slow translation in one holds nothing in another.
+reset();
+provider.reply = () => null;
+mock.timers.enable({ apis: ["setTimeout"] });
+await K.type("ты тут?");
+const elsewhere = [
+    K.managers.appMessagesManager.sendOther({ peerId: GROUP, inputMedia: { _: "inputMediaDocument" } }),
+    K.managers.appMessagesManager.forwardMessages({ peerId: GROUP, fromPeerId: CHANNEL, mids: [4401] }),
+    K.managers.appMessagesManager.sendScheduledMessages(GROUP, [7])
+];
+void K.managers.appMessagesManager.sendOther({ peerId: CHANNEL, inputMedia: { _: "inputMediaDocument" } });
+// Timers are the test's now; what is ready runs on the next turns.
+const turns = async () => {
+    for (let i = 0; i < 20; i++) await new Promise(next => setImmediate(next));
+};
+void elsewhere;
+await turns();
+check("while a message waits for a provider that does not answer, a sticker, a forward and a scheduled send in another chat go at once",
+    sent().map(p => p.method), ["sendOther", "forwardMessages", "sendScheduledMessages"]);
+K.calls.length = 0;
+mock.timers.tick(60_000);
+mock.timers.reset();
+await settle();
+check("and the message is given up on after a minute, whatever the provider does, and goes back into the box",
+    K.restored.map(r => r.text), ["ты тут?"]);
+check("with the reason", notices.at(-1), ["failure", "AI Translate: Network error: timed out"]);
+check("and what was waiting behind it in its chat goes then", sent().map(p => p.method), ["sendOther"]);
 
 // --- a translation that fails
 

@@ -57,6 +57,14 @@ export const album = () => [
     { ...typed(undefined), args: [{ chat, attachment: { blobUrl: "blob:2", mimeType: "image/jpeg" }, groupedId: "17311" }] }
 ];
 
+/** A reaction (methods/reactions.ts) and a forward (methods/messages.ts, ForwardMessagesParams): neither carries typed text. */
+export const reaction = (into = chat) => ({ messageId: id(), type: "callMethod", name: "sendReaction", args: [{ chat: into, messageId: 4401, reactions: [{ type: "emoji", emoticon: "👍" }] }] });
+export const forward = (to = otherChat) => ({
+    messageId: id(), type: "callMethod", name: "forwardMessages",
+    args: [{ fromChat: chat, toChat: to, messages: [{ id: 4401, chatId: chat.id }], wasDrafted: false, lastMessageId: 4410 }]
+});
+export const photo = (into = chat) => ({ messageId: id(), type: "callMethod", name: "sendMessage", args: [{ chat: into, attachment: { blobUrl: "blob:3", mimeType: "image/jpeg" }, wasDrafted: false }] });
+
 export const markRead = () => ({ messageId: id(), type: "callMethod", name: "markMessageListRead", args: [{ chat, threadId: -1, maxId: 4410 }] });
 export const typing = () => ({ messageId: id(), type: "callMethod", name: "sendMessageAction", args: [{ peer: chat, action: { type: "typing" } }] });
 export const initApi = () => ({ messageId: id(), type: "initApi", args: [{ userAgent: "x", platform: "Linux" }, {}] });
