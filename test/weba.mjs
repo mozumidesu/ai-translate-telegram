@@ -144,6 +144,41 @@ check("a paid message is drawn translated and sent translated", worker.sent.map(
     [["sendMessageLocal", "paid hello"], ["sendMessage", "paid hello"]]);
 check("and the provider is asked once for both", provider.asked.length, 1);
 
+// --- what a translation is remembered by
+
+// The same text within ten minutes is answered from memory, but only when nothing that changes the answer has changed.
+reset();
+provider.reply = () => "[ru] see you tomorrow";
+worker.postMessage({ payloads: [A.typed("до завтра")] });
+await settle();
+store.aiTranslateSettings.sentLanguage = "Japanese";
+provider.reply = () => "[ru] また明日";
+worker.postMessage({ payloads: [A.typed("до завтра")] });
+await settle();
+check("the same text after the language is changed is asked about again, in the new language",
+    [provider.asked.length, worker.sent.map(m => m.payloads[0].args[0].text)], [2, ["see you tomorrow", "また明日"]]);
+store.aiTranslateSettings.sentLanguage = SETTINGS.sentLanguage;
+
+reset();
+provider.reply = text => `[ru] here is [the article](${/\((.*)\)/.exec(text)[1]})`;
+const linked = url => A.typed("вот статья", [{ type: "MessageEntityTextUrl", offset: 4, length: 6, url }]);
+worker.postMessage({ payloads: [linked("https://example.com/one")] });
+await settle();
+worker.postMessage({ payloads: [linked("https://example.com/two")] });
+await settle();
+check("and the same text with its link changed goes with the new link",
+    worker.sent.map(m => m.payloads[0].args[0].entities?.[0]?.url), ["https://example.com/one", "https://example.com/two"]);
+
+reset();
+provider.reply = text => `[ru] ${text.replace("привет", "hi")}`;
+const mention = userId => A.typed("Ваня, привет", [{ type: "MessageEntityMentionName", offset: 0, length: 4, userId }]);
+worker.postMessage({ payloads: [mention("5001")] });
+await settle();
+worker.postMessage({ payloads: [mention("5002")] });
+await settle();
+check("and a mention of someone else names them",
+    worker.sent.map(m => m.payloads[0].args[0].entities?.find(e => e.type === "MessageEntityMentionName")?.userId), ["5001", "5002"]);
+
 // --- a translation that fails
 
 // A refused key, which the core does not ask again about, unlike an overloaded provider.

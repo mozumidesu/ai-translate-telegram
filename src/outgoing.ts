@@ -100,7 +100,9 @@ export function asWritten(chatId: string, text: string, entities: Entity[]): For
 export async function translateOutgoing(chatId: string, text: string, entities: Entity[]): Promise<Formatted | undefined> {
     if (!wouldTranslate(chatId, text, entities)) return undefined;
 
-    const key = `${chatId}\n${text}\n${JSON.stringify(entities.map(e => [e.kind, e.offset, e.length]))}`;
+    // Whatever changes the answer, or what goes back with it: the language, a link's address, whom a mention names.
+    const key = JSON.stringify([chatId, String(config().sentLanguage), text,
+        entities.map(e => [e.kind, e.offset, e.length, e.url, e.userId, e.documentId, e.language])]);
     const known = remembered.get(key);
     if (known) return known;
 

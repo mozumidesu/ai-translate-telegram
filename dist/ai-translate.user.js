@@ -5929,9 +5929,12 @@ ${sent}`;
   }
   async function translateOutgoing(chatId, text, entities) {
     if (!wouldTranslate(chatId, text, entities)) return void 0;
-    const key = `${chatId}
-${text}
-${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
+    const key = JSON.stringify([
+      chatId,
+      String(config().sentLanguage),
+      text,
+      entities.map((e) => [e.kind, e.offset, e.length, e.url, e.userId, e.documentId, e.language])
+    ]);
     const known = remembered.get(key);
     if (known) return known;
     let waiting = inFlight.get(key);
