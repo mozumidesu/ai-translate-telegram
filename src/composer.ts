@@ -11,7 +11,6 @@
  */
 
 import { isChannelEnabled, toggleChannel } from "../ai-translate/core/chats";
-import { appName } from "../ai-translate/core/host";
 import { t } from "../ai-translate/core/locales";
 import { record } from "../ai-translate/core/log";
 import type { TelegramClient } from "./client";
@@ -68,7 +67,7 @@ export function installComposerButton(client: TelegramClient) {
             }
             button.classList.toggle("on", on);
             button.classList.toggle("busy", busy);
-            button.title = missing ? t("button.unhooked", { app: appName() }) : `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
+            button.title = missing ? t("button.unhooked") : `${t(on ? "button.on" : "button.off")} — ${t("button.hint")}`;
             button.setAttribute("aria-pressed", String(on));
             button.setAttribute("aria-label", t("panel.title"));
             // The client's own buttons say what grey is in this theme.

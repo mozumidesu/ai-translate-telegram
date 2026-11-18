@@ -170,13 +170,12 @@ Both clients, in a switched-on chat that translates into English.
 8. Web A, Tampermonkey: a script that lands too late. In the script's
    Settings tab in the manager, set Run at to document-idle, save, and reload
    `/a/` with a switched-on chat open. The button is not blue, though the
-   chat is on, and its tooltip says "AI Translate: not working in this tab.
-   It could not reach the way Telegram sends messages, so they go as typed.
-   Reload the page". Logs has a line saying no call to Telegram's worker has
-   crossed the script's hook. No notice appears. Open another chat and come
-   back, or start typing to your second account: within a second the button
-   turns blue, and a message sent now goes translated. Put Run at back to
-   its default and reload.
+   chat is on, and its tooltip says "AI Translate isn't working in this tab,
+   so messages go as typed. Reload the page." Logs has a line saying no call
+   to Telegram's worker has crossed the script's hook. No notice appears.
+   Open another chat and come back, or start typing to your second account:
+   within a second the button turns blue, and a message sent now goes
+   translated. Put Run at back to its default and reload.
 
 ## 9. Check for updates ★
 

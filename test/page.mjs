@@ -876,7 +876,7 @@ const lateButton = () => lateA.evaluate(() => {
     return [button.classList.contains("on"), button.title];
 });
 check("Web A, the script late: until a call crosses its hook, the button of a chat that is on is not coloured, and says why",
-    await lateButton(), [false, "AI Translate: not working in this tab. It could not reach the way Telegram sends messages, so they go as typed. Reload the page"]);
+    await lateButton(), [false, "AI Translate isn't working in this tab, so messages go as typed. Reload the page."]);
 await lateA.evaluate(() => __gm.menu.run());
 await clickOurs(lateA, ".logs .button");
 check("Web A, the script late: and the log says why",
