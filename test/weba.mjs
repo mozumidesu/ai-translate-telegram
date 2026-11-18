@@ -157,6 +157,19 @@ check("the app's own promise is settled with nothing", answered.at(-1)?.payloads
 check("the text goes back into the chat box", restored, [{ chatId: A.chat.id, text: "не переводится", entities: [] }]);
 check("and the person is told why", notices.length > 0 && notices[0][0], "failure");
 
+// Held once by a busy provider, the same text sent again once it answers goes, translated.
+reset();
+provider.reply = () => 429;
+worker.postMessage({ payloads: [A.typed("привет, как дела сегодня")] });
+await settle();
+check("a message held by a refusal", sentNames(), []);
+reset();
+provider.reply = () => "[ru] hi, how are you today";
+worker.postMessage({ payloads: [A.typed("привет, как дела сегодня")] });
+await settle();
+check("is asked about again when it is sent again, and goes once the provider answers",
+    [provider.asked.length, worker.sent[0]?.payloads[0].args[0].text], [1, "hi, how are you today"]);
+
 reset();
 store.aiTranslateSettings.onError = "sendAsTyped";
 provider.reply = () => 401;

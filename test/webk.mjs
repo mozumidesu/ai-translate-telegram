@@ -141,8 +141,22 @@ check("the text goes back into the chat bar", K.restored, [{ text: "не пер�
 check("and the person is told why", notices[0]?.[0], "failure");
 void answer;
 
+// Held once by a busy provider, the same text sent again once it answers goes, translated.
+reset();
+provider.reply = () => 429;
+await K.type("привет, как дела сегодня");
+await settle();
+check("a message held by a refusal", sent().length, 0);
+reset();
+provider.reply = () => "[ru] hi, how are you today";
+await K.type("привет, как дела сегодня");
+await settle();
+check("is asked about again when it is sent again, and goes once the provider answers",
+    [provider.asked.length, sent()[0]?.args[0].text], [1, "hi, how are you today"]);
+
 reset();
 store.aiTranslateSettings.onError = "sendAsTyped";
+provider.reply = () => 401;
 await K.type("отправь как есть");
 await settle();
 check("with sendAsTyped the original goes", sent()[0]?.args[0].text, "отправь как есть");

@@ -5930,7 +5930,6 @@ ${sent}`;
 ${text}
 ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
     const known = remembered.get(key);
-    if (known === "held") throw new Held("held back a moment ago");
     if (known) return known;
     let waiting = inFlight.get(key);
     if (!waiting) {
@@ -5946,7 +5945,6 @@ ${JSON.stringify(entities.map((e) => [e.kind, e.offset, e.length]))}`;
         } catch (e) {
           notify(e, "failure");
           if (config().onError === "sendAsTyped") return void 0;
-          remember(key, "held");
           throw new Held(e instanceof Error ? e.message : String(e));
         } finally {
           busy(-1);

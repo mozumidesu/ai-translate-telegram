@@ -31,10 +31,10 @@ const BOT_COMMAND = /^\/[A-Za-z0-9_]{1,32}(?:@[A-Za-z]\w{3,31})?(?:\s|$)/;
  * and both ask for the same text.
  */
 const REMEMBER_MS = 10 * 60_000;
-const remembered = new Map<string, Formatted | "held">();
+const remembered = new Map<string, Formatted>();
 const inFlight = new Map<string, Promise<Formatted | undefined>>();
 
-const remember = (key: string, what: Formatted | "held") => {
+const remember = (key: string, what: Formatted) => {
     remembered.set(key, what);
     setTimeout(() => remembered.delete(key), REMEMBER_MS);
 };
@@ -102,7 +102,6 @@ export async function translateOutgoing(chatId: string, text: string, entities: 
 
     const key = `${chatId}\n${text}\n${JSON.stringify(entities.map(e => [e.kind, e.offset, e.length]))}`;
     const known = remembered.get(key);
-    if (known === "held") throw new Held("held back a moment ago");
     if (known) return known;
 
     let waiting = inFlight.get(key);
@@ -121,7 +120,6 @@ export async function translateOutgoing(chatId: string, text: string, entities: 
                 notify(e, "failure");
                 // Sending the untranslated text would quietly defeat the point of the script.
                 if (config().onError === "sendAsTyped") return undefined;
-                remember(key, "held");
                 throw new Held(e instanceof Error ? e.message : String(e));
             } finally {
                 busy(-1);
