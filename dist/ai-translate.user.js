@@ -225,7 +225,6 @@
     "fallback.add": "Add a backup provider",
     "fallback.remove": "Remove",
     "apiKey.bad": "{provider} did not accept this key.",
-    "message.switchedProvider": "Main provider unavailable, translated via {provider}",
     "message.waiting": "{provider} is at its limit, translating in {seconds} s",
     "error.tooLarge": "The request was too large for {provider}'s per-minute limit. Shorten the message, or wait a minute",
     "feedback.title": "Support and feedback",
@@ -418,7 +417,6 @@
     "fallback.add": "Добавить запасного провайдера",
     "fallback.remove": "Удалить",
     "apiKey.bad": "{provider} не принял этот ключ.",
-    "message.switchedProvider": "Основной провайдер недоступен, перевод через {provider}",
     "message.waiting": "У {provider} исчерпан лимит, перевод через {seconds} с",
     "error.tooLarge": "Запрос оказался больше, чем позволяет минутный лимит {provider}. Сократите сообщение или подождите минуту",
     "feedback.title": "Поддержка и обратная связь",
@@ -610,7 +608,6 @@
     "fallback.add": "Додати запасного провайдера",
     "fallback.remove": "Видалити",
     "apiKey.bad": "{provider} не прийняв цей ключ.",
-    "message.switchedProvider": "Основний провайдер недоступний, переклад через {provider}",
     "message.waiting": "У {provider} вичерпано ліміт, переклад через {seconds} с",
     "error.tooLarge": "Запит виявився більшим, ніж дозволяє хвилинний ліміт {provider}. Скоротіть повідомлення або зачекайте хвилину",
     "feedback.title": "Підтримка та зворотний звʼязок",
@@ -802,7 +799,6 @@
     "fallback.add": "Adaugă un provider de rezervă",
     "fallback.remove": "Elimină",
     "apiKey.bad": "{provider} nu a acceptat această cheie.",
-    "message.switchedProvider": "Furnizorul principal indisponibil, tradus prin {provider}",
     "message.waiting": "{provider} și-a atins limita, traduc în {seconds} s",
     "error.tooLarge": "Cererea a depășit limita pe minut a {provider}. Scurtează mesajul sau așteaptă un minut",
     "feedback.title": "Asistență și feedback",
@@ -994,7 +990,6 @@
     "fallback.add": "Ersatzanbieter hinzufügen",
     "fallback.remove": "Entfernen",
     "apiKey.bad": "{provider} hat diesen Schlüssel nicht angenommen.",
-    "message.switchedProvider": "Hauptanbieter nicht erreichbar, übersetzt über {provider}",
     "message.waiting": "{provider} ist am Limit, Übersetzung in {seconds} s",
     "error.tooLarge": "Die Anfrage war größer als das Minutenlimit von {provider} erlaubt. Kürze die Nachricht oder warte eine Minute",
     "feedback.title": "Hilfe und Rückmeldung",
@@ -1186,7 +1181,6 @@
     "fallback.add": "Añadir un proveedor de reserva",
     "fallback.remove": "Quitar",
     "apiKey.bad": "{provider} no aceptó esta clave.",
-    "message.switchedProvider": "Proveedor principal no disponible, traducido con {provider}",
     "message.waiting": "{provider} está en su límite, traduzco en {seconds} s",
     "error.tooLarge": "La petición superó el límite por minuto de {provider}. Acorta el mensaje o espera un minuto",
     "feedback.title": "Ayuda y comentarios",
@@ -1378,7 +1372,6 @@
     "fallback.add": "Ajouter un fournisseur de secours",
     "fallback.remove": "Retirer",
     "apiKey.bad": "{provider} n'a pas accepté cette clé.",
-    "message.switchedProvider": "Fournisseur principal indisponible, traduit via {provider}",
     "message.waiting": "{provider} a atteint sa limite, traduction dans {seconds} s",
     "error.tooLarge": "La requête dépassait la limite par minute de {provider}. Raccourcissez le message ou attendez une minute",
     "feedback.title": "Aide et retours",
@@ -1570,7 +1563,6 @@
     "fallback.add": "Adicionar um provedor reserva",
     "fallback.remove": "Remover",
     "apiKey.bad": "{provider} não aceitou esta chave.",
-    "message.switchedProvider": "Provedor principal indisponível, traduzido via {provider}",
     "message.waiting": "{provider} atingiu o limite, traduzindo em {seconds} s",
     "error.tooLarge": "O pedido passou do limite por minuto do {provider}. Encurte a mensagem ou espere um minuto",
     "feedback.title": "Ajuda e comentários",
@@ -1762,7 +1754,6 @@
     "fallback.add": "予備のプロバイダーを追加",
     "fallback.remove": "削除",
     "apiKey.bad": "{provider} はこのキーを受け付けませんでした。",
-    "message.switchedProvider": "主プロバイダーが使えないため {provider} で翻訳しました",
     "message.waiting": "{provider} が上限に達しています。{seconds} 秒後に翻訳します",
     "error.tooLarge": "リクエストが {provider} の毎分の上限を超えました。メッセージを短くするか、1 分ほど待ってください",
     "feedback.title": "サポートとご意見",
@@ -1954,7 +1945,6 @@
     "fallback.add": "添加备用提供商",
     "fallback.remove": "移除",
     "apiKey.bad": "{provider} 不接受这个密钥。",
-    "message.switchedProvider": "主服务商不可用，已通过 {provider} 翻译",
     "message.waiting": "{provider} 已达上限，{seconds} 秒后翻译",
     "error.tooLarge": "请求超出了 {provider} 的每分钟上限。请缩短消息，或等待一分钟",
     "feedback.title": "支持与反馈",
@@ -2146,7 +2136,6 @@
     "fallback.add": "เพิ่มผู้ให้บริการสำรอง",
     "fallback.remove": "เอาออก",
     "apiKey.bad": "{provider} ไม่รับคีย์นี้",
-    "message.switchedProvider": "ผู้ให้บริการหลักใช้ไม่ได้ จึงแปลผ่าน {provider}",
     "message.waiting": "{provider} ถึงขีดจำกัดแล้ว จะแปลในอีก {seconds} วินาที",
     "error.tooLarge": "คำขอใหญ่เกินขีดจำกัดต่อนาทีของ {provider} ย่อข้อความ หรือรอสักนาที",
     "feedback.title": "ความช่วยเหลือและความคิดเห็น",
@@ -2338,7 +2327,6 @@
     "fallback.add": "Thêm nhà cung cấp dự phòng",
     "fallback.remove": "Xoá",
     "apiKey.bad": "{provider} không chấp nhận khoá này.",
-    "message.switchedProvider": "Nhà cung cấp chính không dùng được, đã dịch qua {provider}",
     "message.waiting": "{provider} đã chạm giới hạn, sẽ dịch sau {seconds} giây",
     "error.tooLarge": "Yêu cầu vượt quá giới hạn mỗi phút của {provider}. Hãy rút ngắn tin nhắn hoặc đợi một phút",
     "feedback.title": "Hỗ trợ và phản hồi",
@@ -2530,7 +2518,6 @@
     "fallback.add": "Yedek sağlayıcı ekle",
     "fallback.remove": "Kaldır",
     "apiKey.bad": "{provider} bu anahtarı kabul etmedi.",
-    "message.switchedProvider": "Ana sağlayıcı kullanılamıyor, {provider} ile çevrildi",
     "message.waiting": "{provider} sınırına ulaştı, {seconds} sn sonra çevrilecek",
     "error.tooLarge": "İstek {provider} sağlayıcısının dakika sınırını aştı. Mesajı kısaltın ya da bir dakika bekleyin",
     "feedback.title": "Destek ve geri bildirim",
@@ -2722,7 +2709,6 @@
     "fallback.add": "Tambah penyedia cadangan",
     "fallback.remove": "Hapus",
     "apiKey.bad": "{provider} tidak menerima kunci ini.",
-    "message.switchedProvider": "Penyedia utama tidak tersedia, diterjemahkan lewat {provider}",
     "message.waiting": "{provider} sedang mencapai batas, menerjemahkan dalam {seconds} dtk",
     "error.tooLarge": "Permintaan terlalu besar untuk batas per menit {provider}. Perpendek pesan atau tunggu sebentar",
     "feedback.title": "Dukungan dan masukan",
@@ -2914,7 +2900,6 @@
     "fallback.add": "إضافة مزود احتياطي",
     "fallback.remove": "إزالة",
     "apiKey.bad": "لم يقبل {provider} هذا المفتاح.",
-    "message.switchedProvider": "المزوّد الرئيسي غير متاح، فتُرجم النص عبر {provider}",
     "message.waiting": "بلغ {provider} حدّه، ستتم الترجمة بعد {seconds} ث",
     "error.tooLarge": "كان الطلب أكبر من حد {provider} في الدقيقة. اختصر الرسالة، أو انتظر دقيقة",
     "feedback.title": "الدعم والملاحظات",
@@ -3106,7 +3091,6 @@
     "fallback.add": "예비 제공자 추가",
     "fallback.remove": "제거",
     "apiKey.bad": "{provider}가 이 키를 받지 않았습니다.",
-    "message.switchedProvider": "주 제공자를 쓸 수 없어 {provider}(으)로 번역했습니다",
     "message.waiting": "{provider}가 한도에 도달했습니다. {seconds}초 뒤에 번역합니다",
     "error.tooLarge": "요청이 {provider}의 분당 한도보다 큽니다. 메시지를 줄이거나 잠시 기다려 주세요",
     "feedback.title": "지원 및 피드백",
@@ -3289,15 +3273,18 @@
   var KEPT = 200;
   var DETAIL_LIMIT = 600;
   var SECRETS = [
-    /\b(?:sk|gsk|xai|sk-ant|sk-proj)[-_][A-Za-z0-9_-]{8,}/g,
+    /\b(?:sk|gsk|xai|csk|hf|sk-ant|sk-proj)[-_][A-Za-z0-9_-]{8,}/g,
     /\bAIza[A-Za-z0-9_-]{10,}/g,
+    // Z.ai's, before the bare hex that would leave its tail behind.
     /\b[A-Fa-f0-9]{32}\.[A-Za-z0-9_-]{8,}/g,
+    /\b[A-Fa-f0-9]{32,}\b/g,
+    /(\bBearer\s+)[A-Za-z0-9._~+/=-]{8,}/gi,
     /("(?:api_?key|authorization|token)"\s*:\s*")[^"]+/gi
   ];
   function masked(text) {
     let out = text;
     for (const pattern of SECRETS)
-      out = out.replace(pattern, (whole, keep2) => keep2 ? `${keep2}***` : "***");
+      out = out.replace(pattern, (whole2, keep2) => typeof keep2 === "string" ? `${keep2}***` : "***");
     return out;
   }
   var kept = [];
@@ -3611,9 +3598,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
           if (seen2[n] > 1) return null;
           if (seen2[n] === 0 && !answer.includes(pieces[n - 1].text)) return null;
         }
-        return answer.replace(form.find, (whole, digits) => {
+        return answer.replace(form.find, (whole2, digits) => {
           const n = numberOf(digits);
-          return n >= 1 && n <= pieces.length ? pieces[n - 1].text : whole;
+          return n >= 1 && n <= pieces.length ? pieces[n - 1].text : whole2;
         });
       }
     };
@@ -4019,12 +4006,32 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   };
 
   // ai-translate/core/languages.ts
+  var LATIN = { script: ["Latin"], cased: true, closing: {} };
+  var CYRILLIC = { ...LATIN, script: ["Cyrillic"] };
+  var GREEK = { script: ["Greek"], cased: true, closing: { ";": "?", ";": "?" } };
+  var ARMENIAN = { script: ["Armenian"], cased: true, closing: { "։": "." } };
+  var GEORGIAN = { script: ["Georgian"], cased: false, closing: {} };
+  var HEBREW = { script: ["Hebrew"], cased: false, closing: {} };
+  var ARABIC = { script: ["Arabic"], cased: false, closing: { "؟": "?" } };
+  var URDU = { ...ARABIC, closing: { "؟": "?", "۔": "." } };
+  var DANDA = { "।": ".", "॥": "." };
+  var DEVANAGARI = { script: ["Devanagari"], cased: false, closing: DANDA };
+  var BENGALI = { script: ["Bengali"], cased: false, closing: DANDA };
+  var TAMIL = { script: ["Tamil"], cased: false, closing: {} };
+  var THAI = { script: ["Thai"], cased: false, closing: {} };
+  var HANGUL = { script: ["Hangul"], cased: false, closing: {} };
+  var FULLWIDTH = { "。": ".", "｡": ".", "？": "?", "！": "!" };
+  var CHINESE = { script: ["Han"], cased: false, closing: FULLWIDTH };
+  var JAPANESE = { script: ["Han", "Hiragana", "Katakana"], cased: false, closing: FULLWIDTH };
+  function record2([value, native, code, writing = LATIN]) {
+    return { ...writing, value, code, label: value === native ? value : `${value} — ${native}` };
+  }
   var LANGUAGES = [
     ["Romanian", "Română", "ro"],
-    ["Russian", "Русский", "ru"],
+    ["Russian", "Русский", "ru", CYRILLIC],
     ["English", "English", "en"],
-    ["Ukrainian", "Українська", "uk"],
-    ["Belarusian", "Беларуская", "be"],
+    ["Ukrainian", "Українська", "uk", CYRILLIC],
+    ["Belarusian", "Беларуская", "be", CYRILLIC],
     ["Polish", "Polski", "pl"],
     ["German", "Deutsch", "de"],
     ["French", "Français", "fr"],
@@ -4034,13 +4041,13 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     ["Brazilian Portuguese", "Português do Brasil", "pt-BR"],
     ["Dutch", "Nederlands", "nl"],
     ["Turkish", "Türkçe", "tr"],
-    ["Greek", "Ελληνικά", "el"],
-    ["Bulgarian", "Български", "bg"],
-    ["Serbian", "Српски", "sr"],
+    ["Greek", "Ελληνικά", "el", GREEK],
+    ["Bulgarian", "Български", "bg", CYRILLIC],
+    ["Serbian", "Српски", "sr", CYRILLIC],
     ["Croatian", "Hrvatski", "hr"],
     ["Bosnian", "Bosanski", "bs"],
     ["Slovenian", "Slovenščina", "sl"],
-    ["Macedonian", "Македонски", "mk"],
+    ["Macedonian", "Македонски", "mk", CYRILLIC],
     ["Albanian", "Shqip", "sq"],
     ["Czech", "Čeština", "cs"],
     ["Slovak", "Slovenčina", "sk"],
@@ -4053,25 +4060,25 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     ["Estonian", "Eesti", "et"],
     ["Latvian", "Latviešu", "lv"],
     ["Lithuanian", "Lietuvių", "lt"],
-    ["Hebrew", "עברית", "he"],
-    ["Arabic", "العربية", "ar"],
-    ["Persian", "فارسی", "fa"],
-    ["Hindi", "हिन्दी", "hi"],
-    ["Bengali", "বাংলা", "bn"],
-    ["Urdu", "اردو", "ur"],
-    ["Tamil", "தமிழ்", "ta"],
+    ["Hebrew", "עברית", "he", HEBREW],
+    ["Arabic", "العربية", "ar", ARABIC],
+    ["Persian", "فارسی", "fa", ARABIC],
+    ["Hindi", "हिन्दी", "hi", DEVANAGARI],
+    ["Bengali", "বাংলা", "bn", BENGALI],
+    ["Urdu", "اردو", "ur", URDU],
+    ["Tamil", "தமிழ்", "ta", TAMIL],
     ["Indonesian", "Bahasa Indonesia", "id"],
     ["Malay", "Bahasa Melayu", "ms"],
-    ["Thai", "ไทย", "th"],
+    ["Thai", "ไทย", "th", THAI],
     ["Vietnamese", "Tiếng Việt", "vi"],
-    ["Chinese (Simplified)", "简体中文", "zh-Hans"],
-    ["Chinese (Traditional)", "繁體中文", "zh-Hant"],
-    ["Japanese", "日本語", "ja"],
-    ["Korean", "한국어", "ko"],
-    ["Georgian", "ქართული", "ka"],
-    ["Armenian", "Հայերեն", "hy"],
+    ["Chinese (Simplified)", "简体中文", "zh-Hans", CHINESE],
+    ["Chinese (Traditional)", "繁體中文", "zh-Hant", CHINESE],
+    ["Japanese", "日本語", "ja", JAPANESE],
+    ["Korean", "한국어", "ko", HANGUL],
+    ["Georgian", "ქართული", "ka", GEORGIAN],
+    ["Armenian", "Հայերեն", "hy", ARMENIAN],
     ["Azerbaijani", "Azərbaycan", "az"],
-    ["Kazakh", "Қазақша", "kk"],
+    ["Kazakh", "Қазақша", "kk", CYRILLIC],
     ["Uzbek", "Oʻzbekcha", "uz"],
     ["Catalan", "Català", "ca"],
     ["Basque", "Euskara", "eu"],
@@ -4084,11 +4091,83 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     ["Afrikaans", "Afrikaans", "af"],
     ["Esperanto", "Esperanto", "eo"],
     ["Latin", "Latina", "la"]
-  ].map(([value, native, code]) => ({
-    value,
-    code,
-    label: value === native ? value : `${value} — ${native}`
-  }));
+  ].map(record2);
+  var UNLISTED = [
+    ["Mongolian", "Монгол", "mn", CYRILLIC],
+    ["Pashto", "پښتو", "ps", ARABIC],
+    ["Yiddish", "ייִדיש", "yi", HEBREW],
+    ["Marathi", "मराठी", "mr", DEVANAGARI],
+    ["Nepali", "नेपाली", "ne", DEVANAGARI]
+  ].map(record2);
+  var ALL2 = [...LANGUAGES, ...UNLISTED];
+  function languageNamed(name) {
+    const said = name.trim().toLowerCase();
+    const named = (l) => l.value.toLowerCase();
+    return ALL2.find((l) => named(l) === said) ?? ALL2.find((l) => named(l).replace(/ \(.*\)$/, "") === said) ?? ALL2.find((l) => said.startsWith(named(l)) && !/\p{L}/u.test(said.charAt(named(l).length)));
+  }
+  var patterns = /* @__PURE__ */ new Map();
+  function lettersOf(scripts) {
+    const key = scripts.join("|");
+    let pattern = patterns.get(key);
+    if (!pattern) patterns.set(key, pattern = new RegExp(scripts.map((s) => `\\p{Script=${s}}`).join("|"), "u"));
+    return pattern;
+  }
+  var scriptPattern = (language) => lettersOf(languageNamed(language)?.script ?? LATIN.script);
+  var SCRIPTS = [...new Set(ALL2.flatMap((l) => l.script))];
+  var scriptOf = (letter) => SCRIPTS.find((script) => lettersOf([script]).test(letter));
+  function mostlyIn(text) {
+    const counted = /* @__PURE__ */ new Map();
+    for (const letter of text.match(/\p{L}/gu) ?? []) {
+      const script = scriptOf(letter);
+      if (script) counted.set(script, (counted.get(script) ?? 0) + 1);
+    }
+    return [...counted].sort((a, b) => b[1] - a[1])[0]?.[0];
+  }
+  var CASED = new Set(ALL2.filter((l) => l.cased).flatMap((l) => l.script));
+  var hasCase = (letter) => {
+    const script = scriptOf(letter);
+    return !!script && CASED.has(script);
+  };
+  var COMMON = { ".": ".", "?": "?", "!": "!", "…": "..." };
+  var marksOf = (keep2) => ALL2.flatMap((l) => Object.entries(l.closing).filter(([mark]) => keep2(mark)).map(([mark, plain]) => ({ language: l, mark, plain })));
+  var ALWAYS = new Map([...Object.entries(COMMON), ...marksOf((mark) => mark.charCodeAt(0) > 127).map((m) => [m.mark, m.plain])]);
+  var ORDINARY = marksOf((mark) => mark.charCodeAt(0) <= 127);
+  function closingOf(text, language) {
+    const own2 = language === void 0 ? void 0 : languageNamed(language);
+    let alphabet;
+    const plainOf = (mark) => {
+      const always = ALWAYS.get(mark);
+      if (always !== void 0) return always;
+      const ours = ORDINARY.filter((m) => m.mark === mark);
+      if (!ours.length) return void 0;
+      if (!own2 && alphabet === void 0) alphabet = mostlyIn(text) ?? "";
+      return ours.find((m) => own2 ? own2 === m.language : m.language.script.includes(alphabet))?.plain;
+    };
+    const chars = [...text];
+    const run = [];
+    const plain = [];
+    for (let at = chars.length - 1; at >= 0; at--) {
+      const stands = plainOf(chars[at]);
+      if (stands === void 0) break;
+      run.unshift(chars[at]);
+      plain.unshift(stands);
+    }
+    return { run: run.join(""), plain: plain.join("") };
+  }
+  var PLAIN2 = new Map(ALL2.flatMap((l) => Object.entries(l.closing)));
+  function closeIn(language, run) {
+    const own2 = languageNamed(language)?.closing ?? {};
+    return [...run].map((mark) => mark in COMMON || mark in own2 ? mark : PLAIN2.get(mark) ?? mark).join("");
+  }
+  var whole = /* @__PURE__ */ new Map();
+  function wholly(script) {
+    let pattern = whole.get(script);
+    if (!pattern) whole.set(script, pattern = new RegExp(`^[\\p{Script=${script}}\\p{M}]+$`, "u"));
+    return pattern;
+  }
+  function writtenIn(language, ...words) {
+    return (languageNamed(language)?.script ?? LATIN.script).some((script) => words.every((word) => wholly(script).test(word)));
+  }
 
   // ai-translate/core/slots.ts
   var PROVIDERS = ["groq", "gemini", "glm", "anthropic", "openai"];
@@ -4230,11 +4309,11 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     }
     return found;
   }
-  var lettersOf = (text) => text.replace(idsAndLinks(), " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim().toLowerCase();
+  var lettersOf2 = (text) => text.replace(idsAndLinks(), " ").replace(/[^\p{L}\p{N}]+/gu, " ").trim().toLowerCase();
   function isJustAName(text, channelId) {
-    const said = lettersOf(text);
+    const said = lettersOf2(text);
     if (!said) return false;
-    return recent(channelId).some((m) => !!m.authorName && lettersOf(m.authorName) === said);
+    return recent(channelId).some((m) => !!m.authorName && lettersOf2(m.authorName) === said);
   }
   var RELATED_LANGUAGES_WARNING = "Russian and Ukrainian, Spanish and Portuguese, Czech and Slovak, and similar pairs are SEPARATE languages. Text in one is not text in the other and must still be translated.";
   var FORMALITY_RULES = {
@@ -4464,29 +4543,14 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     stripped = stripped.replace(/https?:\/\/\S+/g, "").replace(/[\p{Extended_Pictographic}\p{Emoji_Component}]/gu, "").replace(/[\s\p{P}\p{S}]/gu, "");
     return stripped.length === 0;
   }
-  var SCRIPTS = [
-    [/\p{Script=Cyrillic}/u, ["Russian", "Ukrainian", "Belarusian", "Bulgarian", "Serbian", "Macedonian", "Kazakh", "Mongolian"]],
-    [/\p{Script=Arabic}/u, ["Arabic", "Persian", "Urdu", "Pashto"]],
-    [/\p{Script=Hebrew}/u, ["Hebrew", "Yiddish"]],
-    [/\p{Script=Greek}/u, ["Greek"]],
-    [/\p{Script=Thai}/u, ["Thai"]],
-    [/\p{Script=Han}|\p{Script=Hiragana}|\p{Script=Katakana}/u, ["Japanese"]],
-    [/\p{Script=Han}/u, ["Chinese (Simplified)", "Chinese (Traditional)", "Chinese"]],
-    [/\p{Script=Hangul}/u, ["Korean"]],
-    [/\p{Script=Devanagari}/u, ["Hindi", "Marathi", "Nepali"]],
-    [/\p{Script=Bengali}/u, ["Bengali"]],
-    [/\p{Script=Tamil}/u, ["Tamil"]],
-    [/\p{Script=Armenian}/u, ["Armenian"]],
-    [/\p{Script=Georgian}/u, ["Georgian"]]
-  ];
-  function expectedScript(language) {
-    for (const [pattern, languages] of SCRIPTS)
-      if (languages.some((l) => language.toLowerCase().startsWith(l.toLowerCase()))) return pattern;
-    return /\p{Script=Latin}/u;
-  }
-  function scriptShare(text, language) {
-    const pattern = expectedScript(language);
-    const letters = text.replace(/`[^`]*`|https?:\/\/\S+|<[^>]+>|:\w+:/g, "").match(/\p{L}/gu) ?? [];
+  var writingOf = (text) => text.replace(/`[^`]*`|https?:\/\/\S+|<[^>]+>|:\w+:/g, "");
+  var wordKey = (word) => word.normalize("NFC").toLowerCase();
+  function scriptShare(text, language, source = "") {
+    const pattern = scriptPattern(language);
+    const words = writingOf(text).match(/[\p{L}\p{M}]+/gu) ?? [];
+    const kept2 = new Set((writingOf(source).match(/[\p{L}\p{M}]+/gu) ?? []).map(wordKey));
+    const changed2 = words.filter((word) => !kept2.has(wordKey(word)));
+    const letters = (changed2.length ? changed2 : words).join("").match(/\p{L}/gu) ?? [];
     if (!letters.length) return 1;
     return letters.filter((ch) => pattern.test(ch)).length / letters.length;
   }
@@ -4515,6 +4579,16 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   var THINKING = "low";
   var SINGLE_WORD = /^\p{L}[\p{L}\p{M}'\u2019-]*$/u;
   var NOT_PROSE = /https?:\/\/\S+|www\.\S+|<[^>\s]+>/g;
+  function inProse(text, change) {
+    let out = "";
+    let last = 0;
+    for (const match of text.matchAll(NOT_PROSE)) {
+      const at = match.index ?? 0;
+      out += change(text.slice(last, at)) + match[0];
+      last = at + match[0].length;
+    }
+    return out + change(text.slice(last));
+  }
   function applyGlossary(text) {
     const swaps = [];
     for (const entry2 of config().glossary.split(",")) {
@@ -4528,25 +4602,16 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       const head = found.charAt(0);
       return head === head.toUpperCase() && head !== head.toLowerCase() ? to.charAt(0).toUpperCase() + to.slice(1) : to;
     }), part);
-    let out = "";
-    let last = 0;
-    for (const match of text.matchAll(NOT_PROSE)) {
-      const at = match.index ?? 0;
-      out += swap(text.slice(last, at)) + match[0];
-      last = at + match[0].length;
-    }
-    return out + swap(text.slice(last));
+    return inProse(text, swap);
   }
-  var CLOSING = /[.?!…。？！｡؟]+$/;
-  var plainMarks = (run) => run.replace(/[。｡]/g, ".").replace(/[？؟]/g, "?").replace(/！/g, "!").replace(/…/g, "...");
   var WRITERS_DASH = /[\u2013\u2014\u2015]|[^\S\n]-[^\S\n]/;
   var SPACED_DASH = /[^\S\n]([-\u2013\u2014\u2015])[^\S\n]/;
-  var DASH_IN_ANSWER = /[^\S\n]+-[^\S\n]+|[^\S\n]*[\u2013\u2014\u2015][^\S\n]*/g;
+  var DASH_IN_ANSWER = /[^\S\n]+-[^\S\n]+|[^\S\n]*[\u2013\u2014\u2015]+[^\S\n]*/g;
   function dropAddedDashes(source, translated) {
     if (WRITERS_DASH.test(source)) return translated;
-    return translated.replace(/\s*[\u2013\u2014\u2015]\s*/g, (run, at, whole) => {
-      const before = whole[at - 1] ?? "";
-      const after = whole[at + run.length] ?? "";
+    return translated.replace(/\s*[\u2013\u2014\u2015]+\s*/g, (run, at, whole2) => {
+      const before = whole2[at - 1] ?? "";
+      const after = whole2[at + run.length] ?? "";
       if (/\d/.test(before) && /\d/.test(after)) return run;
       if (!before || !after) return "";
       if (/[,;:]/.test(before)) return " ";
@@ -4556,9 +4621,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   function keepWritersDash(source, translated) {
     const theirs = source.match(SPACED_DASH)?.[1];
     if (!theirs) return translated;
-    return translated.replace(DASH_IN_ANSWER, (run, at, whole) => {
-      const before = whole[at - 1] ?? "";
-      const after = whole[at + run.length] ?? "";
+    return translated.replace(DASH_IN_ANSWER, (run, at, whole2) => {
+      const before = whole2[at - 1] ?? "";
+      const after = whole2[at + run.length] ?? "";
       if (!before || !after || before === "\n" || after === "\n") return run;
       if (/\d/.test(before) && /\d/.test(after)) return run;
       return ` ${theirs} `;
@@ -4569,7 +4634,10 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     const gender = config().gender;
     if (gender !== "male" && gender !== "female") return text;
     if (isLanguage(target, "english")) return text;
-    return text.replace(HEDGED_ENDING, (whole, stem, dash, ending) => gender === "male" ? stem : stem + ending.replace(/^-/, ""));
+    return text.replace(HEDGED_ENDING, (whole2, stem, dash, ending) => {
+      if (!writtenIn(target, stem, ending)) return whole2;
+      return gender === "male" ? stem : stem + ending.replace(/^-/, "");
+    });
   }
   var KEYBOARDLESS_HYPHEN = /([\p{L}\p{M}\p{N}])[\u2010\u2011](?=[\p{L}\p{N}])/gu;
   var INTO_CYRILLIC = {
@@ -4600,7 +4668,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   );
   var inTwoAlphabets = (word) => /\p{Script=Latin}/u.test(word) && /\p{Script=Cyrillic}/u.test(word);
   function oneAlphabet(text, target) {
-    const script = expectedScript(target);
+    const script = scriptPattern(target);
     const cyrillic = script.test("а");
     if (!cyrillic && !script.test("a")) return text;
     const twins = cyrillic ? INTO_CYRILLIC : INTO_LATIN;
@@ -4612,6 +4680,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       return word.replace(stray, (letter) => twins[letter]);
     });
   }
+  var PRONOUN_I = /(^|[^\p{L}\p{N}/])i(?=$|[^\p{L}\p{N}'’./=]|\.(?!\p{L}))/gu;
+  var CONTRACTED_I = /(^|[^\p{L}\p{N}/])i(?=['’](?:m|ve|ll|d|re)\b)/giu;
+  var STARTS_WITH_I = /^I(?=$|[^\p{L}\p{N}.]|\.(?!\p{L}))/u;
   function postProcess(original, translated, target, kind) {
     let t2 = translated.trim();
     const source = original.trim();
@@ -4624,24 +4695,22 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     t2 = settleGender(t2, target);
     if (kind === "sent") t2 = keepWritersDash(source, dropAddedDashes(source, t2));
     {
-      const theirs = source.match(CLOSING)?.[0] ?? "";
-      const ours = t2.match(CLOSING)?.[0] ?? "";
-      if (plainMarks(ours) !== plainMarks(theirs))
-        t2 = t2.slice(0, t2.length - ours.length).trimEnd() + theirs;
-      if (!plainMarks(theirs).includes("?")) t2 = t2.replace(/^¿\s*/, "");
-      if (!plainMarks(theirs).includes("!")) t2 = t2.replace(/^¡\s*/, "");
+      const theirs = closingOf(source);
+      const ours = closingOf(t2, target);
+      if (ours.plain !== theirs.plain)
+        t2 = t2.slice(0, t2.length - ours.run.length).trimEnd() + closeIn(target, theirs.run);
+      if (!theirs.plain.includes("?")) t2 = t2.replace(/^¿\s*/, "");
+      if (!theirs.plain.includes("!")) t2 = t2.replace(/^¡\s*/, "");
     }
-    if (/^english/i.test(target)) {
-      t2 = t2.replace(/(^|[^\p{L}\p{N}])i(?=$|[^\p{L}\p{N}'’])/gu, "$1I");
-      t2 = t2.replace(/(^|[^\p{L}\p{N}])i(?=['’](?:m|ve|ll|d|re)\b)/giu, "$1I");
-    }
+    if (isLanguage(target, "english"))
+      t2 = inProse(t2, (prose) => prose.replace(PRONOUN_I, "$1I").replace(CONTRACTED_I, "$1I"));
     const firstLetter = source.match(/\p{L}/u)?.[0];
-    const cased = !!firstLetter && firstLetter.toUpperCase() !== firstLetter.toLowerCase();
-    const keepsCapital = /^german/i.test(target) || /^english/i.test(target) && /^I(?=$|[^\p{L}\p{N}])/u.test(t2);
+    const cased = !!firstLetter && hasCase(firstLetter) && firstLetter.toUpperCase() !== firstLetter.toLowerCase();
+    const keepsCapital = isLanguage(target, "german") || isLanguage(target, "english") && STARTS_WITH_I.test(t2);
     if (cased && firstLetter === firstLetter.toUpperCase())
-      t2 = t2.replace(/\p{L}/u, (c) => c.toUpperCase());
+      t2 = t2.replace(/\p{L}/u, (c) => hasCase(c) ? c.toUpperCase() : c);
     else if (cased && !keepsCapital)
-      t2 = t2.replace(/\p{L}/u, (c) => c.toLowerCase());
+      t2 = t2.replace(/\p{L}/u, (c) => hasCase(c) ? c.toLowerCase() : c);
     return restoreLinePrefixes(source, keepBlankLines(source, t2));
   }
   function extractText(provider, raw) {
@@ -4655,7 +4724,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
         return (json.choices?.[0]?.message?.content ?? "").replace(/<think>[\s\S]*?<\/think>/gi, "").trim();
     }
   }
-  var BRACKETED = /^[ \t]*\[([^\]\n]{1,24})\][ \t]*/;
+  var BRACKETED = /^[ \t]*\[([^\]\n]{1,24})\](?!\()[ \t]*/;
   function looksLikeLanguage(token) {
     const said = token.trim();
     return /^[a-z]{2,3}(-[a-z]{2,4})?$/i.test(said) || LANGUAGES.some((l) => l.value.toLowerCase() === said.toLowerCase());
@@ -4697,8 +4766,11 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   }
   var CUT_OFF = /"finish_reason"\s*:\s*"length"|"finishReason"\s*:\s*"MAX_TOKENS"|"stop_reason"\s*:\s*"max_tokens"/;
   var CONTEXT_MESSAGES = 4;
+  var oneLine = (text) => text.replace(/[\p{White_Space}\p{Cc}]+/gu, " ").trim();
+  var NAME_LIMIT = 64;
+  var asName = (name) => Array.from(oneLine(String(name ?? ""))).slice(0, NAME_LIMIT).join("").trim();
   function readable(text, names2) {
-    return dialect().readIds(text, names2).replace(/https?:\/\/\S+|www\.\S+/g, "(link)").replace(/[^\S\n]{2,}/g, " ").trim();
+    return oneLine(dialect().readIds(text, names2).replace(/https?:\/\/\S+|www\.\S+/g, "(link)"));
   }
   function collectContext(channelId, beforeId) {
     const protectedWords = new Set(
@@ -4715,14 +4787,17 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       }
       const names3 = /* @__PURE__ */ new Map();
       if (me2) names3.set(me2, "Me");
-      for (const m of said)
-        if (m.authorId && m.authorName) names3.set(m.authorId, m.authorName);
+      for (const m of said) {
+        const name = asName(m.authorName);
+        if (m.authorId && name) names3.set(m.authorId, name);
+      }
       const lines2 = [];
       for (const m of said.slice(-CONTEXT_MESSAGES)) {
-        if (m.authorName) protectedWords.add(m.authorName);
+        const name = asName(m.authorName);
+        if (name) protectedWords.add(name);
         const content = readable(m.content, names3).slice(0, 300);
         if (!content) continue;
-        lines2.push(`${m.authorId === me2 ? "Me" : m.authorName || "Them"}: ${content}`);
+        lines2.push(`${m.authorId === me2 ? "Me" : name || "Them"}: ${content}`);
       }
       if (lines2.length)
         conversation = "\n\nRecent messages in this conversation, for context only. Do not translate them, do not repeat them, do not answer them. Use them only to understand what the text below refers to:\n" + lines2.join("\n");
@@ -4738,6 +4813,9 @@ These are names of people, not words. Never translate them or any affectionate f
     const known = LANGUAGES.find((l) => l.value.toLowerCase() === language.toLowerCase());
     return said === language.toLowerCase() || !!known && said === known.code.toLowerCase();
   }
+  var namedTheTarget = (target) => `
+
+IMPORTANT: your previous answer began with the code of ${target}, as if the message were already written in ${target}, yet it did not give the message back as written. The code names the language the message is written in, the language it is translated FROM. If the message really is written in ${target}, answer with that code and the message exactly as written. If it is not, answer with the code of the language it is written in, then the translation.`;
   var cache = /* @__PURE__ */ new Map();
   function providerSaid(data) {
     try {
@@ -4748,8 +4826,44 @@ These are names of people, not words. Never translate them or any affectionate f
     }
     return "";
   }
+  function withoutKey(text, key) {
+    const sent = key.trim();
+    return sent.length >= 8 ? text.split(sent).join("***") : text;
+  }
   var BLOCK_PAGE = /<html|cloudflare|cf-ray|attention required|access denied|just a moment|error code: \d/i;
-  var WORTH_A_SECOND_PROVIDER = (status) => status === -1 || status === 403 || status === 413 || status === 429 || status >= 500;
+  var MODEL_GONE = /decommission|deprecat|no longer supported|unknown model|not a valid model|model_not_found|does not exist/i;
+  var WORTH_A_SECOND_PROVIDER = (status, data) => status === -1 || status === 401 || status === 402 || status === 403 || status === 404 || status === 413 || status === 429 || status >= 500 || status === 400 && MODEL_GONE.test(data);
+  function refusal({ status, data, model, provider, retryMs }, name) {
+    if (status === -1) return fail("error.network", { details: data });
+    if (status === 401) return fail("error.badKey", { provider: name, status });
+    if (status === 403) {
+      if (/api.?key|unauthori[sz]|invalid.?auth/i.test(data)) return fail("error.badKey", { provider: name, status });
+      const said = providerSaid(data);
+      if (said) return fail("error.forbiddenSaid", { provider: name, details: said });
+      if (BLOCK_PAGE.test(data)) return fail("error.blocked", { provider: name });
+      return fail("error.forbidden", { provider: name });
+    }
+    if (status === 404) return fail("error.noSuchModel", { provider: name, model });
+    if (status === 429) {
+      const said = providerSaid(data);
+      if (provider === "glm" && /insufficient|balance|no credit|\u6b20\u8d39|\u4f59\u989d/i.test(data))
+        return fail("error.noBalance", {
+          provider: name,
+          model,
+          details: (said || data.slice(0, 120)).replace(/[.\u3002\uff61]+$/, ""),
+          free: FREE_MODELS.glm.join(", ")
+        });
+      const limit = readLimit(data, retryMs);
+      if (limit.scope === "day")
+        return limit.waitMs ? fail("error.dailyLimit", { provider: name, model, wait: humanWait(limit.waitMs) }) : fail("error.dailyLimitNoWait", { provider: name, model });
+      if (limit.waitMs) return fail("error.rateLimitWait", { provider: name, wait: humanWait(limit.waitMs) });
+      return said ? fail("error.rateLimitSaid", { provider: name, details: said }) : fail("error.rateLimit", { provider: name });
+    }
+    if (status === 413) return fail("error.tooLarge", { provider: name });
+    if (status >= 500) return fail("error.overloaded", { provider: name });
+    return fail("error.http", { status, details: data.slice(0, 300) });
+  }
+  var passedOver = /* @__PURE__ */ new Map();
   var CANCELLED = "ai-translate: cancelled";
   var sleep2 = (ms, signal) => new Promise((resolve, reject) => {
     if (signal?.aborted) return reject(new Error(CANCELLED));
@@ -4834,14 +4948,14 @@ These are names of people, not words. Never translate them or any affectionate f
   };
   var PACE_UNKNOWN = { base: 1e3, perChar: 1.5 };
   var paces = /* @__PURE__ */ new Map();
-  var paceOf = (id2) => paces.get(id2) ?? PACE_START[id2] ?? PACE_UNKNOWN;
-  function notePace(id2, chars, ms) {
-    const pace = { ...paceOf(id2) };
+  var paceOf = (slot) => paces.get(slot.id) ?? PACE_START[slot.provider] ?? PACE_UNKNOWN;
+  function notePace(slot, chars, ms) {
+    const pace = { ...paceOf(slot) };
     if (chars < 400) pace.base += (Math.max(0, ms - pace.perChar * chars) - pace.base) / 2;
     else pace.perChar += (Math.max(0, (ms - pace.base) / chars) - pace.perChar) / 2;
-    paces.set(id2, pace);
+    paces.set(slot.id, pace);
   }
-  var expectedMs = (id2, chars) => paceOf(id2).base + paceOf(id2).perChar * chars;
+  var expectedMs = (slot, chars) => paceOf(slot).base + paceOf(slot).perChar * chars;
   async function aiTranslate(kind, typed2, context = "", mine = false, signal) {
     const kept2 = kind === "explain" || kind === "correct" ? void 0 : keepPieces(typed2, kind === "sent", glossaryKeeps());
     const text = kept2?.masked ?? typed2;
@@ -4855,6 +4969,7 @@ These are names of people, not words. Never translate them or any affectionate f
     if (!apiKey) throw fail("error.noKey", { provider: firstName });
     if (!model) throw fail("error.noModel", { provider: firstName });
     const target = kind === "sent" || kind === "correct" ? config().sentLanguage : config().receivedLanguage;
+    const shareOf = (answer) => scriptShare(answer, target, text);
     const { extraInstructions, formality } = config();
     const cacheKey = [
       kind,
@@ -4869,6 +4984,7 @@ These are names of people, not words. Never translate them or any affectionate f
       config().glossary,
       context,
       mine,
+      kind === "correct" ? config().receivedLanguage : "",
       typed2
     ].join("|");
     const hit = cache.get(cacheKey);
@@ -4887,7 +5003,7 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
       const chars = system.length + text.length;
       reserve(id2, estimateTokens(`${id2}|${kind}`, chars));
       const started = Date.now();
-      const { status, data, budget, retryMs } = await Bridge.makeAiTranslateRequest(JSON.stringify({
+      const { status, data: answered, budget, retryMs } = await Bridge.makeAiTranslateRequest(JSON.stringify({
         provider: slot.provider,
         apiKey: key,
         model: chosen,
@@ -4897,11 +5013,12 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
         text,
         roomy
       }));
+      const data = withoutKey(answered, key);
       noteBudget(id2, budget);
       let billed = 0;
       let cached;
       if (status === 200) {
-        notePace(id2, text.length, Date.now() - started);
+        notePace(slot, text.length, Date.now() - started);
         billed = promptTokens(data);
         if (billed) billedPerChar.set(`${id2}|${kind}`, billed / chars);
         cached = cachedTokens(data);
@@ -4943,8 +5060,9 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
         }
         return void 0;
       };
-      const soonerBackup = (wait2) => backups.find((slot) => !tried.has(slot.id) && waitFor(slot.id, modelOf(slot), cost(slot)) === 0 && (waited + wait2 > MAX_WAIT_MS || expectedMs(slot.id, text.length) < wait2 + expectedMs(first.id, text.length)));
+      const soonerBackup = (wait2) => backups.find((slot) => !tried.has(slot.id) && waitFor(slot.id, modelOf(slot), cost(slot)) === 0 && (waited + wait2 > MAX_WAIT_MS || expectedMs(slot, text.length) < wait2 + expectedMs(first, text.length)));
       let answer;
+      let firstRefused;
       const wait = waitFor(first.id, model, cost(first));
       const sooner = wait > 0 ? soonerBackup(wait) : void 0;
       if (sooner) {
@@ -4965,43 +5083,29 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
           if (!soonerBackup(again) && await waitOut(first.provider, again))
             answer = await callProvider(first, system, roomy);
         }
-        if (WORTH_A_SECOND_PROVIDER(answer.status)) {
+        if (WORTH_A_SECOND_PROVIDER(answer.status, answer.data)) {
           const second = await askBackups();
-          if (second) answer = second;
+          if (second) {
+            firstRefused = answer;
+            answer = second;
+          }
         }
       }
-      if (answer.slot !== first.id)
-        notify(t("message.switchedProvider", { provider: providerName(answer.provider) }), "message");
-      const { status, data, model: usedModel, provider: usedProvider } = answer;
-      const name = answer.slot === first.id ? firstName : providerName(usedProvider);
-      if (status === -1) throw fail("error.network", { details: data });
-      if (status === 401) throw fail("error.badKey", { provider: name, status });
-      if (status === 403) {
-        if (/api.?key|unauthori[sz]|invalid.?auth/i.test(data)) throw fail("error.badKey", { provider: name, status });
-        const said = providerSaid(data);
-        if (said) throw fail("error.forbiddenSaid", { provider: name, details: said });
-        if (BLOCK_PAGE.test(data)) throw fail("error.blocked", { provider: name });
-        throw fail("error.forbidden", { provider: name });
-      }
-      if (status === 404) throw fail("error.noSuchModel", { provider: name, model: usedModel });
-      if (status === 429) {
-        const said = providerSaid(data);
-        if (usedProvider === "glm" && /insufficient|balance|no credit|\u6b20\u8d39|\u4f59\u989d/i.test(data))
-          throw fail("error.noBalance", {
-            provider: name,
-            model: usedModel,
-            details: (said || data.slice(0, 120)).replace(/[.\u3002\uff61]+$/, ""),
-            free: FREE_MODELS.glm.join(", ")
-          });
-        const limit = readLimit(data, answer.retryMs);
-        if (limit.scope === "day")
-          throw limit.waitMs ? fail("error.dailyLimit", { provider: name, model: usedModel, wait: humanWait(limit.waitMs) }) : fail("error.dailyLimitNoWait", { provider: name, model: usedModel });
-        if (limit.waitMs) throw fail("error.rateLimitWait", { provider: name, wait: humanWait(limit.waitMs) });
-        throw said ? fail("error.rateLimitSaid", { provider: name, details: said }) : fail("error.rateLimit", { provider: name });
-      }
-      if (status === 413) throw fail("error.tooLarge", { provider: name });
-      if (status >= 500) throw fail("error.overloaded", { provider: name });
-      if (status !== 200) throw fail("error.http", { status, details: data.slice(0, 300) });
+      if (firstRefused) {
+        const why2 = [
+          first.provider,
+          model,
+          firstRefused.status,
+          firstRefused.status === 429 ? readLimit(firstRefused.data).scope : ""
+        ].join("|");
+        const said = passedOver.get(first.id) ?? /* @__PURE__ */ new Set();
+        if (!said.has(why2)) {
+          passedOver.set(first.id, said.add(why2));
+          notify(refusal(firstRefused, firstName), "message");
+        }
+      } else if (answer.slot === first.id && answer.status === 200) passedOver.delete(first.id);
+      const { status, data, provider: usedProvider } = answer;
+      if (status !== 200) throw refusal(answer, answer.slot === first.id ? firstName : providerName(usedProvider));
       let out = extractText(usedProvider, data);
       if (CUT_OFF.test(data)) {
         if (!roomy) return ask(system, true, "the answer was cut off where the budget ran out");
@@ -5021,12 +5125,16 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
     };
     let result = await ask(basePrompt);
     if (kind === "sent" && result.inTarget && scriptShare(kept2 ? kept2.bare(text) : text, target) >= 0.97) {
-      const asTyped = { text: kept2?.restore(text) ?? typed2 };
-      cache.set(cacheKey, asTyped);
-      return asTyped;
+      if (!sameMessage(text, result.text))
+        result = await ask(basePrompt + namedTheTarget(target), false, "the answer named the target language and changed the message");
+      if (result.inTarget && sameMessage(text, result.text)) {
+        const asTyped = { text: kept2?.restore(text) ?? typed2 };
+        cache.set(cacheKey, asTyped);
+        return asTyped;
+      }
     }
-    const keptWhole = kind === "received" && /^\S+$/.test(lettersOf(text)) && lettersOf(result.text) === lettersOf(text);
-    const share = keptWhole ? 1 : scriptShare(result.text, target);
+    const keptWhole = kind === "received" && /^\S+$/.test(lettersOf2(text)) && lettersOf2(result.text) === lettersOf2(text);
+    const share = keptWhole ? 1 : shareOf(result.text);
     if (kind === "explain" || kind === "correct") {
     } else if (share < 0.3) {
       const nudges = [
@@ -5040,9 +5148,9 @@ Your last two answers repeated the message instead of translating it. Write it i
       let retried = result;
       for (const nudge of nudges) {
         retried = await ask(basePrompt + nudge, false, "the answer came back in the wrong language");
-        if (scriptShare(retried.text, target) >= 0.3) break;
+        if (shareOf(retried.text) >= 0.3) break;
       }
-      if (scriptShare(retried.text, target) < 0.3) throw fail("error.untranslated");
+      if (shareOf(retried.text) < 0.3) throw fail("error.untranslated");
       result = retried;
     } else if (share < 0.97) {
       const cleaner = await ask(
@@ -5052,7 +5160,7 @@ IMPORTANT: your previous answer still contained words in the original language. 
         false,
         "part of the message stayed in its own language"
       );
-      if (scriptShare(cleaner.text, target) > share) result = cleaner;
+      if (shareOf(cleaner.text) > share) result = cleaner;
     }
     if (lines2 > 1 && kind !== "explain" && kind !== "correct" && lineCount(result.text) !== lines2) {
       const rebroken = await ask(
@@ -5062,7 +5170,7 @@ IMPORTANT: your previous answer was not written on ${lines2} lines. Give the sam
         false,
         "the writer's line breaks were flattened"
       );
-      if (lineCount(rebroken.text) === lines2 && scriptShare(rebroken.text, target) >= 0.3) result = rebroken;
+      if (lineCount(rebroken.text) === lines2 && shareOf(rebroken.text) >= 0.3) result = rebroken;
     }
     if (kind !== "explain" && kind !== "correct" && SHOUTED.test(typed2) && !SHOUTED.test(result.text)) {
       const louder = await ask(
@@ -5072,7 +5180,7 @@ IMPORTANT: your previous answer lost the capital letters the writer typed. The w
         false,
         "the capitals the writer typed were lost"
       );
-      if (SHOUTED.test(louder.text) && scriptShare(louder.text, target) >= 0.3) result = louder;
+      if (SHOUTED.test(louder.text) && shareOf(louder.text) >= 0.3) result = louder;
     }
     if (kept2?.pieces.length) {
       if (!kept2.complete(result.text)) {
@@ -6037,7 +6145,7 @@ ${sent}`;
 
   // src/version.ts
   var SCRIPT_VERSION = `${VERSION}.${2}`;
-  var BUILD_NAME = `${VERSION} (${"606d8f3"}-${2})`;
+  var BUILD_NAME = `${VERSION} (${"f1106a6"}-${2})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7299,8 +7407,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       }
     };
     const watch = (root, subtree) => new MutationObserver((records) => {
-      for (const record2 of records)
-        for (const node of record2.addedNodes) {
+      for (const record3 of records)
+        for (const node of record3.addedNodes) {
           if (!(node instanceof Element)) continue;
           const items = client2.menu.itemsIn(node);
           if (items) fill(items);
