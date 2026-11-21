@@ -7084,7 +7084,8 @@ ${sent}`;
     const { verdict, models } = await checkKey(slot);
     if (verdict === "bad" || verdict === "blocked") {
       refused.classList.toggle("bad", verdict === "bad");
-      refused.textContent = t(verdict === "bad" ? "apiKey.bad" : "apiKey.blocked", { provider: providerName(slot.provider) });
+      const provider = providerName(slot.provider);
+      refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
       return;
     }
     for (const model of models) {

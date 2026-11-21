@@ -356,7 +356,9 @@ async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLE
 
     if (verdict === "bad" || verdict === "blocked") {
         refused.classList.toggle("bad", verdict === "bad");
-        refused.textContent = t(verdict === "bad" ? "apiKey.bad" : "apiKey.blocked", { provider: providerName(slot.provider) });
+        const provider = providerName(slot.provider);
+        // Each key written out whole, so test/strings.mjs sees both.
+        refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
         return;
     }
 
