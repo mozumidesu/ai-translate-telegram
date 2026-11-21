@@ -33,8 +33,8 @@ const CSS = `
 }
 `;
 
-/** A file name nobody has to rename: the script, then when it was taken. */
-const fileName = () => `ai-translate-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}.txt`;
+/** A file name nobody has to rename: the script, then when it was taken, in UTC like the lines inside it. */
+const fileName = () => `ai-translate-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}Z.txt`;
 
 /** The clipboard, with the old way behind it for browsers that refuse the new one. */
 async function toClipboard(text: string) {

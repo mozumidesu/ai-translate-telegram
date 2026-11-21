@@ -351,19 +351,22 @@ function providers() {
 /**
  * The provider's own list of models, and its verdict on the key, by the core's
  * one rule (keyVerdict): a key called bad only when the provider says so, and
- * a network or a country turned away said as that, not in red. The line under
- * the model list follows the same verdict, as the core's model picker does.
+ * a network or a country turned away said as that, not in red, and a value Z.ai
+ * did not take for a key at all said further, in red like a wrong key. The line
+ * under the model list follows the same verdict, as the core's model picker does.
  */
 async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLElement, note: HTMLElement) {
     if (!keyOf(slot)) return;
 
-    const { verdict, models } = await checkKey(slot);
+    const { verdict, notAKey, models } = await checkKey(slot);
     const provider = providerName(slot.provider);
 
     if (verdict === "bad" || verdict === "blocked") {
         refused.classList.toggle("bad", verdict === "bad");
-        // Each key written out whole, so test/strings.mjs sees both.
-        refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
+        // Each key written out whole, so test/strings.mjs sees all three.
+        refused.textContent = verdict === "blocked" ? t("apiKey.blocked", { provider })
+            : notAKey ? t("apiKey.notAKey", { provider })
+                : t("apiKey.bad", { provider });
     }
 
     // As the core's picker has it: the provider's list with the models it runs but does not list, or, when

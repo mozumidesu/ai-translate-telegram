@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.2a.8
+// @version         0.2.3a.9
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -227,6 +227,7 @@
     "fallback.remove": "Remove",
     "apiKey.bad": "{provider} did not accept this key.",
     "apiKey.blocked": "{provider} refused requests from this network or region, so the key was not checked.",
+    "apiKey.notAKey": "{provider} did not take this for an API key at all. Copy the whole Standard API Key from z.ai, under API Keys.",
     "message.waiting": "{provider} is at its limit, translating in {seconds} s",
     "error.tooLarge": "The request was too large for {provider}'s per-minute limit. Shorten the message, or wait a minute",
     "feedback.title": "Support and feedback",
@@ -421,6 +422,7 @@
     "fallback.remove": "Удалить",
     "apiKey.bad": "{provider} не принял этот ключ.",
     "apiKey.blocked": "{provider} не принимает запросы из этой сети или региона, поэтому ключ не проверен.",
+    "apiKey.notAKey": "{provider} вообще не принял это за ключ API. Скопируйте ключ Standard API Key на z.ai целиком, в разделе API Keys.",
     "message.waiting": "У {provider} исчерпан лимит, перевод через {seconds} с",
     "error.tooLarge": "Запрос оказался больше, чем позволяет минутный лимит {provider}. Сократите сообщение или подождите минуту",
     "feedback.title": "Поддержка и обратная связь",
@@ -614,6 +616,7 @@
     "fallback.remove": "Видалити",
     "apiKey.bad": "{provider} не прийняв цей ключ.",
     "apiKey.blocked": "{provider} не приймає запити з цієї мережі чи регіону, тому ключ не перевірено.",
+    "apiKey.notAKey": "{provider} узагалі не сприйняв це як ключ API. Скопіюйте ключ Standard API Key на z.ai повністю, у розділі API Keys.",
     "message.waiting": "У {provider} вичерпано ліміт, переклад через {seconds} с",
     "error.tooLarge": "Запит виявився більшим, ніж дозволяє хвилинний ліміт {provider}. Скоротіть повідомлення або зачекайте хвилину",
     "feedback.title": "Підтримка та зворотний звʼязок",
@@ -807,6 +810,7 @@
     "fallback.remove": "Elimină",
     "apiKey.bad": "{provider} nu a acceptat această cheie.",
     "apiKey.blocked": "{provider} refuză cererile din această rețea sau regiune, așa că cheia nu a fost verificată.",
+    "apiKey.notAKey": "{provider} nu a recunoscut deloc asta drept o cheie API. Copiază întreaga cheie Standard API Key de pe z.ai, din secțiunea API Keys.",
     "message.waiting": "{provider} și-a atins limita, traduc în {seconds} s",
     "error.tooLarge": "Cererea a depășit limita pe minut a {provider}. Scurtează mesajul sau așteaptă un minut",
     "feedback.title": "Asistență și feedback",
@@ -1000,6 +1004,7 @@
     "fallback.remove": "Entfernen",
     "apiKey.bad": "{provider} hat diesen Schlüssel nicht angenommen.",
     "apiKey.blocked": "{provider} lehnt Anfragen aus diesem Netz oder dieser Region ab, deshalb wurde der Schlüssel nicht geprüft.",
+    "apiKey.notAKey": "{provider} hat das gar nicht als API-Schlüssel erkannt. Kopiere den ganzen Standard API Key auf z.ai, unter API Keys.",
     "message.waiting": "{provider} ist am Limit, Übersetzung in {seconds} s",
     "error.tooLarge": "Die Anfrage war größer als das Minutenlimit von {provider} erlaubt. Kürze die Nachricht oder warte eine Minute",
     "feedback.title": "Hilfe und Rückmeldung",
@@ -1193,6 +1198,7 @@
     "fallback.remove": "Quitar",
     "apiKey.bad": "{provider} no aceptó esta clave.",
     "apiKey.blocked": "{provider} rechaza las solicitudes desde esta red o región, así que la clave no se comprobó.",
+    "apiKey.notAKey": "{provider} ni siquiera reconoció esto como una clave de API. Copia completa la clave Standard API Key de z.ai, en el apartado API Keys.",
     "message.waiting": "{provider} está en su límite, traduzco en {seconds} s",
     "error.tooLarge": "La petición superó el límite por minuto de {provider}. Acorta el mensaje o espera un minuto",
     "feedback.title": "Ayuda y comentarios",
@@ -1386,6 +1392,7 @@
     "fallback.remove": "Retirer",
     "apiKey.bad": "{provider} n'a pas accepté cette clé.",
     "apiKey.blocked": "{provider} refuse les requêtes venant de ce réseau ou de cette région, la clé n'a donc pas été vérifiée.",
+    "apiKey.notAKey": "{provider} n'a même pas reconnu ceci comme une clé API. Copiez la clé Standard API Key en entier depuis z.ai, dans la rubrique API Keys.",
     "message.waiting": "{provider} a atteint sa limite, traduction dans {seconds} s",
     "error.tooLarge": "La requête dépassait la limite par minute de {provider}. Raccourcissez le message ou attendez une minute",
     "feedback.title": "Aide et retours",
@@ -1579,6 +1586,7 @@
     "fallback.remove": "Remover",
     "apiKey.bad": "{provider} não aceitou esta chave.",
     "apiKey.blocked": "{provider} recusa solicitações desta rede ou região, por isso a chave não foi verificada.",
+    "apiKey.notAKey": "{provider} nem reconheceu isto como uma chave de API. Copie a chave Standard API Key inteira no z.ai, na seção API Keys.",
     "message.waiting": "{provider} atingiu o limite, traduzindo em {seconds} s",
     "error.tooLarge": "O pedido passou do limite por minuto do {provider}. Encurte a mensagem ou espere um minuto",
     "feedback.title": "Ajuda e comentários",
@@ -1772,6 +1780,7 @@
     "fallback.remove": "削除",
     "apiKey.bad": "{provider} はこのキーを受け付けませんでした。",
     "apiKey.blocked": "{provider} はこのネットワークまたは地域からの接続を拒否しているため、キーを確認できませんでした。",
+    "apiKey.notAKey": "{provider} はこれをそもそも API キーとして認識しませんでした。z.ai の API Keys から Standard API Key を丸ごとコピーしてください。",
     "message.waiting": "{provider} が上限に達しています。{seconds} 秒後に翻訳します",
     "error.tooLarge": "リクエストが {provider} の毎分の上限を超えました。メッセージを短くするか、1 分ほど待ってください",
     "feedback.title": "サポートとご意見",
@@ -1965,6 +1974,7 @@
     "fallback.remove": "移除",
     "apiKey.bad": "{provider} 不接受这个密钥。",
     "apiKey.blocked": "{provider} 拒绝来自这个网络或地区的请求，所以没能检查这个密钥。",
+    "apiKey.notAKey": "{provider} 根本没有把它当作 API 密钥。请在 z.ai 的 API Keys 中完整复制 Standard API Key。",
     "message.waiting": "{provider} 已达上限，{seconds} 秒后翻译",
     "error.tooLarge": "请求超出了 {provider} 的每分钟上限。请缩短消息，或等待一分钟",
     "feedback.title": "支持与反馈",
@@ -2158,6 +2168,7 @@
     "fallback.remove": "เอาออก",
     "apiKey.bad": "{provider} ไม่รับคีย์นี้",
     "apiKey.blocked": "{provider} ปฏิเสธคำขอจากเครือข่ายหรือภูมิภาคนี้ จึงตรวจสอบคีย์ไม่ได้",
+    "apiKey.notAKey": "{provider} ไม่ถือว่านี่เป็นคีย์ API เลย คัดลอก Standard API Key ให้ครบทั้งหมดจาก z.ai ในส่วน API Keys",
     "message.waiting": "{provider} ถึงขีดจำกัดแล้ว จะแปลในอีก {seconds} วินาที",
     "error.tooLarge": "คำขอใหญ่เกินขีดจำกัดต่อนาทีของ {provider} ย่อข้อความ หรือรอสักนาที",
     "feedback.title": "ความช่วยเหลือและความคิดเห็น",
@@ -2351,6 +2362,7 @@
     "fallback.remove": "Xoá",
     "apiKey.bad": "{provider} không chấp nhận khoá này.",
     "apiKey.blocked": "{provider} từ chối yêu cầu từ mạng hoặc khu vực này, nên chưa kiểm tra được khoá.",
+    "apiKey.notAKey": "{provider} hoàn toàn không coi đây là khoá API. Hãy sao chép toàn bộ khoá Standard API Key từ z.ai, trong mục API Keys.",
     "message.waiting": "{provider} đã chạm giới hạn, sẽ dịch sau {seconds} giây",
     "error.tooLarge": "Yêu cầu vượt quá giới hạn mỗi phút của {provider}. Hãy rút ngắn tin nhắn hoặc đợi một phút",
     "feedback.title": "Hỗ trợ và phản hồi",
@@ -2544,6 +2556,7 @@
     "fallback.remove": "Kaldır",
     "apiKey.bad": "{provider} bu anahtarı kabul etmedi.",
     "apiKey.blocked": "{provider} bu ağdan veya bölgeden gelen istekleri reddediyor, bu yüzden anahtar kontrol edilemedi.",
+    "apiKey.notAKey": "{provider} bunu hiç API anahtarı olarak tanımadı. z.ai'de API Keys bölümünden Standard API Key anahtarının tamamını kopyalayın.",
     "message.waiting": "{provider} sınırına ulaştı, {seconds} sn sonra çevrilecek",
     "error.tooLarge": "İstek {provider} sağlayıcısının dakika sınırını aştı. Mesajı kısaltın ya da bir dakika bekleyin",
     "feedback.title": "Destek ve geri bildirim",
@@ -2737,6 +2750,7 @@
     "fallback.remove": "Hapus",
     "apiKey.bad": "{provider} tidak menerima kunci ini.",
     "apiKey.blocked": "{provider} menolak permintaan dari jaringan atau wilayah ini, jadi kuncinya tidak diperiksa.",
+    "apiKey.notAKey": "{provider} sama sekali tidak menganggap ini kunci API. Salin seluruh kunci Standard API Key dari z.ai, di bagian API Keys.",
     "message.waiting": "{provider} sedang mencapai batas, menerjemahkan dalam {seconds} dtk",
     "error.tooLarge": "Permintaan terlalu besar untuk batas per menit {provider}. Perpendek pesan atau tunggu sebentar",
     "feedback.title": "Dukungan dan masukan",
@@ -2930,6 +2944,7 @@
     "fallback.remove": "إزالة",
     "apiKey.bad": "لم يقبل {provider} هذا المفتاح.",
     "apiKey.blocked": "يرفض {provider} الطلبات من هذه الشبكة أو المنطقة، لذلك لم يُفحص المفتاح.",
+    "apiKey.notAKey": "لم يعتبر {provider} هذا مفتاح API أصلًا. انسخ مفتاح Standard API Key كاملًا من z.ai، من قسم API Keys.",
     "message.waiting": "بلغ {provider} حدّه، ستتم الترجمة بعد {seconds} ث",
     "error.tooLarge": "كان الطلب أكبر من حد {provider} في الدقيقة. اختصر الرسالة، أو انتظر دقيقة",
     "feedback.title": "الدعم والملاحظات",
@@ -3123,6 +3138,7 @@
     "fallback.remove": "제거",
     "apiKey.bad": "{provider}가 이 키를 받지 않았습니다.",
     "apiKey.blocked": "{provider}가 이 네트워크나 지역에서 오는 요청을 거부해서 키를 확인하지 못했습니다.",
+    "apiKey.notAKey": "{provider}가 이것을 API 키로 전혀 인식하지 않았습니다. z.ai의 API Keys에서 Standard API Key 전체를 복사해 주세요.",
     "message.waiting": "{provider}가 한도에 도달했습니다. {seconds}초 뒤에 번역합니다",
     "error.tooLarge": "요청이 {provider}의 분당 한도보다 큽니다. 메시지를 줄이거나 잠시 기다려 주세요",
     "feedback.title": "지원 및 피드백",
@@ -3338,13 +3354,14 @@
   function clear() {
     kept.length = 0;
   }
+  var utc = (at) => `${new Date(at).toISOString().replace("T", " ").slice(0, 19)} UTC`;
   function asText() {
     if (!kept.length) return "";
     return kept.map((e) => {
-      const when2 = new Date(e.at).toISOString().replace("T", " ").slice(0, 19);
+      const when2 = utc(e.at);
       const head = `${when2}  ${e.level === "error" ? "ERROR" : "info "}  ${e.what}  ${e.text}`;
       return e.detail ? `${head}
-${" ".repeat(21)}${e.detail}` : head;
+${" ".repeat(when2.length + 2)}${e.detail}` : head;
     }).join("\n");
   }
 
@@ -3706,14 +3723,27 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
 
   // ai-translate/core/net.ts
   var noHeaders = () => null;
-  var fetchNet = async ({ url, method = "GET", headers, body, signal }) => {
-    try {
-      const res = await fetch(url, { method, headers, body, signal });
-      return { status: res.status, data: await res.text(), header: (name) => res.headers.get(name) };
-    } catch (e) {
-      return { status: -1, data: String(e), header: noHeaders };
-    }
-  };
+  var messageOf = (e) => typeof e?.message === "string" ? e.message.trim() : "";
+  function failureOf(e) {
+    const said = String(e);
+    const cause = e?.cause;
+    if (!cause || typeof cause !== "object") return said;
+    let reason = messageOf(cause) || (Array.isArray(cause.errors) ? cause.errors.map(messageOf).filter(Boolean).join("; ") : "");
+    const code = typeof cause.code === "string" ? cause.code : "";
+    if (code && !reason.includes(code)) reason = reason ? `${code}: ${reason}` : code;
+    return reason ? `${said} (${reason})` : said;
+  }
+  function netOf(fetcher) {
+    return async ({ url, method = "GET", headers, body, signal }) => {
+      try {
+        const res = await fetcher(url, { method, headers, body, signal });
+        return { status: res.status, data: await res.text(), header: (name) => res.headers.get(name) };
+      } catch (e) {
+        return { status: -1, data: failureOf(e), header: noHeaders };
+      }
+    };
+  }
+  var fetchNet = netOf((url, init) => fetch(url, init));
   function readHeaders(raw) {
     const found = /* @__PURE__ */ new Map();
     for (const line of (raw ?? "").split("\n")) {
@@ -3796,6 +3826,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     if (REGION.test(data) || BLOCK_PAGE.test(data)) return "blocked";
     return status === 403 && onlyForbidden(data) ? "blocked" : "unknown";
   }
+  var notAnApiKey = (provider, status, data) => provider === "glm" && status === 401 && /token expired or incorrect/i.test(data);
   var mayPassAgain = (status, data) => status === 403 && !/api.?key|unauthori[sz]|invalid.?auth/i.test(data) && !REGION.test(data);
   async function againAfter403(send, first) {
     let result = first;
@@ -3833,7 +3864,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     const signal = timeoutSignal(2e4);
     const ask = () => net({ url, headers, signal });
     const res = await againAfter403(ask, await ask());
-    if (!ok(res.status)) return { status: res.status, models: [], data: res.data };
+    if (!ok(res.status)) return { status: res.status, models: [], data: res.data, route: res.route };
     try {
       const json = JSON.parse(res.data);
       let models;
@@ -3963,12 +3994,13 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
         body: JSON.stringify(payload2),
         signal: deadline
       });
-      if (res.status === -1) return { status: -1, data: res.data };
+      if (res.status === -1) return { status: -1, data: res.data, route: res.route };
       return {
         status: res.status,
         data: res.data,
         budget: readBudget(res.header),
-        retryMs: readRetry(res.header)
+        retryMs: readRetry(res.header),
+        route: res.route
       };
     };
     let result = await againAfter403(() => send(body), await sendWithRetry(send, body));
@@ -3983,7 +4015,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   }
 
   // ai-translate/core/version.ts
-  var VERSION = "0.2.2a";
+  var VERSION = "0.2.3a";
 
   // ai-translate/core/bridge.ts
   function desktop() {
@@ -4308,13 +4340,15 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     blocked: "network or region refused, key not checked",
     unknown: "nothing said about the key"
   };
+  var NOT_A_KEY = "key refused, the value was not taken for an API key: copy the whole Standard API Key from z.ai, API Keys";
   async function checkKey(slot) {
     const apiKey = keyOf(slot);
     let status = -1;
     let models = [];
     let data = "";
+    let route;
     try {
-      ({ status, models, data } = await Bridge.listAiModels(JSON.stringify({
+      ({ status, models, data, route } = await Bridge.listAiModels(JSON.stringify({
         provider: slot.provider,
         apiKey,
         baseUrl: baseUrlOf(slot)
@@ -4323,13 +4357,14 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       data = String(e);
     }
     const verdict = keyVerdict(status, data);
+    const notAKey = verdict === "bad" && notAnApiKey(slot.provider, status, data);
     record(
       verdict === "ok" ? "info" : "error",
       "key check",
-      `${slot.provider} answered ${status}: ${SAID[verdict]}${verdict === "ok" ? `, ${models.length} models` : ""}`,
+      `${slot.provider} answered ${status}: ${notAKey ? NOT_A_KEY : SAID[verdict]}${verdict === "ok" ? `, ${models.length} models` : ""}${route ? `, via ${route}` : ""}`,
       verdict === "ok" ? void 0 : withoutKey(data, apiKey)
     );
-    return { verdict, status, models };
+    return { verdict, notAKey, status, models };
   }
 
   // ai-translate/core/translate.ts
@@ -4932,7 +4967,10 @@ IMPORTANT: your previous answer began with the code of ${target}, as if the mess
   function refusal({ status, data, model, provider, retryMs }, name) {
     if (status === -1) return fail("error.network", { details: data });
     const verdict = keyVerdict(status, data);
-    if (verdict === "bad") return fail("error.badKey", { provider: name, status });
+    if (verdict === "bad") {
+      if (notAnApiKey(provider, status, data)) return fail("apiKey.notAKey", { provider: name });
+      return fail("error.badKey", { provider: name, status });
+    }
     if (verdict === "blocked") {
       const said = status === 403 ? providerSaid(data) : "";
       return said && !/^forbidden\.?$/i.test(said) ? fail("error.forbiddenSaid", { provider: name, details: said }) : fail("error.blocked", { provider: name });
@@ -5102,7 +5140,7 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
       const chars = system.length + text.length;
       reserve(id2, estimateTokens(`${id2}|${kind}`, chars));
       const started = Date.now();
-      const { status, data: answered, budget, retryMs } = await Bridge.makeAiTranslateRequest(JSON.stringify({
+      const { status, data: answered, budget, retryMs, route } = await Bridge.makeAiTranslateRequest(JSON.stringify({
         provider: slot.provider,
         apiKey: key,
         model: chosen,
@@ -5133,7 +5171,7 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
       record(
         status === 200 ? "info" : "error",
         kind,
-        `${slot.provider} ${chosen} answered ${status} in ${Date.now() - started} ms${spent}`,
+        `${slot.provider} ${chosen} answered ${status} in ${Date.now() - started} ms${spent}${route ? `, via ${route}` : ""}`,
         status === 200 ? void 0 : data
       );
       return { slot: id2, provider: slot.provider, model: chosen, status, data, retryMs };
@@ -6250,8 +6288,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${8}`;
-  var BUILD_NAME = `${VERSION} (${"c1c2e41"}-${8})`;
+  var SCRIPT_VERSION = `${VERSION}.${9}`;
+  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${9})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -6634,7 +6672,7 @@ ${sent}`;
     user-select: text;
 }
 `;
-  var fileName = () => `ai-translate-${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19)}.txt`;
+  var fileName = () => `ai-translate-${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-").slice(0, 19)}Z.txt`;
   async function toClipboard(text) {
     try {
       await navigator.clipboard.writeText(text);
@@ -7086,11 +7124,11 @@ ${sent}`;
   }
   async function offerModels(slot, list, refused, note) {
     if (!keyOf(slot)) return;
-    const { verdict, models } = await checkKey(slot);
+    const { verdict, notAKey, models } = await checkKey(slot);
     const provider = providerName(slot.provider);
     if (verdict === "bad" || verdict === "blocked") {
       refused.classList.toggle("bad", verdict === "bad");
-      refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
+      refused.textContent = verdict === "blocked" ? t("apiKey.blocked", { provider }) : notAKey ? t("apiKey.notAKey", { provider }) : t("apiKey.bad", { provider });
     }
     const own2 = FREE_MODELS[slot.provider] ?? [];
     const found = verdict === "ok" ? [.../* @__PURE__ */ new Set([...models, ...own2])].sort() : [];

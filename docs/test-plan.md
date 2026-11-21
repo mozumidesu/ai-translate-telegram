@@ -17,9 +17,9 @@ with a reply keyboard, any will do.
    first build), and offers to install. Install. With an earlier build
    already installed, the manager's own update check (Tampermonkey:
    Utilities, Check for userscript updates) offers this one instead. A copy
-   from before the counter, which says 0.2.3a, is not offered it: to the
-   manager that is newer than 0.2.1a.1. Delete that script in the manager and
-   open the link again, once.
+   from before the counter, which says 0.2.3a, was offered nothing before
+   0.2.3a.9, and Tampermonkey may still offer it nothing. If so, delete that
+   script in the manager and open the link again, once.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
@@ -46,6 +46,9 @@ with a reply keyboard, any will do.
    that Groq turns away (a bare 403 "Forbidden"), the same key gets a plain
    line, not a red one, saying the network or region was refused, and the
    line under the model list says the same; a wrong key gets the red line.
+   Pick Z.ai GLM and paste any word as its key: the red line says Z.ai GLM did
+   not take this for an API key at all, and to copy the whole Standard API Key
+   from z.ai. Pick Groq again; its key is still there.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
    without the build counter: 0.2.1a, where the manager's dashboard, column
    Version, shows 0.2.1a.2.

@@ -358,6 +358,16 @@ const LIST_BAD = "The provider did not accept the key, so the list stayed empty.
 const LIST_BLOCKED = "The provider refused requests from this network or region, so the list stayed empty. Try another network, or turn a VPN on or off";
 const LIST_FAILED = "Could not load the list. Enter the model name yourself";
 const LIST_OK = "Check the provider's current model list and pick a small, fast one: translation needs speed, not reasoning power";
+const LIST_BUILTIN = "This provider publishes no list of its own, so these are the models the plugin knows";
+
+const ZAI_MODELS = "https://api.z.ai/api/paas/v4/models";
+const ZAI_NOT_A_KEY = "Z.ai GLM did not take this for an API key at all. Copy the whole Standard API Key from z.ai, under API Keys.";
+const ZAI_WRONG_KEY = "Z.ai GLM did not accept this key.";
+const chooseProvider = async (page, id) => (await settled(page), page.evaluate(id => {
+    const field = __ours().querySelector('.sheet[data-name="settings"] .providers .slot select');
+    field.value = id;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+}, id));
 
 /**
  * What the panel says for each verdict of the core's keyVerdict, in one client.
@@ -398,6 +408,21 @@ async function panelVerdicts(page, name) {
         await say(PASTED_KEY, LIST_OK) && [await underKey(page), await offered(page)],
         [{ text: "", red: false }, ["llama-3.1-8b-instant", "openai/gpt-oss-120b"]]);
 
+    // Z.ai answers a value it does not take for a key at all with "token expired or incorrect", and a key it does not know with code 1000.
+    const zai = body => page.evaluate(([url, body]) => { __gm.routes[url] = () => [401, body]; }, [ZAI_MODELS, body]);
+    await zai(`{"error":{"code":"401","message":"token expired or incorrect"}}`);
+    await chooseProvider(page, "glm");
+    check(`${name}: Z.ai's "token expired or incorrect" is a red line that says the value is no API key, and the list is the models the plugin knows`,
+        await say(PASTED_KEY, LIST_BUILTIN) && [await underKey(page), (await ours(page, UNDER_LIST))[0]],
+        [{ text: ZAI_NOT_A_KEY, red: true }, LIST_BUILTIN]);
+
+    await zai(`{"error":{"code":"1000","message":"身份验证失败。"}}`);
+    check(`${name}: and Z.ai's numbered 401, a key it does not know, is the plain red line`,
+        await say(PASTED_KEY, LIST_BUILTIN) && await underKey(page), { text: ZAI_WRONG_KEY, red: true });
+
+    await page.evaluate(url => { delete __gm.routes[url]; }, ZAI_MODELS);
+    await chooseProvider(page, "groq");
+    await waitOurs(page, ".providers datalist option");
     await page.evaluate(url => { delete __gm.routes[url]; }, MODELS);
 }
 
@@ -1023,6 +1048,8 @@ await lateA.evaluate(() => __gm.menu.run());
 await clickOurs(lateA, ".logs .button");
 check("Web A, the script late: and the log says why",
     (await ours(lateA, '.sheet[data-name="logs"] .log'))[0]?.includes("Web A: no call to Telegram's worker has crossed the script's hook"), true);
+check("Web A: the Logs window shows the core's own lines, each with its time in UTC",
+    /^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d UTC {2}(info |ERROR) {2}/.test((await ours(lateA, '.sheet[data-name="logs"] .log'))[0] ?? ""), true);
 await lateA.keyboard.press("Escape");
 await lateA.keyboard.press("Escape");
 

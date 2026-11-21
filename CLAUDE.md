@@ -39,7 +39,7 @@ the chats switched on, and incoming ones from a message's menu.
 
 ## The version
 
-There is one, the plugin's: `ai-translate/core/version.ts`, `0.2.2a` today,
+There is one, the plugin's: `ai-translate/core/version.ts`, `0.2.3a` today,
 read from the submodule when the script is built. It is what a person sees: the
 line under Logs, the early-build line of the feedback form, and what Check for
 updates takes the installed script to be. Nothing here raises it. It moves when
@@ -70,7 +70,10 @@ a dash, the counter.
 - **History.** Copies installed before the counter say `0.2.3a`. To every
   manager that is newer than `0.2.1a.1`, because the third number decides, so
   none of them is offered it: each takes one reinstall by hand from the
-  `.user.js` link. No counter makes it otherwise. Do not try.
+  `.user.js` link. No counter makes it otherwise. Do not try. From `0.2.3a.9`
+  the numbers are equal and the counter decides: Violentmonkey offers the
+  build. Tampermonkey may not, since its published order puts a longer version
+  below the shorter one it runs on from.
 - `test/version.mjs` holds all of this against Violentmonkey's own comparison,
   copied from its source, and Tampermonkey's published order, which is all of
   Tampermonkey that is public.
