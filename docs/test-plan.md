@@ -42,7 +42,10 @@ with a reply keyboard, any will do.
    foot. Pick Groq, paste the key with a space after it, leave the model.
    Leave the field: the space is gone, there is no red line under the key,
    and Logs has a "key check" line saying the key was accepted. Typing in any field stays there: Telegram's chat box
-   does not take the keys, and Escape shuts only the window.
+   does not take the keys, and Escape shuts only the window. With a VPN
+   that Groq turns away (a bare 403 "Forbidden"), the same key gets a plain
+   line, not a red one, saying the network or region was refused, and the
+   line under the model list says the same; a wrong key gets the red line.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
    without the build counter: 0.2.1a, where the manager's dashboard, column
    Version, shows 0.2.1a.2.

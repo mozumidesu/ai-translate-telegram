@@ -335,43 +335,85 @@ check("Web K: the language setting names Telegram, not Discord",
 check("Web K: the backslashes explained, with their examples",
     await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
 
-// A key as it is pasted, and what the provider says about it, under the key.
+// A key as it is pasted, and what the provider says about it: under the key, and under the model list.
 const MODELS = "https://api.groq.com/openai/v1/models";
 const PASTED_KEY = "gsk_" + "A1b2C3d4E5f6G7h8J9k0L1m2N3p4Q5r6S7t8U9v0W1x2Y3z4A5b6";
 const KEY_FIELD = '.sheet[data-name="settings"] .providers .slot .keyrow input';
 const UNDER_KEY = '.sheet[data-name="settings"] .providers .slot .keyrow + .hint';
-const pasteKey = async value => (await settled(k), k.evaluate(([selector, value]) => {
+const UNDER_LIST = '.sheet[data-name="settings"] .providers .slot input[list] + .hint';
+const pasteKey = async (page, value) => (await settled(page), page.evaluate(([selector, value]) => {
     const field = __ours().querySelector(selector);
     field.value = value;
     field.dispatchEvent(new Event("change", { bubbles: true }));
 }, [KEY_FIELD, value]));
-const underKey = () => k.evaluate(selector => {
+const underKey = page => page.evaluate(selector => {
     const line = __ours().querySelector(selector);
     return { text: line?.textContent, red: !!line?.classList.contains("bad") };
 }, UNDER_KEY);
+const offered = page => page.evaluate(() => [...__ours().querySelectorAll(".providers datalist option")].map(o => o.value));
+
+const WRONG_KEY = "Groq did not accept this key.";
+const BLOCKED_LINE = "Groq refused requests from this network or region, so the key was not checked.";
+const LIST_BAD = "The provider did not accept the key, so the list stayed empty. Check the key above";
+const LIST_BLOCKED = "The provider refused requests from this network or region, so the list stayed empty. Try another network, or turn a VPN on or off";
+const LIST_FAILED = "Could not load the list. Enter the model name yourself";
+const LIST_OK = "Check the provider's current model list and pick a small, fast one: translation needs speed, not reasoning power";
+
+/**
+ * What the panel says for each verdict of the core's keyVerdict, in one client.
+ * The line under the model list is the last to arrive and so says the check is over.
+ */
+async function panelVerdicts(page, name) {
+    const route = (status, body) => page.evaluate(([url, status, body]) => {
+        __gm.routes[url] = () => [status, body];
+    }, [MODELS, status, body]);
+    // A pasted key draws the slot again, and its model line starts as the plain one: it is the new line that says the check is over. A list that comes is seen by its models.
+    const say = async (key, listLine) => (await pasteKey(page, key),
+        await waitOurs(page, listLine === LIST_OK ? ".providers datalist option" : UNDER_LIST, listLine === LIST_OK ? undefined : listLine));
+
+    await route(401, `{"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}`);
+    check(`${name}: a 401 that names the key is a red line under it, and the list says the key was not taken`,
+        await say(PASTED_KEY, LIST_BAD) && [await underKey(page), (await ours(page, UNDER_LIST))[0]],
+        [{ text: WRONG_KEY, red: true }, LIST_BAD]);
+
+    await route(403, "Forbidden");
+    check(`${name}: Groq's bare 403 to a network it turns away is said as that, not in red, and the list says so too`,
+        await say(PASTED_KEY, LIST_BLOCKED) && [await underKey(page), (await ours(page, UNDER_LIST))[0]],
+        [{ text: BLOCKED_LINE, red: false }, LIST_BLOCKED]);
+
+    // A 403 is not a bad key by itself, and a 401 is not one when it is the network that is named.
+    await route(401, `{"error":{"message":"Access denied: this service is not available in your country"}}`);
+    check(`${name}: a 401 that says the country is turned away is the same quiet line, not a bad key`,
+        await say(PASTED_KEY, LIST_BLOCKED) && await underKey(page), { text: BLOCKED_LINE, red: false });
+
+    for (const [status, body] of [[500, "upstream went away"], [429, `{"error":{"message":"Rate limit reached"}}`], [403, `{"error":{"message":"This organization has no access to the model"}}`]]) {
+        await route(status, body);
+        check(`${name}: a ${status} that says nothing of the key leaves no line under it, and the list says it did not load`,
+            await say(PASTED_KEY, LIST_FAILED) && [await underKey(page), (await ours(page, UNDER_LIST))[0]],
+            [{ text: "", red: false }, LIST_FAILED]);
+    }
+
+    await route(200, `{"data":[{"id":"openai/gpt-oss-120b"},{"id":"llama-3.1-8b-instant"}]}`);
+    check(`${name}: a list that comes is offered, and no line stands under the key`,
+        await say(PASTED_KEY, LIST_OK) && [await underKey(page), await offered(page)],
+        [{ text: "", red: false }, ["llama-3.1-8b-instant", "openai/gpt-oss-120b"]]);
+
+    await page.evaluate(url => { delete __gm.routes[url]; }, MODELS);
+}
 
 await k.evaluate(([url, body]) => { __gm.routes[url] = () => [401, body]; },
     [MODELS, `{"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}`]);
-await pasteKey(PASTED_KEY + " \u200b\r\n");
+await pasteKey(k, PASTED_KEY + " \u200b\r\n");
 check("Web K: a key pasted with a space, a zero-width space and a line break is shown clean",
     await k.evaluate(selector => __ours().querySelector(selector).value, KEY_FIELD), PASTED_KEY);
 check("Web K: and saved clean in the manager's storage",
     await k.evaluate(() => JSON.parse(__gm.store.aiTranslateSettings.providerSlots)[0].keys.groq), PASTED_KEY);
 check("Web K: Groq's answer to a wrong key is a red line under it",
-    await waitOurs(k, UNDER_KEY, "Groq did not accept this key.") && await underKey(), { text: "Groq did not accept this key.", red: true });
+    await waitOurs(k, UNDER_KEY, WRONG_KEY) && await underKey(k), { text: WRONG_KEY, red: true });
 check("Web K: and the key went out as Bearer and the key, nothing after it",
     await k.evaluate(url => __gm.requests.filter(r => r.url === url).at(-1)?.headers.Authorization, MODELS), `Bearer ${PASTED_KEY}`);
 
-await k.evaluate(url => { __gm.routes[url] = () => [403, "Forbidden"]; }, MODELS);
-await pasteKey(PASTED_KEY);
-const BLOCKED_LINE = "Groq refused requests from this network or region, so the key was not checked.";
-check("Web K: a network Groq turns away is said as that, and not in red",
-    await waitOurs(k, UNDER_KEY, BLOCKED_LINE) && await underKey(), { text: BLOCKED_LINE, red: false });
-
-await k.evaluate(url => { delete __gm.routes[url]; }, MODELS);
-await pasteKey("test-key");
-check("Web K: a provider that says nothing about the key leaves no line",
-    await waitOurs(k, UNDER_KEY) && (await underKey()).text, "");
+await panelVerdicts(k, "Web K");
 
 check("Web K: under Logs, the version: the plugin's, which is the core's, with no build counter",
     await ours(k, ".logs .hint"), [`AI Translate · ${coreVersion()}`]);
@@ -902,6 +944,7 @@ await watchMotion(a, "settings", "open");
 await a.evaluate(() => __gm.menu.run());
 check("Web A: the settings page comes as Web A's modals do: it fades in .15s and comes down 1rem in .2s", await motion(a), { settings: A_IN });
 check("Web A: as wide as Vencord's plugin modal, 680px", await widthOf(a, "settings"), 680);
+await panelVerdicts(a, "Web A");
 await watchMotion(a, "feedback", "open");
 await clickOurs(a, '.sheet[data-name="settings"] .head .link:last-child');
 check("Web A: the feedback form comes over it as one modal over another: it moves, the settings stay", await motion(a), { settings: STILL, feedback: A_IN });

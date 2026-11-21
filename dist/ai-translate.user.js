@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.2a.7
+// @version         0.2.2a.8
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -4931,11 +4931,15 @@ IMPORTANT: your previous answer began with the code of ${target}, as if the mess
   var WORTH_A_SECOND_PROVIDER = (status, data) => status === -1 || status === 401 || status === 402 || status === 403 || status === 404 || status === 413 || status === 429 || status >= 500 || status === 400 && (MODEL_GONE.test(data) || keyVerdict(status, data) !== "unknown");
   function refusal({ status, data, model, provider, retryMs }, name) {
     if (status === -1) return fail("error.network", { details: data });
-    if (keyVerdict(status, data) === "bad") return fail("error.badKey", { provider: name, status });
+    const verdict = keyVerdict(status, data);
+    if (verdict === "bad") return fail("error.badKey", { provider: name, status });
+    if (verdict === "blocked") {
+      const said = status === 403 ? providerSaid(data) : "";
+      return said && !/^forbidden\.?$/i.test(said) ? fail("error.forbiddenSaid", { provider: name, details: said }) : fail("error.blocked", { provider: name });
+    }
     if (status === 403) {
       const said = providerSaid(data);
       if (said) return fail("error.forbiddenSaid", { provider: name, details: said });
-      if (BLOCK_PAGE.test(data)) return fail("error.blocked", { provider: name });
       return fail("error.forbidden", { provider: name });
     }
     if (status === 404) return fail("error.noSuchModel", { provider: name, model });
@@ -6246,8 +6250,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${7}`;
-  var BUILD_NAME = `${VERSION} (${"af27c17"}-${7})`;
+  var SCRIPT_VERSION = `${VERSION}.${8}`;
+  var BUILD_NAME = `${VERSION} (${"c1c2e41"}-${8})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7023,7 +7027,7 @@ ${sent}`;
           };
           keyRow.append(key, show);
           block.append(keyRow);
-          const refused = hint("", true);
+          const refused = hint();
           block.append(refused);
           if (slot.provider === "openai") {
             const urlLabel = document.createElement("label");
@@ -7049,8 +7053,9 @@ ${sent}`;
           const suggestions = document.createElement("datalist");
           suggestions.id = `ai-translate-models-${slot.id}`;
           model.setAttribute("list", suggestions.id);
-          block.append(suggestions, model);
-          void offerModels(slot, suggestions, refused);
+          const listNote = hint(keyOf(slot) ? t("model.desc") : t("model.needKey"));
+          block.append(suggestions, model, listNote);
+          void offerModels(slot, suggestions, refused, listNote);
         }
         const buttons = document.createElement("div");
         buttons.className = "signs";
@@ -7079,20 +7084,22 @@ ${sent}`;
     draw2();
     return list;
   }
-  async function offerModels(slot, list, refused) {
+  async function offerModels(slot, list, refused, note) {
     if (!keyOf(slot)) return;
     const { verdict, models } = await checkKey(slot);
+    const provider = providerName(slot.provider);
     if (verdict === "bad" || verdict === "blocked") {
       refused.classList.toggle("bad", verdict === "bad");
-      const provider = providerName(slot.provider);
       refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
-      return;
     }
-    for (const model of models) {
+    const own2 = FREE_MODELS[slot.provider] ?? [];
+    const found = verdict === "ok" ? [.../* @__PURE__ */ new Set([...models, ...own2])].sort() : [];
+    for (const model of found.length ? found : own2) {
       const item = document.createElement("option");
       item.value = model;
       list.append(item);
     }
+    note.textContent = found.length ? t("model.desc") : own2.length ? t("model.builtin") : verdict === "bad" ? t("model.failedKey") : verdict === "blocked" ? t("model.blocked") : t("model.failed");
   }
   function withExample(key, example) {
     const line = document.createElement("li");

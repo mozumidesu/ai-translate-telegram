@@ -12,6 +12,7 @@
 
 import { config, set } from "../ai-translate/core/host";
 import { LOCALES, t } from "../ai-translate/core/locales";
+import { FREE_MODELS } from "../ai-translate/core/providers";
 import {
     baseUrlOf, canRemove, checkKey, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, PROVIDERS, providerLabel, providerName,
     readSlots, type Slot, writeSlots
@@ -276,7 +277,8 @@ function providers() {
                 keyRow.append(key, show);
                 block.append(keyRow);
 
-                const refused = hint("", true);
+                // Empty until the provider has said something, and red only for a key it calls wrong.
+                const refused = hint();
                 block.append(refused);
 
                 if (slot.provider === "openai") {
@@ -308,8 +310,10 @@ function providers() {
                 const suggestions = document.createElement("datalist");
                 suggestions.id = `ai-translate-models-${slot.id}`;
                 model.setAttribute("list", suggestions.id);
-                block.append(suggestions, model);
-                void offerModels(slot, suggestions, refused);
+                // What the list says about itself, in the core's words for each outcome (ui/ModelPicker.tsx).
+                const listNote = hint(keyOf(slot) ? t("model.desc") : t("model.needKey"));
+                block.append(suggestions, model, listNote);
+                void offerModels(slot, suggestions, refused, listNote);
             }
 
             const buttons = document.createElement("div");
@@ -347,26 +351,37 @@ function providers() {
 /**
  * The provider's own list of models, and its verdict on the key, by the core's
  * one rule (keyVerdict): a key called bad only when the provider says so, and
- * a network or a country turned away said as that, not in red.
+ * a network or a country turned away said as that, not in red. The line under
+ * the model list follows the same verdict, as the core's model picker does.
  */
-async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLElement) {
+async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLElement, note: HTMLElement) {
     if (!keyOf(slot)) return;
 
     const { verdict, models } = await checkKey(slot);
+    const provider = providerName(slot.provider);
 
     if (verdict === "bad" || verdict === "blocked") {
         refused.classList.toggle("bad", verdict === "bad");
-        const provider = providerName(slot.provider);
         // Each key written out whole, so test/strings.mjs sees both.
         refused.textContent = verdict === "bad" ? t("apiKey.bad", { provider }) : t("apiKey.blocked", { provider });
-        return;
     }
 
-    for (const model of models) {
+    // As the core's picker has it: the provider's list with the models it runs but does not list, or, when
+    // the list did not come, those alone (FREE_MODELS), and a line for whatever is left.
+    const own = FREE_MODELS[slot.provider] ?? [];
+    const found = verdict === "ok" ? [...new Set([...models, ...own])].sort() : [];
+
+    for (const model of found.length ? found : own) {
         const item = document.createElement("option");
         item.value = model;
         list.append(item);
     }
+
+    note.textContent = found.length ? t("model.desc")
+        : own.length ? t("model.builtin")
+            : verdict === "bad" ? t("model.failedKey")
+                : verdict === "blocked" ? t("model.blocked")
+                    : t("model.failed");
 }
 
 /** "{example}" in a sentence becomes the example itself, set as code. */
