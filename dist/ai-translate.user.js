@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.2a.6
+// @version         0.2.2a.7
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -212,6 +212,7 @@
     "model.loading": "Loading models…",
     "model.failed": "Could not load the list. Enter the model name yourself",
     "model.failedKey": "The provider did not accept the key, so the list stayed empty. Check the key above",
+    "model.blocked": "The provider refused requests from this network or region, so the list stayed empty. Try another network, or turn a VPN on or off",
     "model.needKey": "Enter the API key above and the list loads by itself",
     "model.builtin": "This provider publishes no list of its own, so these are the models the plugin knows",
     "model.pick": "Select a model",
@@ -225,6 +226,7 @@
     "fallback.add": "Add a backup provider",
     "fallback.remove": "Remove",
     "apiKey.bad": "{provider} did not accept this key.",
+    "apiKey.blocked": "{provider} refused requests from this network or region, so the key was not checked.",
     "message.waiting": "{provider} is at its limit, translating in {seconds} s",
     "error.tooLarge": "The request was too large for {provider}'s per-minute limit. Shorten the message, or wait a minute",
     "feedback.title": "Support and feedback",
@@ -404,6 +406,7 @@
     "model.loading": "Загрузка моделей…",
     "model.failed": "Не удалось загрузить список. Впишите название модели вручную",
     "model.failedKey": "Провайдер не принял ключ, поэтому список не загрузился. Проверьте ключ выше",
+    "model.blocked": "Провайдер не принимает запросы из этой сети или региона, поэтому список не загрузился. Попробуйте другую сеть или включите либо выключите VPN",
     "model.needKey": "Введите ключ API выше, и список загрузится сам",
     "model.builtin": "Этот провайдер не отдаёт список моделей, поэтому здесь те, которые знает плагин",
     "model.pick": "Выберите модель",
@@ -417,6 +420,7 @@
     "fallback.add": "Добавить запасного провайдера",
     "fallback.remove": "Удалить",
     "apiKey.bad": "{provider} не принял этот ключ.",
+    "apiKey.blocked": "{provider} не принимает запросы из этой сети или региона, поэтому ключ не проверен.",
     "message.waiting": "У {provider} исчерпан лимит, перевод через {seconds} с",
     "error.tooLarge": "Запрос оказался больше, чем позволяет минутный лимит {provider}. Сократите сообщение или подождите минуту",
     "feedback.title": "Поддержка и обратная связь",
@@ -595,6 +599,7 @@
     "model.loading": "Завантаження моделей…",
     "model.failed": "Не вдалося завантажити список. Впишіть назву моделі вручну",
     "model.failedKey": "Провайдер не прийняв ключ, тому список не завантажився. Перевірте ключ вище",
+    "model.blocked": "Провайдер не приймає запити з цієї мережі чи регіону, тому список не завантажився. Спробуйте іншу мережу або увімкніть чи вимкніть VPN",
     "model.needKey": "Введіть ключ API вище, і список завантажиться сам",
     "model.builtin": "Цей провайдер не віддає список моделей, тому тут ті, які знає плагін",
     "model.pick": "Оберіть модель",
@@ -608,6 +613,7 @@
     "fallback.add": "Додати запасного провайдера",
     "fallback.remove": "Видалити",
     "apiKey.bad": "{provider} не прийняв цей ключ.",
+    "apiKey.blocked": "{provider} не приймає запити з цієї мережі чи регіону, тому ключ не перевірено.",
     "message.waiting": "У {provider} вичерпано ліміт, переклад через {seconds} с",
     "error.tooLarge": "Запит виявився більшим, ніж дозволяє хвилинний ліміт {provider}. Скоротіть повідомлення або зачекайте хвилину",
     "feedback.title": "Підтримка та зворотний звʼязок",
@@ -786,6 +792,7 @@
     "model.loading": "Se încarcă modelele…",
     "model.failed": "Lista nu a putut fi încărcată. Scrie numele modelului manual",
     "model.failedKey": "Furnizorul nu a acceptat cheia, așa că lista nu s-a încărcat. Verifică cheia de mai sus",
+    "model.blocked": "Furnizorul refuză cererile din această rețea sau regiune, așa că lista nu s-a încărcat. Încearcă altă rețea sau pornește ori oprește VPN-ul",
     "model.needKey": "Introdu cheia API mai sus și lista se încarcă singură",
     "model.builtin": "Acest furnizor nu publică o listă de modele, așa că aici sunt cele pe care le știe pluginul",
     "model.pick": "Alege un model",
@@ -799,6 +806,7 @@
     "fallback.add": "Adaugă un provider de rezervă",
     "fallback.remove": "Elimină",
     "apiKey.bad": "{provider} nu a acceptat această cheie.",
+    "apiKey.blocked": "{provider} refuză cererile din această rețea sau regiune, așa că cheia nu a fost verificată.",
     "message.waiting": "{provider} și-a atins limita, traduc în {seconds} s",
     "error.tooLarge": "Cererea a depășit limita pe minut a {provider}. Scurtează mesajul sau așteaptă un minut",
     "feedback.title": "Asistență și feedback",
@@ -977,6 +985,7 @@
     "model.loading": "Modelle werden geladen…",
     "model.failed": "Liste konnte nicht geladen werden. Gib den Modellnamen selbst ein",
     "model.failedKey": "Der Anbieter hat den Schlüssel nicht angenommen, deshalb blieb die Liste leer. Prüfe den Schlüssel oben",
+    "model.blocked": "Der Anbieter lehnt Anfragen aus diesem Netz oder dieser Region ab, deshalb blieb die Liste leer. Versuche ein anderes Netz oder schalte das VPN ein oder aus",
     "model.needKey": "Trag den API-Schlüssel oben ein, dann lädt die Liste von selbst",
     "model.builtin": "Dieser Anbieter veröffentlicht keine Liste, hier stehen die Modelle, die das Plugin kennt",
     "model.pick": "Modell wählen",
@@ -990,6 +999,7 @@
     "fallback.add": "Ersatzanbieter hinzufügen",
     "fallback.remove": "Entfernen",
     "apiKey.bad": "{provider} hat diesen Schlüssel nicht angenommen.",
+    "apiKey.blocked": "{provider} lehnt Anfragen aus diesem Netz oder dieser Region ab, deshalb wurde der Schlüssel nicht geprüft.",
     "message.waiting": "{provider} ist am Limit, Übersetzung in {seconds} s",
     "error.tooLarge": "Die Anfrage war größer als das Minutenlimit von {provider} erlaubt. Kürze die Nachricht oder warte eine Minute",
     "feedback.title": "Hilfe und Rückmeldung",
@@ -1168,6 +1178,7 @@
     "model.loading": "Cargando modelos…",
     "model.failed": "No se pudo cargar la lista. Escribe el nombre del modelo a mano",
     "model.failedKey": "El proveedor no aceptó la clave, así que la lista no se cargó. Revisa la clave de arriba",
+    "model.blocked": "El proveedor rechaza las solicitudes desde esta red o región, así que la lista no se cargó. Prueba otra red o activa o desactiva la VPN",
     "model.needKey": "Escribe arriba la clave de API y la lista se carga sola",
     "model.builtin": "Este proveedor no publica una lista, así que estos son los modelos que conoce el plugin",
     "model.pick": "Elige un modelo",
@@ -1181,6 +1192,7 @@
     "fallback.add": "Añadir un proveedor de reserva",
     "fallback.remove": "Quitar",
     "apiKey.bad": "{provider} no aceptó esta clave.",
+    "apiKey.blocked": "{provider} rechaza las solicitudes desde esta red o región, así que la clave no se comprobó.",
     "message.waiting": "{provider} está en su límite, traduzco en {seconds} s",
     "error.tooLarge": "La petición superó el límite por minuto de {provider}. Acorta el mensaje o espera un minuto",
     "feedback.title": "Ayuda y comentarios",
@@ -1359,6 +1371,7 @@
     "model.loading": "Chargement des modèles…",
     "model.failed": "Impossible de charger la liste. Saisissez le nom du modèle vous-même",
     "model.failedKey": "Le fournisseur n'a pas accepté la clé, la liste n'a donc pas pu se charger. Vérifiez la clé ci-dessus",
+    "model.blocked": "Le fournisseur refuse les requêtes venant de ce réseau ou de cette région, la liste n'a donc pas pu se charger. Essayez un autre réseau, ou activez ou désactivez le VPN",
     "model.needKey": "Saisissez la clé API ci-dessus et la liste se charge toute seule",
     "model.builtin": "Ce fournisseur ne publie pas de liste, voici donc les modèles que le plugin connaît",
     "model.pick": "Choisir un modèle",
@@ -1372,6 +1385,7 @@
     "fallback.add": "Ajouter un fournisseur de secours",
     "fallback.remove": "Retirer",
     "apiKey.bad": "{provider} n'a pas accepté cette clé.",
+    "apiKey.blocked": "{provider} refuse les requêtes venant de ce réseau ou de cette région, la clé n'a donc pas été vérifiée.",
     "message.waiting": "{provider} a atteint sa limite, traduction dans {seconds} s",
     "error.tooLarge": "La requête dépassait la limite par minute de {provider}. Raccourcissez le message ou attendez une minute",
     "feedback.title": "Aide et retours",
@@ -1550,6 +1564,7 @@
     "model.loading": "Carregando modelos…",
     "model.failed": "Não foi possível carregar a lista. Digite o nome do modelo você mesmo",
     "model.failedKey": "O provedor não aceitou a chave, por isso a lista não carregou. Confira a chave acima",
+    "model.blocked": "O provedor recusa solicitações desta rede ou região, por isso a lista não carregou. Tente outra rede ou ligue ou desligue a VPN",
     "model.needKey": "Escreva a chave de API acima e a lista carrega sozinha",
     "model.builtin": "Este provedor não publica uma lista, então estes são os modelos que o plugin conhece",
     "model.pick": "Escolha um modelo",
@@ -1563,6 +1578,7 @@
     "fallback.add": "Adicionar um provedor reserva",
     "fallback.remove": "Remover",
     "apiKey.bad": "{provider} não aceitou esta chave.",
+    "apiKey.blocked": "{provider} recusa solicitações desta rede ou região, por isso a chave não foi verificada.",
     "message.waiting": "{provider} atingiu o limite, traduzindo em {seconds} s",
     "error.tooLarge": "O pedido passou do limite por minuto do {provider}. Encurte a mensagem ou espere um minuto",
     "feedback.title": "Ajuda e comentários",
@@ -1741,6 +1757,7 @@
     "model.loading": "モデルを読み込み中…",
     "model.failed": "一覧を取得できませんでした。モデル名を手入力してください",
     "model.failedKey": "プロバイダーがキーを受け付けなかったため、一覧を読み込めませんでした。上のキーを確認してください",
+    "model.blocked": "プロバイダーがこのネットワークまたは地域からの接続を拒否しているため、一覧を読み込めませんでした。別のネットワークを試すか、VPN をオンまたはオフにしてください",
     "model.needKey": "上で API キーを入力すると、一覧は自動で読み込まれます",
     "model.builtin": "このプロバイダーは一覧を公開していないため、プラグインが知っているモデルを並べています",
     "model.pick": "モデルを選択",
@@ -1754,6 +1771,7 @@
     "fallback.add": "予備のプロバイダーを追加",
     "fallback.remove": "削除",
     "apiKey.bad": "{provider} はこのキーを受け付けませんでした。",
+    "apiKey.blocked": "{provider} はこのネットワークまたは地域からの接続を拒否しているため、キーを確認できませんでした。",
     "message.waiting": "{provider} が上限に達しています。{seconds} 秒後に翻訳します",
     "error.tooLarge": "リクエストが {provider} の毎分の上限を超えました。メッセージを短くするか、1 分ほど待ってください",
     "feedback.title": "サポートとご意見",
@@ -1932,6 +1950,7 @@
     "model.loading": "正在加载模型…",
     "model.failed": "无法加载列表。请自行输入模型名称",
     "model.failedKey": "服务商没有接受该密钥，列表无法加载。请检查上面的密钥",
+    "model.blocked": "服务商拒绝来自这个网络或地区的请求，列表无法加载。请换一个网络，或者打开或关闭 VPN",
     "model.needKey": "在上面填入 API 密钥，列表会自动加载",
     "model.builtin": "该服务商不提供模型列表，这里是插件已知的模型",
     "model.pick": "选择模型",
@@ -1945,6 +1964,7 @@
     "fallback.add": "添加备用提供商",
     "fallback.remove": "移除",
     "apiKey.bad": "{provider} 不接受这个密钥。",
+    "apiKey.blocked": "{provider} 拒绝来自这个网络或地区的请求，所以没能检查这个密钥。",
     "message.waiting": "{provider} 已达上限，{seconds} 秒后翻译",
     "error.tooLarge": "请求超出了 {provider} 的每分钟上限。请缩短消息，或等待一分钟",
     "feedback.title": "支持与反馈",
@@ -2043,6 +2063,7 @@
     "model.loading": "กำลังโหลดโมเดล…",
     "model.failed": "โหลดรายการไม่สำเร็จ พิมพ์ชื่อโมเดลเอง",
     "model.failedKey": "ผู้ให้บริการไม่รับคีย์นี้ รายการจึงโหลดไม่ได้ ตรวจสอบคีย์ด้านบน",
+    "model.blocked": "ผู้ให้บริการปฏิเสธคำขอจากเครือข่ายหรือภูมิภาคนี้ รายการจึงโหลดไม่ได้ ลองใช้เครือข่ายอื่น หรือเปิดหรือปิด VPN",
     "model.needKey": "ใส่คีย์ API ด้านบน แล้วรายการจะโหลดเอง",
     "model.builtin": "ผู้ให้บริการนี้ไม่เปิดเผยรายการโมเดล จึงแสดงรุ่นที่ปลั๊กอินรู้จัก",
     "model.pick": "เลือกโมเดล",
@@ -2136,6 +2157,7 @@
     "fallback.add": "เพิ่มผู้ให้บริการสำรอง",
     "fallback.remove": "เอาออก",
     "apiKey.bad": "{provider} ไม่รับคีย์นี้",
+    "apiKey.blocked": "{provider} ปฏิเสธคำขอจากเครือข่ายหรือภูมิภาคนี้ จึงตรวจสอบคีย์ไม่ได้",
     "message.waiting": "{provider} ถึงขีดจำกัดแล้ว จะแปลในอีก {seconds} วินาที",
     "error.tooLarge": "คำขอใหญ่เกินขีดจำกัดต่อนาทีของ {provider} ย่อข้อความ หรือรอสักนาที",
     "feedback.title": "ความช่วยเหลือและความคิดเห็น",
@@ -2234,6 +2256,7 @@
     "model.loading": "Đang tải mô hình…",
     "model.failed": "Không tải được danh sách. Hãy tự nhập tên mô hình",
     "model.failedKey": "Nhà cung cấp không nhận khóa, nên danh sách không tải được. Hãy kiểm tra khóa ở trên",
+    "model.blocked": "Nhà cung cấp từ chối yêu cầu từ mạng hoặc khu vực này, nên danh sách không tải được. Hãy thử mạng khác, hoặc bật hay tắt VPN",
     "model.needKey": "Nhập khóa API ở trên, danh sách sẽ tự tải",
     "model.builtin": "Nhà cung cấp này không công bố danh sách, nên đây là các mô hình mà plugin biết",
     "model.pick": "Chọn mô hình",
@@ -2327,6 +2350,7 @@
     "fallback.add": "Thêm nhà cung cấp dự phòng",
     "fallback.remove": "Xoá",
     "apiKey.bad": "{provider} không chấp nhận khoá này.",
+    "apiKey.blocked": "{provider} từ chối yêu cầu từ mạng hoặc khu vực này, nên chưa kiểm tra được khoá.",
     "message.waiting": "{provider} đã chạm giới hạn, sẽ dịch sau {seconds} giây",
     "error.tooLarge": "Yêu cầu vượt quá giới hạn mỗi phút của {provider}. Hãy rút ngắn tin nhắn hoặc đợi một phút",
     "feedback.title": "Hỗ trợ và phản hồi",
@@ -2425,6 +2449,7 @@
     "model.loading": "Modeller yükleniyor…",
     "model.failed": "Liste yüklenemedi. Model adını kendiniz yazın",
     "model.failedKey": "Sağlayıcı anahtarı kabul etmedi, bu yüzden liste yüklenemedi. Yukarıdaki anahtarı kontrol edin",
+    "model.blocked": "Sağlayıcı bu ağdan veya bölgeden gelen istekleri reddediyor, bu yüzden liste yüklenemedi. Başka bir ağ deneyin ya da VPN'i açın veya kapatın",
     "model.needKey": "API anahtarını yukarıya girin, liste kendiliğinden yüklenir",
     "model.builtin": "Bu sağlayıcı model listesi yayımlamıyor, burada eklentinin bildiği modeller var",
     "model.pick": "Bir model seçin",
@@ -2518,6 +2543,7 @@
     "fallback.add": "Yedek sağlayıcı ekle",
     "fallback.remove": "Kaldır",
     "apiKey.bad": "{provider} bu anahtarı kabul etmedi.",
+    "apiKey.blocked": "{provider} bu ağdan veya bölgeden gelen istekleri reddediyor, bu yüzden anahtar kontrol edilemedi.",
     "message.waiting": "{provider} sınırına ulaştı, {seconds} sn sonra çevrilecek",
     "error.tooLarge": "İstek {provider} sağlayıcısının dakika sınırını aştı. Mesajı kısaltın ya da bir dakika bekleyin",
     "feedback.title": "Destek ve geri bildirim",
@@ -2696,6 +2722,7 @@
     "model.loading": "Memuat model…",
     "model.failed": "Tidak dapat memuat daftar. Ketik nama model sendiri",
     "model.failedKey": "Penyedia tidak menerima kunci itu, jadi daftarnya tidak termuat. Periksa kunci di atas",
+    "model.blocked": "Penyedia menolak permintaan dari jaringan atau wilayah ini, jadi daftarnya tidak termuat. Coba jaringan lain, atau nyalakan atau matikan VPN",
     "model.needKey": "Masukkan kunci API di atas, daftarnya akan termuat sendiri",
     "model.builtin": "Penyedia ini tidak menerbitkan daftar model, jadi ini yang diketahui plugin",
     "model.pick": "Pilih model",
@@ -2709,6 +2736,7 @@
     "fallback.add": "Tambah penyedia cadangan",
     "fallback.remove": "Hapus",
     "apiKey.bad": "{provider} tidak menerima kunci ini.",
+    "apiKey.blocked": "{provider} menolak permintaan dari jaringan atau wilayah ini, jadi kuncinya tidak diperiksa.",
     "message.waiting": "{provider} sedang mencapai batas, menerjemahkan dalam {seconds} dtk",
     "error.tooLarge": "Permintaan terlalu besar untuk batas per menit {provider}. Perpendek pesan atau tunggu sebentar",
     "feedback.title": "Dukungan dan masukan",
@@ -2887,6 +2915,7 @@
     "model.loading": "جارٍ تحميل النماذج…",
     "model.failed": "تعذر تحميل القائمة. اكتب اسم النموذج بنفسك",
     "model.failedKey": "لم يقبل المزوّد المفتاح، لذلك لم تُحمّل القائمة. تحقق من المفتاح في الأعلى",
+    "model.blocked": "يرفض المزوّد الطلبات من هذه الشبكة أو المنطقة، لذلك لم تُحمّل القائمة. جرّب شبكة أخرى، أو شغّل VPN أو أوقفه",
     "model.needKey": "أدخل مفتاح API في الأعلى، وستُحمّل القائمة وحدها",
     "model.builtin": "هذا المزوّد لا ينشر قائمة بالنماذج، وهذه هي النماذج التي يعرفها الملحق",
     "model.pick": "اختر نموذجًا",
@@ -2900,6 +2929,7 @@
     "fallback.add": "إضافة مزود احتياطي",
     "fallback.remove": "إزالة",
     "apiKey.bad": "لم يقبل {provider} هذا المفتاح.",
+    "apiKey.blocked": "يرفض {provider} الطلبات من هذه الشبكة أو المنطقة، لذلك لم يُفحص المفتاح.",
     "message.waiting": "بلغ {provider} حدّه، ستتم الترجمة بعد {seconds} ث",
     "error.tooLarge": "كان الطلب أكبر من حد {provider} في الدقيقة. اختصر الرسالة، أو انتظر دقيقة",
     "feedback.title": "الدعم والملاحظات",
@@ -3078,6 +3108,7 @@
     "model.loading": "모델 불러오는 중…",
     "model.failed": "목록을 불러오지 못했습니다. 모델 이름을 직접 입력해 주세요",
     "model.failedKey": "제공자가 키를 받아들이지 않아 목록을 불러오지 못했습니다. 위의 키를 확인해 주세요",
+    "model.blocked": "제공자가 이 네트워크나 지역에서 오는 요청을 거부해서 목록을 불러오지 못했습니다. 다른 네트워크를 쓰거나 VPN을 켜거나 꺼 보세요",
     "model.needKey": "위에 API 키를 입력하면 목록이 저절로 불러와집니다",
     "model.builtin": "이 제공자는 모델 목록을 공개하지 않아, 플러그인이 아는 모델을 보여줍니다",
     "model.pick": "모델 선택",
@@ -3091,6 +3122,7 @@
     "fallback.add": "예비 제공자 추가",
     "fallback.remove": "제거",
     "apiKey.bad": "{provider}가 이 키를 받지 않았습니다.",
+    "apiKey.blocked": "{provider}가 이 네트워크나 지역에서 오는 요청을 거부해서 키를 확인하지 못했습니다.",
     "message.waiting": "{provider}가 한도에 도달했습니다. {seconds}초 뒤에 번역합니다",
     "error.tooLarge": "요청이 {provider}의 분당 한도보다 큽니다. 메시지를 줄이거나 잠시 기다려 주세요",
     "feedback.title": "지원 및 피드백",
@@ -3286,6 +3318,10 @@
     for (const pattern of SECRETS)
       out = out.replace(pattern, (whole2, keep2) => typeof keep2 === "string" ? `${keep2}***` : "***");
     return out;
+  }
+  function withoutKey(text, key) {
+    const sent = key.trim();
+    return sent.length >= 8 ? text.split(sent).join("***") : text;
   }
   var kept = [];
   function record(level, what, text, detail) {
@@ -3745,13 +3781,38 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     groq: "https://api.groq.com/openai/v1",
     glm: "https://api.z.ai/api/paas/v4"
   };
-  var openAiBase = (provider, baseUrl) => OPENAI_STYLE_BASES[provider] ?? baseUrl.replace(/\/+$/, "");
+  var openAiBase = (provider, baseUrl) => OPENAI_STYLE_BASES[provider] ?? cleanAddress(baseUrl).replace(/\/+$/, "");
+  var cleanKey = (key) => String(key ?? "").replace(/[\s\p{Cf}]/gu, "");
+  var cleanAddress = (url) => String(url ?? "").replace(/^[\s\p{Cf}]+|[\s\p{Cf}]+$/gu, "");
+  var SAYS_BAD_KEY = /invalid_api_key|API_KEY_INVALID|authentication_error|invalid (?:x-)?api.?key|incorrect api key|api key not valid|api key expired|reported as leaked|unauthori[sz]ed|invalid.?auth/i;
+  var REGION = /unsupported_country|country, region|territory not supported|location is not supported|not available in your (?:country|region)|ip not authorized|ip allowlist/i;
+  var BLOCK_PAGE = /<html|cloudflare|cf-ray|attention required|access denied|check your network|just a moment|error code: \d/i;
+  var onlyForbidden = (data) => /^(?:forbidden)?$/i.test(data.replace(/"(?:error|message|type|code)"\s*:/gi, "").replace(/[\W_]+/g, ""));
+  function keyVerdict(status, data) {
+    if (status === 200) return "ok";
+    if (status === 401) return REGION.test(data) ? "blocked" : "bad";
+    if (status !== 400 && status !== 403) return "unknown";
+    if (SAYS_BAD_KEY.test(data)) return "bad";
+    if (REGION.test(data) || BLOCK_PAGE.test(data)) return "blocked";
+    return status === 403 && onlyForbidden(data) ? "blocked" : "unknown";
+  }
+  var mayPassAgain = (status, data) => status === 403 && !/api.?key|unauthori[sz]|invalid.?auth/i.test(data) && !REGION.test(data);
+  async function againAfter403(send, first) {
+    let result = first;
+    for (const delay of [800, 2e3]) {
+      if (!mayPassAgain(result.status, result.data)) break;
+      await sleep(delay);
+      result = await send();
+    }
+    return result;
+  }
   var FREE_MODELS = {
     glm: ["glm-4.5-flash", "glm-4.7-flash"]
   };
   var ok = (status) => status >= 200 && status < 300;
   async function listModels(net, payload) {
-    const { provider, apiKey, baseUrl } = JSON.parse(payload);
+    const { provider, apiKey: typed2, baseUrl } = JSON.parse(payload);
+    const apiKey = cleanKey(typed2);
     let url;
     const headers = { "User-Agent": CLIENT };
     switch (provider) {
@@ -3769,7 +3830,9 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
         headers["Authorization"] = `Bearer ${apiKey}`;
         break;
     }
-    const res = await net({ url, headers, signal: timeoutSignal(2e4) });
+    const signal = timeoutSignal(2e4);
+    const ask = () => net({ url, headers, signal });
+    const res = await againAfter403(ask, await ask());
     if (!ok(res.status)) return { status: res.status, models: [], data: res.data };
     try {
       const json = JSON.parse(res.data);
@@ -3832,7 +3895,8 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     return result;
   }
   async function sendChat(net, payload) {
-    const { provider, apiKey, model, baseUrl, system, text, thinkingLevel, roomy } = JSON.parse(payload);
+    const { provider, apiKey: typed2, model, baseUrl, system, text, thinkingLevel, roomy } = JSON.parse(payload);
+    const apiKey = cleanKey(typed2);
     let url;
     const headers = { "Content-Type": "application/json", "User-Agent": CLIENT };
     let body;
@@ -3907,12 +3971,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
         retryMs: readRetry(res.header)
       };
     };
-    let result = await sendWithRetry(send, body);
-    for (const delay of [800, 2e3]) {
-      if (result.status !== 403 || /api.?key|unauthori[sz]|invalid.?auth/i.test(result.data)) break;
-      await sleep(delay);
-      result = await send(body);
-    }
+    let result = await againAfter403(() => send(body), await sendWithRetry(send, body));
     if (result.status === 400 && /thinking|reasoning/i.test(result.data)) {
       delete body.generationConfig?.thinkingConfig;
       delete body.reasoning_effort;
@@ -4183,9 +4242,15 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   var keyHeading = (id2) => `${t("apiKey.name")} — ${id2 === "openai" ? t("provider.openaiInline") : providerName(id2)}`;
   var MOST_SLOTS = 5;
   var canRemove = (count, at) => at > 0 && count > 2;
-  var keyOf = (slot) => slot.keys?.[slot.provider] ?? "";
+  var keyOf = (slot) => cleanKey(slot.keys?.[slot.provider]);
   var modelOf = (slot) => slot.models?.[slot.provider] ?? "";
-  var baseUrlOf = (slot) => slot.baseUrls?.[slot.provider] ?? "";
+  var baseUrlOf = (slot) => cleanAddress(slot.baseUrls?.[slot.provider]);
+  var cleaned = (values, clean2) => values && Object.fromEntries(Object.entries(values).map(([id2, value]) => [id2, clean2(value)]));
+  var cleanSlot = (slot) => ({
+    ...slot,
+    keys: cleaned(slot.keys, cleanKey) ?? {},
+    ...slot.baseUrls ? { baseUrls: cleaned(slot.baseUrls, cleanAddress) } : {}
+  });
   var isReady = (slot) => !!keyOf(slot) && !!modelOf(slot);
   var newId = () => Math.random().toString(36).slice(2, 10);
   var emptySlot = (provider) => ({ id: newId(), provider, keys: {}, models: {} });
@@ -4233,7 +4298,38 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     return fromOldSettings();
   }
   function writeSlots(slots) {
-    set("providerSlots", JSON.stringify(slots.slice(0, MOST_SLOTS)));
+    const clean2 = slots.slice(0, MOST_SLOTS).map(cleanSlot);
+    set("providerSlots", JSON.stringify(clean2));
+    return clean2;
+  }
+  var SAID = {
+    ok: "key accepted",
+    bad: "key refused",
+    blocked: "network or region refused, key not checked",
+    unknown: "nothing said about the key"
+  };
+  async function checkKey(slot) {
+    const apiKey = keyOf(slot);
+    let status = -1;
+    let models = [];
+    let data = "";
+    try {
+      ({ status, models, data } = await Bridge.listAiModels(JSON.stringify({
+        provider: slot.provider,
+        apiKey,
+        baseUrl: baseUrlOf(slot)
+      })));
+    } catch (e) {
+      data = String(e);
+    }
+    const verdict = keyVerdict(status, data);
+    record(
+      verdict === "ok" ? "info" : "error",
+      "key check",
+      `${slot.provider} answered ${status}: ${SAID[verdict]}${verdict === "ok" ? `, ${models.length} models` : ""}`,
+      verdict === "ok" ? void 0 : withoutKey(data, apiKey)
+    );
+    return { verdict, status, models };
   }
 
   // ai-translate/core/translate.ts
@@ -4831,18 +4927,12 @@ IMPORTANT: your previous answer began with the code of ${target}, as if the mess
     }
     return "";
   }
-  function withoutKey(text, key) {
-    const sent = key.trim();
-    return sent.length >= 8 ? text.split(sent).join("***") : text;
-  }
-  var BLOCK_PAGE = /<html|cloudflare|cf-ray|attention required|access denied|just a moment|error code: \d/i;
   var MODEL_GONE = /decommission|deprecat|no longer supported|unknown model|not a valid model|model_not_found|does not exist/i;
-  var WORTH_A_SECOND_PROVIDER = (status, data) => status === -1 || status === 401 || status === 402 || status === 403 || status === 404 || status === 413 || status === 429 || status >= 500 || status === 400 && MODEL_GONE.test(data);
+  var WORTH_A_SECOND_PROVIDER = (status, data) => status === -1 || status === 401 || status === 402 || status === 403 || status === 404 || status === 413 || status === 429 || status >= 500 || status === 400 && (MODEL_GONE.test(data) || keyVerdict(status, data) !== "unknown");
   function refusal({ status, data, model, provider, retryMs }, name) {
     if (status === -1) return fail("error.network", { details: data });
-    if (status === 401) return fail("error.badKey", { provider: name, status });
+    if (keyVerdict(status, data) === "bad") return fail("error.badKey", { provider: name, status });
     if (status === 403) {
-      if (/api.?key|unauthori[sz]|invalid.?auth/i.test(data)) return fail("error.badKey", { provider: name, status });
       const said = providerSaid(data);
       if (said) return fail("error.forbiddenSaid", { provider: name, details: said });
       if (BLOCK_PAGE.test(data)) return fail("error.blocked", { provider: name });
@@ -6036,7 +6126,14 @@ ${sent}`;
       saved = (typeof GM_getValue === "function" ? GM_getValue(KEY, {}) : {}) ?? {};
     } catch {
     }
-    return { ...DEFAULTS, ...saved };
+    return clean({ ...DEFAULTS, ...saved });
+  }
+  function clean(all) {
+    const out = all;
+    for (const name of Object.keys(out))
+      if (name.endsWith("ApiKey") && typeof out[name] === "string") out[name] = cleanKey(out[name]);
+    if (typeof out.baseUrl === "string") out.baseUrl = cleanAddress(out.baseUrl);
+    return all;
   }
   var settings = () => held ??= read();
   function fresh() {
@@ -6149,8 +6246,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${6}`;
-  var BUILD_NAME = `${VERSION} (${"5c3f72d"}-${6})`;
+  var SCRIPT_VERSION = `${VERSION}.${7}`;
+  var BUILD_NAME = `${VERSION} (${"af27c17"}-${7})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -6983,20 +7080,17 @@ ${sent}`;
     return list;
   }
   async function offerModels(slot, list, refused) {
-    const apiKey = keyOf(slot);
-    if (!apiKey) return;
-    try {
-      const { status, models } = await Bridge.listAiModels(JSON.stringify({ provider: slot.provider, apiKey, baseUrl: baseUrlOf(slot) }));
-      if (status === 401 || status === 403) {
-        refused.textContent = t("apiKey.bad", { provider: providerName(slot.provider) });
-        return;
-      }
-      for (const model of models) {
-        const item = document.createElement("option");
-        item.value = model;
-        list.append(item);
-      }
-    } catch {
+    if (!keyOf(slot)) return;
+    const { verdict, models } = await checkKey(slot);
+    if (verdict === "bad" || verdict === "blocked") {
+      refused.classList.toggle("bad", verdict === "bad");
+      refused.textContent = t(verdict === "bad" ? "apiKey.bad" : "apiKey.blocked", { provider: providerName(slot.provider) });
+      return;
+    }
+    for (const model of models) {
+      const item = document.createElement("option");
+      item.value = model;
+      list.append(item);
     }
   }
   function withExample(key, example) {

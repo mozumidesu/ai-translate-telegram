@@ -39,8 +39,9 @@ with a reply keyboard, any will do.
    **Translation** (grammatical gender, how to address people, recent
    messages as context, translation exceptions, extra style instructions,
    the backslash Help), **Appearance** (Interface language), and Logs at the
-   foot. Pick Groq, paste the key, leave the model. Leave the field: no red
-   line under the key. Typing in any field stays there: Telegram's chat box
+   foot. Pick Groq, paste the key with a space after it, leave the model.
+   Leave the field: the space is gone, there is no red line under the key,
+   and Logs has a "key check" line saying the key was accepted. Typing in any field stays there: Telegram's chat box
    does not take the keys, and Escape shuts only the window.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
    without the build counter: 0.2.1a, where the manager's dashboard, column

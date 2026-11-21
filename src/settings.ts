@@ -10,11 +10,10 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { Bridge } from "../ai-translate/core/bridge";
 import { config, set } from "../ai-translate/core/host";
 import { LOCALES, t } from "../ai-translate/core/locales";
 import {
-    baseUrlOf, canRemove, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, PROVIDERS, providerLabel, providerName,
+    baseUrlOf, canRemove, checkKey, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, PROVIDERS, providerLabel, providerName,
     readSlots, type Slot, writeSlots
 } from "../ai-translate/core/slots";
 import { headerLinks } from "./feedback";
@@ -345,26 +344,26 @@ function providers() {
     return list;
 }
 
-/** The provider's own list of models, and its verdict on the key: only a 401 or 403 is the key's fault. */
+/**
+ * The provider's own list of models, and its verdict on the key, by the core's
+ * one rule (keyVerdict): a key called bad only when the provider says so, and
+ * a network or a country turned away said as that, not in red.
+ */
 async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLElement) {
-    const apiKey = keyOf(slot);
-    if (!apiKey) return;
+    if (!keyOf(slot)) return;
 
-    try {
-        const { status, models } = await Bridge.listAiModels(JSON.stringify({ provider: slot.provider, apiKey, baseUrl: baseUrlOf(slot) }));
+    const { verdict, models } = await checkKey(slot);
 
-        if (status === 401 || status === 403) {
-            refused.textContent = t("apiKey.bad", { provider: providerName(slot.provider) });
-            return;
-        }
+    if (verdict === "bad" || verdict === "blocked") {
+        refused.classList.toggle("bad", verdict === "bad");
+        refused.textContent = t(verdict === "bad" ? "apiKey.bad" : "apiKey.blocked", { provider: providerName(slot.provider) });
+        return;
+    }
 
-        for (const model of models) {
-            const item = document.createElement("option");
-            item.value = model;
-            list.append(item);
-        }
-    } catch {
-        // Suggestions are a convenience; the field works without them.
+    for (const model of models) {
+        const item = document.createElement("option");
+        item.value = model;
+        list.append(item);
     }
 }
 

@@ -14,6 +14,7 @@
  */
 
 import type { Config } from "../ai-translate/core/host";
+import { cleanAddress, cleanKey } from "../ai-translate/core/providers";
 
 declare const GM_getValue: (<T>(name: string, fallback: T) => T) | undefined;
 declare const GM_setValue: ((name: string, value: unknown) => void) | undefined;
@@ -67,7 +68,20 @@ function read(): Config {
     }
 
     // A setting added in a later version appears with its default, not as undefined.
-    return { ...DEFAULTS, ...saved };
+    return clean({ ...DEFAULTS, ...saved });
+}
+
+/**
+ * The keys from before the provider list, and its address, without what a
+ * paste brought along. The list itself is cleaned by the core when it is read
+ * and when it is written (ai-translate/core/slots.ts).
+ */
+function clean(all: Config): Config {
+    const out = all as Record<string, unknown>;
+    for (const name of Object.keys(out))
+        if (name.endsWith("ApiKey") && typeof out[name] === "string") out[name] = cleanKey(out[name]);
+    if (typeof out.baseUrl === "string") out.baseUrl = cleanAddress(out.baseUrl);
+    return all;
 }
 
 export const settings = () => (held ??= read());

@@ -68,7 +68,7 @@ function GM_addValueChangeListener(name, listener) { __gm.listeners.push(listene
 function GM_registerMenuCommand(name, run) { __gm.menu = { name, run }; }
 // A provider in OpenAI's shape for the chat, and __gm.routes, by address, for anything else.
 function GM_xmlhttpRequest(options) {
-    __gm.requests.push({ url: options.url, method: options.method ?? "GET", data: options.data });
+    __gm.requests.push({ url: options.url, method: options.method ?? "GET", data: options.data, headers: options.headers ?? {} });
     const route = Object.keys(__gm.routes).find(prefix => options.url.startsWith(prefix));
     let status = 404, text = "";
     if (route) [status, text] = __gm.routes[route](options);
@@ -334,6 +334,44 @@ check("Web K: the language setting names Telegram, not Discord",
     (await ours(k, '.sheet[data-name="settings"] select option')).includes("Same as Telegram"), true);
 check("Web K: the backslashes explained, with their examples",
     await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
+
+// A key as it is pasted, and what the provider says about it, under the key.
+const MODELS = "https://api.groq.com/openai/v1/models";
+const PASTED_KEY = "gsk_" + "A1b2C3d4E5f6G7h8J9k0L1m2N3p4Q5r6S7t8U9v0W1x2Y3z4A5b6";
+const KEY_FIELD = '.sheet[data-name="settings"] .providers .slot .keyrow input';
+const UNDER_KEY = '.sheet[data-name="settings"] .providers .slot .keyrow + .hint';
+const pasteKey = async value => (await settled(k), k.evaluate(([selector, value]) => {
+    const field = __ours().querySelector(selector);
+    field.value = value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+}, [KEY_FIELD, value]));
+const underKey = () => k.evaluate(selector => {
+    const line = __ours().querySelector(selector);
+    return { text: line?.textContent, red: !!line?.classList.contains("bad") };
+}, UNDER_KEY);
+
+await k.evaluate(([url, body]) => { __gm.routes[url] = () => [401, body]; },
+    [MODELS, `{"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}`]);
+await pasteKey(PASTED_KEY + " \u200b\r\n");
+check("Web K: a key pasted with a space, a zero-width space and a line break is shown clean",
+    await k.evaluate(selector => __ours().querySelector(selector).value, KEY_FIELD), PASTED_KEY);
+check("Web K: and saved clean in the manager's storage",
+    await k.evaluate(() => JSON.parse(__gm.store.aiTranslateSettings.providerSlots)[0].keys.groq), PASTED_KEY);
+check("Web K: Groq's answer to a wrong key is a red line under it",
+    await waitOurs(k, UNDER_KEY, "Groq did not accept this key.") && await underKey(), { text: "Groq did not accept this key.", red: true });
+check("Web K: and the key went out as Bearer and the key, nothing after it",
+    await k.evaluate(url => __gm.requests.filter(r => r.url === url).at(-1)?.headers.Authorization, MODELS), `Bearer ${PASTED_KEY}`);
+
+await k.evaluate(url => { __gm.routes[url] = () => [403, "Forbidden"]; }, MODELS);
+await pasteKey(PASTED_KEY);
+const BLOCKED_LINE = "Groq refused requests from this network or region, so the key was not checked.";
+check("Web K: a network Groq turns away is said as that, and not in red",
+    await waitOurs(k, UNDER_KEY, BLOCKED_LINE) && await underKey(), { text: BLOCKED_LINE, red: false });
+
+await k.evaluate(url => { delete __gm.routes[url]; }, MODELS);
+await pasteKey("test-key");
+check("Web K: a provider that says nothing about the key leaves no line",
+    await waitOurs(k, UNDER_KEY) && (await underKey()).text, "");
 
 check("Web K: under Logs, the version: the plugin's, which is the core's, with no build counter",
     await ours(k, ".logs .hint"), [`AI Translate · ${coreVersion()}`]);
