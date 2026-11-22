@@ -117,6 +117,33 @@ export function addStyle(css: string) {
     shadow!.append(style);
 }
 
+/** What of ours Escape shuts, the one opened last on top. */
+const escapers: (() => void)[] = [];
+
+/** Escape shuts `shut` while nothing of ours opened after it is still open; the answer takes it off again. */
+export function onEscape(shut: () => void) {
+    escapers.push(shut);
+    return () => {
+        const at = escapers.lastIndexOf(shut);
+        if (at !== -1) escapers.splice(at, 1);
+    };
+}
+
+/**
+ * Both clients shut the open chat on Escape, Web K from the window's capture
+ * and Web A from the document's, so while something of ours is open the key
+ * is caught on the window before either, from before the client's own code
+ * has run, and goes no further. With nothing of ours open it is the client's.
+ */
+export function catchEscape() {
+    addEventListener("keydown", event => {
+        if (event.key !== "Escape" || event.isComposing || !escapers.length) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        escapers.at(-1)!();
+    }, true);
+}
+
 const SHOWN_MS = 7000;
 
 export function toast(text: string, kind: "message" | "failure" = "message") {

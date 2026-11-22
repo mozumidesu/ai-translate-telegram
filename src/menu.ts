@@ -19,7 +19,7 @@ import type { Shown, TelegramClient } from "./client";
 import { toMarked } from "./formatted";
 import { explainIcon, translateIcon } from "./icons";
 import { askForCorrection } from "./learn";
-import { addStyle, ui, UI_ID } from "./ui";
+import { addStyle, onEscape, ui, UI_ID } from "./ui";
 
 const CSS = `
 .card {
@@ -112,7 +112,6 @@ function cardFor(shown: Shown, explaining: boolean) {
         card.style.left = `${Math.round(Math.min(Math.max(8, left), innerWidth - size.width - 8))}px`;
     };
 
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && shut();
     // Seen from the document, a press inside our closed root has its host as the target, and the path stops there.
     const onPress = (e: MouseEvent) => (e.target as Element | null)?.id !== UI_ID && shut();
 
@@ -120,7 +119,7 @@ function cardFor(shown: Shown, explaining: boolean) {
         card.remove();
         document.removeEventListener("scroll", place, true);
         removeEventListener("resize", place);
-        document.removeEventListener("keydown", onKey, true);
+        offEscape();
         document.removeEventListener("mousedown", onPress, true);
         if (open?.card === card) open = undefined;
     }
@@ -128,7 +127,8 @@ function cardFor(shown: Shown, explaining: boolean) {
     shutButton.onclick = shut;
     document.addEventListener("scroll", place, true);
     addEventListener("resize", place);
-    document.addEventListener("keydown", onKey, true);
+    // Escape shuts the card and nothing else: the chat behind it stays open.
+    const offEscape = onEscape(shut);
     // After the press that opened the menu has finished, or it would shut at once.
     setTimeout(() => document.addEventListener("mousedown", onPress, true), 0);
 

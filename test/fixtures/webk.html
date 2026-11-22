@@ -5,7 +5,9 @@
   the chat bar's emoji button, .toggle-emoticons (components/chat/input.ts), and
   the message menu, #bubble-contextmenu.btn-menu, appended to the body on a
   right click (components/chat/contextMenu.ts, components/buttonMenu.ts), shut
-  by a click outside it (helpers/overlayClickHandler.ts).
+  by a click outside it (helpers/overlayClickHandler.ts). Escape shuts the open
+  chat from the window's capture unless something took it first
+  (components/appNavigationController.ts), counted in __k.chatShut.
 -->
 <html lang="en">
 <head><meta charset="utf-8"><title>Telegram Web K (fixture)</title></head>
@@ -60,6 +62,12 @@
     message.innerHTML = '<span class="translatable-message"></span><span class="time">12:05</span>';
     message.firstChild.textContent = K.history[mid]?.message ?? message.dataset.text;
   };
+  // What Web K's navigation does with Escape: the chat it has open is shut, unless the key was taken.
+  K.chatShut = 0;
+  window.addEventListener("keydown", event => {
+    if (event.key === "Escape" && !event.defaultPrevented) K.chatShut++;
+  }, { capture: true, passive: false });
+
   // Opening a chat asks the managers for its history before anything can be typed.
   K.managers.appMessagesManager.getHistory({ peerId: K.appImManager.chat.peerId, limit: 50 });
 

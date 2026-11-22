@@ -139,6 +139,13 @@ from the page, an event inside one has the root's host as its target and a
 asked of the target, never of the path. `test/page.mjs` keeps the roots
 closed, as a browser does, and holds a handle on each.
 
+Both clients shut the open chat on Escape, Web K from the window's capture
+unless the key was taken, Web A from the document's. So `catchEscape` in
+`ui.ts` listens on the window from document-start, before either, and while
+a window or a card of ours is open it takes the key: the one opened last
+shuts, and the client hears nothing. With nothing of ours open, Escape is
+the client's.
+
 The windows come and go as the client's own do: `windows` in `weba.ts` and
 `webk.ts` holds the timings, taken from the client's sources, and what its
 animation setting leaves. A window that is shutting stays drawn for 350ms

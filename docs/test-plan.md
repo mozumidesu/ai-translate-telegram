@@ -90,7 +90,9 @@ with a reply keyboard, any will do.
    **AI Translate**. Choose it: the menu shuts, a card beside the message
    shows the translation and "Translated from …". Select a few words of the
    translation with the mouse and copy them: the card stays open. A click
-   anywhere outside it shuts it.
+   anywhere outside it shuts it. Open it again and press Escape: the card
+   shuts, and the chat stays open behind it. Escape once more, with nothing
+   of ours open, does what it does in Telegram.
 2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
    menu now has **AI Explain** too, which names the language and explains it.
 
@@ -265,7 +267,8 @@ a chat in the chat list, *Delete*, then *Cancel*.
 4. Press the envelope: *Support and feedback* comes over the settings the
    same way; the settings page under it does not move, it only gets darker.
    Escape: the form goes and the settings page is as it was. The same with
-   Logs, and with Corrections (AI Learn on).
+   Logs, and with Corrections (AI Learn on). Escape again shuts the
+   settings, and the chat behind them is still open.
 5. Turn movement off in the client. Web K: Settings, Power Saving, *Motion
    Effects* off. Web A: Settings, Animations and Performance, *Page
    Transitions* off. Every window of ours now fades in and out where it

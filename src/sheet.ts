@@ -14,7 +14,7 @@
 import { isRightToLeft, t } from "../ai-translate/core/locales";
 import { theClient } from "./client";
 import { translateIcon } from "./icons";
-import { addStyle, ui } from "./ui";
+import { addStyle, onEscape, ui } from "./ui";
 
 const CSS = `
 .sheet {
@@ -154,8 +154,10 @@ export function openSheet(opening: Opening): Sheet {
     panel.setAttribute("aria-modal", "true");
     sheet.append(panel);
 
+    let offEscape: (() => void) | undefined;
     const shut = () => {
         if (!sheet.isConnected || sheet.classList.contains("closing")) return;
+        offEscape?.();
         const shown = sheet.classList.contains("open");
         sheet.classList.remove("open");
         sheet.classList.add("closing");
@@ -202,7 +204,7 @@ export function openSheet(opening: Opening): Sheet {
     };
     for (const type of OURS) sheet.addEventListener(type, event => event.stopPropagation());
     shutters.set(sheet, shut);
-    listenForEscape();
+    offEscape = onEscape(shut);
 
     ui().append(sheet);
     draw().focus();
@@ -218,21 +220,6 @@ const shutters = new WeakMap<Element, () => void>();
 /** The windows that are open: one on its way out is still drawn, and is none of them. */
 const STAYING = ".sheet:not(.closing)";
 const topSheet = () => [...ui().querySelectorAll<HTMLElement>(STAYING)].at(-1);
-
-let listening = false;
-/** Escape shuts the window on top wherever the keyboard is, and goes no further: Telegram would shut the chat too. */
-function listenForEscape() {
-    if (listening) return;
-    listening = true;
-    document.addEventListener("keydown", event => {
-        if (event.key !== "Escape") return;
-        const top = topSheet();
-        if (!top) return;
-        event.preventDefault();
-        event.stopPropagation();
-        shutters.get(top)?.();
-    }, true);
-}
 
 /** Shuts the window of that name, if it is open. */
 export function shutSheet(name: string) {

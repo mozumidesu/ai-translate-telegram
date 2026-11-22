@@ -220,6 +220,9 @@ const waitOurs = (page, selector, text) => page.waitForFunction(([selector, text
     return [...(root?.querySelectorAll(selector) ?? [])].some(e => (text ? e.textContent === text : true));
 }, [selector, text], { timeout: 5000 }).then(() => true, () => false);
 
+/** How many times the client has shut its open chat on Escape, as both do (fixtures/webk.html, fixtures/weba.html). */
+const chatShut = page => page.evaluate(() => (window.__k ?? window.__a).chatShut);
+
 // --- Web K
 
 const k = await context.newPage();
@@ -271,7 +274,10 @@ await waitOurs(k, ".card .text", "look at this");
 check("Web K: a message Web K's copy lacks is read off the screen", await k.evaluate(() => __gm.asked.at(-1)), "только на экране");
 
 await k.evaluate(() => __gm.change("explain", true));
+const shutBeforeCard = await chatShut(k);
 await k.keyboard.press("Escape");
+check("Web K: Escape shuts the card, and only the card: the chat behind it stays open",
+    [await ours(k, ".card"), await chatShut(k) - shutBeforeCard], [[], 0]);
 await k.click(".bubble[data-mid='4404']", { button: "right" });
 await k.waitForSelector("#bubble-contextmenu .ai-translate-item", { timeout: 5000 });
 check("Web K: AI Explain is there once it is switched on",
@@ -585,12 +591,16 @@ check("Web K: Logs is as wide as Discord's default modal, 480px", await widthOf(
 await watchMotion(k, "logs", "closing");
 await watchLeaving(k, "logs");
 await settled(k);
+const shutBeforeLogs = await chatShut(k);
 await k.keyboard.press("Escape");
 check("Web K: Logs goes as a popup goes: it fades where it stands", await motion(k), { settings: STILL, "logs, shutting": K_OUT });
 check("Web K: and is gone once 250ms are over, as Web K keeps a popup that shuts", await leftAfter(k, 250), true);
 check("Web K: Escape shuts Logs and leaves the settings", await ours(k, ".sheet .head h1"), ["AI Translate"]);
 await k.keyboard.press("Escape");
 check("Web K: and then the settings", await ours(k, ".sheet"), []);
+check("Web K: and Web K heard neither Escape, so the chat behind them stays open", await chatShut(k) - shutBeforeLogs, 0);
+await k.keyboard.press("Escape");
+check("Web K: with nothing of ours open, Escape is Web K's own again", await chatShut(k) - shutBeforeLogs, 1);
 
 await k.click(".ai-translate-button", { modifiers: ["Shift"] });
 check("Web K: a shift-click switches the open chat off, as in Discord", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "");
@@ -802,7 +812,10 @@ check("Web A: choosing it shuts the menu", await a.evaluate(() => !document.quer
 check("Web A: the translation is shown beside the message", await waitOurs(a, ".card .text", "who is coming on saturday?"), true);
 check("Web A: the text came from what the worker said", await a.evaluate(() => __gm.asked.at(-1)), "кто идёт в субботу?");
 
+const shutBeforeCardA = await chatShut(a);
 await a.keyboard.press("Escape");
+check("Web A: Escape shuts the card, and only the card: the chat behind it stays open",
+    [await ours(a, ".card"), await chatShut(a) - shutBeforeCardA], [[], 0]);
 await a.click(".Message[data-message-id='4998']", { button: "right" });
 await a.waitForSelector("#portals .ai-translate-item", { timeout: 5000 });
 await a.click("#portals .ai-translate-item");
@@ -984,10 +997,18 @@ check("Web A: the report names the Telegram user and the client, then the build:
 await watchMotion(a, "feedback", "closing");
 await watchLeaving(a, "feedback");
 await settled(a);
+const shutBeforeFeedback = await chatShut(a);
 await a.keyboard.press("Escape");
 check("Web A: Escape sends it off as Web A's modals go: it fades in .15s and goes on down 1rem in .2s", await motion(a), { settings: STILL, "feedback, shutting": A_OUT });
 check("Web A: and it is gone once 350ms are over, as Web A keeps a modal that shuts", await leftAfter(a, 350), true);
 await a.keyboard.press("Escape");
+check("Web A: Escape shuts the settings after it, and Web A heard neither, so the chat behind them stays open",
+    [await ours(a, ".sheet"), await chatShut(a) - shutBeforeFeedback], [[], 0]);
+check("Web A: the card opened before them is still open under them", (await ours(a, ".card")).length, 1);
+await a.keyboard.press("Escape");
+check("Web A: and the next Escape shuts it, still without reaching Web A", [await ours(a, ".card"), await chatShut(a) - shutBeforeFeedback], [[], 0]);
+await a.keyboard.press("Escape");
+check("Web A: with nothing of ours open, Escape is Web A's own again", await chatShut(a) - shutBeforeFeedback, 1);
 
 await settled(a);
 await watchMotion(a, "chat", "open");

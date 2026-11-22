@@ -20,7 +20,7 @@ import { installNotes } from "./notes";
 import { whichClient } from "./page";
 import { onWord, seen } from "./relay";
 import { openSettings } from "./settings";
-import { toast } from "./ui";
+import { catchEscape, toast } from "./ui";
 import { webA } from "./weba";
 import { webK } from "./webk";
 
@@ -40,6 +40,8 @@ if (client) {
     } catch (e) {
         console.error("[AI Translate]", e);
     }
+    // Before the client's own listeners too, which shut the open chat on Escape.
+    catchEscape();
 
     onWord(word => {
         if (word.type === "notice" && seen()) toast(word.text, word.kind);

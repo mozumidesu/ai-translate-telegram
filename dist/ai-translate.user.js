@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.10
+// @version         0.2.3a.11
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -5798,6 +5798,22 @@ ${text.replace(/\s+/g, "")}`;
     style.textContent = css;
     shadow.append(style);
   }
+  var escapers = [];
+  function onEscape(shut) {
+    escapers.push(shut);
+    return () => {
+      const at = escapers.lastIndexOf(shut);
+      if (at !== -1) escapers.splice(at, 1);
+    };
+  }
+  function catchEscape() {
+    addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || event.isComposing || !escapers.length) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      escapers.at(-1)();
+    }, true);
+  }
   var SHOWN_MS = 7e3;
   function toast(text, kind = "message") {
     const root = ui();
@@ -5928,8 +5944,10 @@ ${text.replace(/\s+/g, "")}`;
     panel.setAttribute("role", "dialog");
     panel.setAttribute("aria-modal", "true");
     sheet.append(panel);
+    let offEscape;
     const shut = () => {
       if (!sheet.isConnected || sheet.classList.contains("closing")) return;
+      offEscape?.();
       const shown = sheet.classList.contains("open");
       sheet.classList.remove("open");
       sheet.classList.add("closing");
@@ -5968,7 +5986,7 @@ ${text.replace(/\s+/g, "")}`;
     };
     for (const type of OURS) sheet.addEventListener(type, (event) => event.stopPropagation());
     shutters.set(sheet, shut);
-    listenForEscape();
+    offEscape = onEscape(shut);
     ui().append(sheet);
     draw2().focus();
     if (sheet.dataset.motion === "none") sheet.classList.add("open");
@@ -5980,19 +5998,6 @@ ${text.replace(/\s+/g, "")}`;
   var shutters = /* @__PURE__ */ new WeakMap();
   var STAYING = ".sheet:not(.closing)";
   var topSheet = () => [...ui().querySelectorAll(STAYING)].at(-1);
-  var listening = false;
-  function listenForEscape() {
-    if (listening) return;
-    listening = true;
-    document.addEventListener("keydown", (event) => {
-      if (event.key !== "Escape") return;
-      const top = topSheet();
-      if (!top) return;
-      event.preventDefault();
-      event.stopPropagation();
-      shutters.get(top)?.();
-    }, true);
-  }
   function shutSheet(name) {
     const open2 = ui().querySelector(`${STAYING}[data-name="${name}"]`);
     if (open2) shutters.get(open2)?.();
@@ -6288,8 +6293,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${10}`;
-  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${10})`;
+  var SCRIPT_VERSION = `${VERSION}.${11}`;
+  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${11})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7467,20 +7472,19 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       card.style.top = `${Math.round(top)}px`;
       card.style.left = `${Math.round(Math.min(Math.max(8, left), innerWidth - size.width - 8))}px`;
     };
-    const onKey = (e) => e.key === "Escape" && shut();
     const onPress = (e) => e.target?.id !== UI_ID && shut();
     function shut() {
       card.remove();
       document.removeEventListener("scroll", place, true);
       removeEventListener("resize", place);
-      document.removeEventListener("keydown", onKey, true);
+      offEscape();
       document.removeEventListener("mousedown", onPress, true);
       if (open?.card === card) open = void 0;
     }
     shutButton.onclick = shut;
     document.addEventListener("scroll", place, true);
     addEventListener("resize", place);
-    document.addEventListener("keydown", onKey, true);
+    const offEscape = onEscape(shut);
     setTimeout(() => document.addEventListener("mousedown", onPress, true), 0);
     place();
     open = { card, shut };
@@ -8232,6 +8236,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     } catch (e) {
       console.error("[AI Translate]", e);
     }
+    catchEscape();
     onWord((word) => {
       if (word.type === "notice" && seen()) toast(word.text, word.kind);
       if (word.type === "restore") offered(client, word);

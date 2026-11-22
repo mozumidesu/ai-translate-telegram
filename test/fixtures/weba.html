@@ -7,6 +7,9 @@
   Composer.tsx), and the message menu, .Menu.MessageContextMenu with
   .MessageContextMenu_items, drawn into #portals (components/ui/Menu.tsx,
   Portal.ts) and shut by a press outside it (hooks/useVirtualBackdrop.ts).
+  Escape shuts the open chat, from the document's capture
+  (util/captureKeyboardListeners.ts, components/middle/MiddleColumn.tsx),
+  counted in __a.chatShut.
   The worker is a real one, created after the userscript, that answers what
   it is sent so the test can read what crossed the line.
 -->
@@ -33,7 +36,14 @@
 
   // The GramJS worker, created by the app after the userscript has run.
   const worker = new Worker(URL.createObjectURL(new Blob(["onmessage = event => postMessage(event.data.feed ?? { echo: event.data });"], { type: "text/javascript" })));
-  window.__a = { worker, echoes: [], answers: [] };
+  window.__a = { worker, echoes: [], answers: [], chatShut: 0 };
+
+  // What Web A does with Escape while a chat is open: openChat({ id: undefined }).
+  document.addEventListener("keydown", event => {
+    if (event.key !== "Escape") return;
+    window.__a.chatShut++;
+    event.stopPropagation();
+  }, true);
   worker.addEventListener("message", event => {
     if (event.data?.echo) window.__a.echoes.push(event.data.echo);
     else window.__a.answers.push(event.data);
