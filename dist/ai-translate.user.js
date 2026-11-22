@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.12
+// @version         0.2.3a.13
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -119,8 +119,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (free, for countries with regional restrictions)",
-    "provider.openai": "Any OpenAI-compatible",
-    "provider.openaiInline": "any OpenAI-compatible",
+    "provider.openai": "Other",
     "apiKey.name": "API key",
     "apiKey.desc": "Your key for the provider selected above",
     "apiKey.show": "Show the key",
@@ -128,7 +127,7 @@
     "model.name": "Model",
     "model.desc": "Check the provider's current model list and pick a small, fast one: translation needs speed, not reasoning power",
     "baseUrl.name": "Base URL",
-    "baseUrl.desc": "Address of the provider's API, without the /chat/completions part, for example https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Address of any OpenAI-compatible API, without the /chat/completions part, for example https://openrouter.ai/api/v1 or https://api.openai.com/v1",
     "mode.name": "Auto-translate outgoing messages",
     "mode.desc": "Per chat is recommended: left-click the translate button in the chat bar to open the panel, right-click it to switch the current chat on or off",
     "mode.perChannel": "Only in chats I switched on",
@@ -315,8 +314,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (бесплатный, для стран с региональными ограничениями)",
-    "provider.openai": "Любой, совместимый с OpenAI",
-    "provider.openaiInline": "любой, совместимый с OpenAI",
+    "provider.openai": "Другой",
     "apiKey.name": "Ключ API",
     "apiKey.desc": "Ваш ключ для выбранного выше провайдера",
     "apiKey.show": "Показать ключ",
@@ -324,7 +322,7 @@
     "model.name": "Модель",
     "model.desc": "Посмотрите актуальный список моделей провайдера и выберите небольшую и быструю: переводу нужна скорость, а не глубина рассуждений",
     "baseUrl.name": "Адрес API",
-    "baseUrl.desc": "Адрес API провайдера без части /chat/completions, например https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Адрес любого API, совместимого с OpenAI, без части /chat/completions, например https://openrouter.ai/api/v1 или https://api.openai.com/v1",
     "mode.name": "Автоперевод отправляемых сообщений",
     "mode.desc": "Удобнее по чатам: левый клик по кнопке переводчика открывает панель, правый — включает или выключает перевод в текущем чате",
     "mode.perChannel": "Только в чатах, где я включил",
@@ -509,8 +507,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (безкоштовний, для країн із регіональними обмеженнями)",
-    "provider.openai": "Будь-який, сумісний з OpenAI",
-    "provider.openaiInline": "будь-який, сумісний з OpenAI",
+    "provider.openai": "Інший",
     "apiKey.name": "Ключ API",
     "apiKey.desc": "Ваш ключ для обраного вище провайдера",
     "apiKey.show": "Показати ключ",
@@ -518,7 +515,7 @@
     "model.name": "Модель",
     "model.desc": "Подивіться актуальний перелік моделей провайдера й оберіть невелику та швидку: перекладу потрібна швидкість, а не глибина міркувань",
     "baseUrl.name": "Адреса API",
-    "baseUrl.desc": "Адреса API провайдера без частини /chat/completions, наприклад https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Адреса будь-якого API, сумісного з OpenAI, без частини /chat/completions, наприклад https://openrouter.ai/api/v1 або https://api.openai.com/v1",
     "mode.name": "Автопереклад надісланих повідомлень",
     "mode.desc": "Зручніше по чатах: лівий клік на кнопці перекладача відкриває панель, правий — вмикає або вимикає переклад у поточному чаті",
     "mode.perChannel": "Лише в чатах, де я увімкнув",
@@ -703,8 +700,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (gratuit, pentru țări cu restricții regionale)",
-    "provider.openai": "Oricare compatibil cu OpenAI",
-    "provider.openaiInline": "oricare compatibil cu OpenAI",
+    "provider.openai": "Altul",
     "apiKey.name": "Cheie API",
     "apiKey.desc": "Cheia ta pentru furnizorul ales mai sus",
     "apiKey.show": "Arată cheia",
@@ -712,7 +708,7 @@
     "model.name": "Model",
     "model.desc": "Verifică lista actuală de modele a furnizorului și alege unul mic și rapid: traducerea are nevoie de viteză, nu de putere de raționament",
     "baseUrl.name": "Adresă API",
-    "baseUrl.desc": "Adresa API-ului furnizorului, fără partea /chat/completions, de exemplu https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Adresa oricărui API compatibil cu OpenAI, fără partea /chat/completions, de exemplu https://openrouter.ai/api/v1 sau https://api.openai.com/v1",
     "mode.name": "Traducere automată a mesajelor trimise",
     "mode.desc": "Mai comod per conversație: clic stânga pe butonul de traducere deschide panoul, clic dreapta pornește sau oprește traducerea în conversația curentă",
     "mode.perChannel": "Doar în conversațiile pe care le-am pornit",
@@ -897,8 +893,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (kostenlos, für Länder mit regionalen Sperren)",
-    "provider.openai": "Jeder OpenAI-kompatible Anbieter",
-    "provider.openaiInline": "jeder OpenAI-kompatible Anbieter",
+    "provider.openai": "Anderer Anbieter",
     "apiKey.name": "API-Schlüssel",
     "apiKey.desc": "Dein Schlüssel für den oben gewählten Anbieter",
     "apiKey.show": "Schlüssel anzeigen",
@@ -906,7 +901,7 @@
     "model.name": "Modell",
     "model.desc": "Sieh dir die aktuelle Modellliste des Anbieters an und nimm ein kleines, schnelles Modell: Übersetzen braucht Tempo, keine Denkleistung",
     "baseUrl.name": "API-Adresse",
-    "baseUrl.desc": "Adresse der Anbieter-API ohne den Teil /chat/completions, zum Beispiel https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Adresse einer beliebigen OpenAI-kompatiblen API ohne den Teil /chat/completions, zum Beispiel https://openrouter.ai/api/v1 oder https://api.openai.com/v1",
     "mode.name": "Ausgehende Nachrichten automatisch übersetzen",
     "mode.desc": "Pro Chat ist bequemer: Linksklick auf die Übersetzen-Schaltfläche öffnet das Fenster, Rechtsklick schaltet den aktuellen Chat ein oder aus",
     "mode.perChannel": "Nur in Chats, die ich eingeschaltet habe",
@@ -1091,8 +1086,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (gratis, para países con restricciones regionales)",
-    "provider.openai": "Cualquiera compatible con OpenAI",
-    "provider.openaiInline": "cualquiera compatible con OpenAI",
+    "provider.openai": "Otro",
     "apiKey.name": "Clave de API",
     "apiKey.desc": "Tu clave para el proveedor elegido arriba",
     "apiKey.show": "Mostrar la clave",
@@ -1100,7 +1094,7 @@
     "model.name": "Modelo",
     "model.desc": "Consulta la lista actual de modelos del proveedor y elige uno pequeño y rápido: traducir necesita velocidad, no capacidad de razonamiento",
     "baseUrl.name": "Dirección de la API",
-    "baseUrl.desc": "Dirección de la API del proveedor, sin la parte /chat/completions, por ejemplo https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Dirección de cualquier API compatible con OpenAI, sin la parte /chat/completions, por ejemplo https://openrouter.ai/api/v1 o https://api.openai.com/v1",
     "mode.name": "Traducir automáticamente los mensajes que envío",
     "mode.desc": "Por conversación es más cómodo: clic izquierdo en el botón de traducción abre el panel, clic derecho activa o desactiva la conversación actual",
     "mode.perChannel": "Solo en las conversaciones que activé",
@@ -1285,8 +1279,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (gratuit, pour les pays soumis à des restrictions régionales)",
-    "provider.openai": "Tout fournisseur compatible OpenAI",
-    "provider.openaiInline": "tout fournisseur compatible OpenAI",
+    "provider.openai": "Autre",
     "apiKey.name": "Clé API",
     "apiKey.desc": "Votre clé pour le fournisseur choisi ci-dessus",
     "apiKey.show": "Afficher la clé",
@@ -1294,7 +1287,7 @@
     "model.name": "Modèle",
     "model.desc": "Consultez la liste actuelle des modèles du fournisseur et prenez-en un petit et rapide : la traduction demande de la vitesse, pas de la puissance de raisonnement",
     "baseUrl.name": "Adresse de l'API",
-    "baseUrl.desc": "Adresse de l'API du fournisseur, sans la partie /chat/completions, par exemple https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Adresse de n'importe quelle API compatible OpenAI, sans la partie /chat/completions, par exemple https://openrouter.ai/api/v1 ou https://api.openai.com/v1",
     "mode.name": "Traduire automatiquement mes messages",
     "mode.desc": "Par conversation, c'est plus pratique : un clic gauche sur le bouton de traduction ouvre le panneau, un clic droit active ou désactive la conversation en cours",
     "mode.perChannel": "Seulement dans les conversations que j'ai activées",
@@ -1479,8 +1472,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (grátis, para países com restrições regionais)",
-    "provider.openai": "Qualquer provedor compatível com OpenAI",
-    "provider.openaiInline": "qualquer provedor compatível com OpenAI",
+    "provider.openai": "Outro",
     "apiKey.name": "Chave de API",
     "apiKey.desc": "Sua chave para o provedor escolhido acima",
     "apiKey.show": "Mostrar a chave",
@@ -1488,7 +1480,7 @@
     "model.name": "Modelo",
     "model.desc": "Veja a lista atual de modelos do provedor e escolha um pequeno e rápido: traduzir precisa de velocidade, não de capacidade de raciocínio",
     "baseUrl.name": "Endereço da API",
-    "baseUrl.desc": "Endereço da API do provedor, sem a parte /chat/completions, por exemplo https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Endereço de qualquer API compatível com OpenAI, sem a parte /chat/completions, por exemplo https://openrouter.ai/api/v1 ou https://api.openai.com/v1",
     "mode.name": "Traduzir automaticamente as mensagens que envio",
     "mode.desc": "Por conversa é mais prático: clique esquerdo no botão de tradução abre o painel, clique direito liga ou desliga a conversa atual",
     "mode.perChannel": "Só nas conversas que eu liguei",
@@ -1673,8 +1665,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM（無料、地域制限のある国向け）",
-    "provider.openai": "OpenAI 互換ならどれでも",
-    "provider.openaiInline": "OpenAI 互換ならどれでも",
+    "provider.openai": "その他",
     "apiKey.name": "API キー",
     "apiKey.desc": "上で選んだプロバイダーのキー",
     "apiKey.show": "キーを表示",
@@ -1682,7 +1673,7 @@
     "model.name": "モデル",
     "model.desc": "プロバイダーの最新モデル一覧を確認し、小さくて速いものを選んでください。翻訳に必要なのは速さで、推論力ではありません",
     "baseUrl.name": "API アドレス",
-    "baseUrl.desc": "プロバイダー API のアドレス。/chat/completions は含めません。例: https://openrouter.ai/api/v1",
+    "baseUrl.desc": "OpenAI 互換の API ならどれでも使えます。アドレスに /chat/completions は含めません。例: https://openrouter.ai/api/v1、https://api.openai.com/v1",
     "mode.name": "送信するメッセージを自動翻訳",
     "mode.desc": "チャットごとが便利です。チャット欄の翻訳ボタンを左クリックでパネル、右クリックで現在のチャットのオン・オフ",
     "mode.perChannel": "オンにしたチャットだけ",
@@ -1867,8 +1858,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM（免费，适用于有地区限制的国家）",
-    "provider.openai": "任何兼容 OpenAI 的服务",
-    "provider.openaiInline": "任何兼容 OpenAI 的服务",
+    "provider.openai": "其他",
     "apiKey.name": "API 密钥",
     "apiKey.desc": "上方所选服务商的密钥",
     "apiKey.show": "显示密钥",
@@ -1876,7 +1866,7 @@
     "model.name": "模型",
     "model.desc": "查看服务商当前的模型列表，挑一个小而快的：翻译需要的是速度，不是推理能力",
     "baseUrl.name": "API 地址",
-    "baseUrl.desc": "服务商 API 的地址，不含 /chat/completions 部分，例如 https://openrouter.ai/api/v1",
+    "baseUrl.desc": "任何兼容 OpenAI 的 API 的地址，不含 /chat/completions 部分，例如 https://openrouter.ai/api/v1 或 https://api.openai.com/v1",
     "mode.name": "自动翻译我发出的消息",
     "mode.desc": "按聊天设置更方便：左键点击输入框旁的翻译按钮打开面板，右键开关当前聊天",
     "mode.perChannel": "仅在我开启的聊天中",
@@ -2061,8 +2051,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (ฟรี สำหรับประเทศที่มีข้อจำกัดด้านภูมิภาค)",
-    "provider.openai": "บริการใดก็ได้ที่เข้ากันได้กับ OpenAI",
-    "provider.openaiInline": "บริการใดก็ได้ที่เข้ากันได้กับ OpenAI",
+    "provider.openai": "อื่น ๆ",
     "apiKey.name": "คีย์ API",
     "apiKey.desc": "คีย์ของคุณสำหรับผู้ให้บริการที่เลือกไว้ด้านบน",
     "apiKey.show": "แสดงคีย์",
@@ -2078,7 +2067,7 @@
     "model.builtin": "ผู้ให้บริการนี้ไม่เปิดเผยรายการโมเดล จึงแสดงรุ่นที่ปลั๊กอินรู้จัก",
     "model.pick": "เลือกโมเดล",
     "baseUrl.name": "ที่อยู่ API",
-    "baseUrl.desc": "ที่อยู่ API ของผู้ให้บริการ โดยไม่ต้องใส่ส่วน /chat/completions เช่น https://openrouter.ai/api/v1",
+    "baseUrl.desc": "ที่อยู่ของ API ใดก็ได้ที่เข้ากันได้กับ OpenAI โดยไม่ต้องใส่ส่วน /chat/completions เช่น https://openrouter.ai/api/v1 หรือ https://api.openai.com/v1",
     "mode.name": "แปลข้อความที่ส่งออกโดยอัตโนมัติ",
     "mode.desc": "แยกตามแชทจะสะดวกกว่า คลิกซ้ายที่ปุ่มแปลข้างช่องพิมพ์เพื่อเปิดแผง คลิกขวาเพื่อเปิดหรือปิดแชทนี้",
     "mode.perChannel": "เฉพาะแชทที่ฉันเปิดไว้",
@@ -2255,8 +2244,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (miễn phí, cho các nước có hạn chế khu vực)",
-    "provider.openai": "Bất kỳ nhà cung cấp nào tương thích OpenAI",
-    "provider.openaiInline": "bất kỳ nhà cung cấp nào tương thích OpenAI",
+    "provider.openai": "Khác",
     "apiKey.name": "Khoá API",
     "apiKey.desc": "Khoá của bạn cho nhà cung cấp đã chọn ở trên",
     "apiKey.show": "Hiện khoá",
@@ -2272,7 +2260,7 @@
     "model.builtin": "Nhà cung cấp này không công bố danh sách, nên đây là các mô hình mà plugin biết",
     "model.pick": "Chọn mô hình",
     "baseUrl.name": "Địa chỉ API",
-    "baseUrl.desc": "Địa chỉ API của nhà cung cấp, không kèm phần /chat/completions, ví dụ https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Địa chỉ của bất kỳ API nào tương thích OpenAI, không kèm phần /chat/completions, ví dụ https://openrouter.ai/api/v1 hoặc https://api.openai.com/v1",
     "mode.name": "Tự động dịch tin nhắn bạn gửi",
     "mode.desc": "Theo từng cuộc trò chuyện thì tiện hơn: nhấp chuột trái vào nút dịch để mở bảng, nhấp chuột phải để bật hoặc tắt cho cuộc trò chuyện hiện tại",
     "mode.perChannel": "Chỉ trong các cuộc trò chuyện tôi đã bật",
@@ -2449,8 +2437,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (ücretsiz, bölgesel kısıtlamaları olan ülkeler için)",
-    "provider.openai": "OpenAI uyumlu herhangi biri",
-    "provider.openaiInline": "OpenAI uyumlu herhangi biri",
+    "provider.openai": "Diğer",
     "apiKey.name": "API anahtarı",
     "apiKey.desc": "Yukarıda seçilen sağlayıcı için anahtarınız",
     "apiKey.show": "Anahtarı göster",
@@ -2466,7 +2453,7 @@
     "model.builtin": "Bu sağlayıcı model listesi yayımlamıyor, burada eklentinin bildiği modeller var",
     "model.pick": "Bir model seçin",
     "baseUrl.name": "API adresi",
-    "baseUrl.desc": "Sağlayıcının API adresi, /chat/completions kısmı olmadan, örneğin https://openrouter.ai/api/v1",
+    "baseUrl.desc": "OpenAI uyumlu herhangi bir API'nin adresi, /chat/completions kısmı olmadan, örneğin https://openrouter.ai/api/v1 veya https://api.openai.com/v1",
     "mode.name": "Gönderdiğim mesajları otomatik çevir",
     "mode.desc": "Sohbet başına daha kullanışlı: yazı alanındaki çeviri düğmesine sol tıklayınca panel açılır, sağ tıklayınca o sohbet açılır veya kapanır",
     "mode.perChannel": "Yalnızca açtığım sohbetlerde",
@@ -2643,8 +2630,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (gratis, untuk negara dengan pembatasan regional)",
-    "provider.openai": "Penyedia apa pun yang kompatibel dengan OpenAI",
-    "provider.openaiInline": "penyedia apa pun yang kompatibel dengan OpenAI",
+    "provider.openai": "Lainnya",
     "apiKey.name": "Kunci API",
     "apiKey.desc": "Kunci Anda untuk penyedia yang dipilih di atas",
     "apiKey.show": "Tampilkan kunci",
@@ -2652,7 +2638,7 @@
     "model.name": "Model",
     "model.desc": "Periksa daftar model terbaru dari penyedia dan pilih yang kecil dan cepat: terjemahan butuh kecepatan, bukan kemampuan bernalar",
     "baseUrl.name": "URL dasar",
-    "baseUrl.desc": "Alamat API penyedia, tanpa bagian /chat/completions, misalnya https://openrouter.ai/api/v1",
+    "baseUrl.desc": "Alamat API apa pun yang kompatibel dengan OpenAI, tanpa bagian /chat/completions, misalnya https://openrouter.ai/api/v1 atau https://api.openai.com/v1",
     "mode.name": "Terjemahkan otomatis pesan keluar",
     "mode.desc": "Disarankan per obrolan: klik kiri tombol terjemah di bilah obrolan untuk membuka panel, klik kanan untuk menyalakan atau mematikannya di obrolan saat ini",
     "mode.perChannel": "Hanya di obrolan yang saya nyalakan",
@@ -2837,8 +2823,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (مجاني، للدول التي عليها قيود إقليمية)",
-    "provider.openai": "أي مزوّد متوافق مع OpenAI",
-    "provider.openaiInline": "أي مزوّد متوافق مع OpenAI",
+    "provider.openai": "مزوّد آخر",
     "apiKey.name": "مفتاح API",
     "apiKey.desc": "مفتاحك للمزوّد المحدد أعلاه",
     "apiKey.show": "إظهار المفتاح",
@@ -2846,7 +2831,7 @@
     "model.name": "النموذج",
     "model.desc": "راجع قائمة النماذج الحالية لدى المزوّد واختر نموذجًا سريعًا، فالترجمة تحتاج إلى السرعة لا إلى قدرة الاستدلال",
     "baseUrl.name": "عنوان URL الأساسي",
-    "baseUrl.desc": "عنوان واجهة API لدى المزوّد، من دون الجزء ‎/chat/completions، مثلًا ‎https://openrouter.ai/api/v1",
+    "baseUrl.desc": "عنوان أي واجهة API متوافقة مع OpenAI، من دون الجزء ‎/chat/completions، مثلًا ‎https://openrouter.ai/api/v1 أو ‎https://api.openai.com/v1",
     "mode.name": "الترجمة التلقائية للرسائل الصادرة",
     "mode.desc": "يُنصح بالتفعيل لكل محادثة على حدة: انقر بالزر الأيسر على زر الترجمة في شريط المحادثة لفتح اللوحة، وبالزر الأيمن لتشغيلها أو إيقافها في المحادثة الحالية",
     "mode.perChannel": "فقط في المحادثات التي فعّلتها",
@@ -3031,8 +3016,7 @@
     "provider.gemini": "Google Gemini",
     "provider.anthropic": "Anthropic Claude",
     "provider.glm": "Z.ai GLM (무료, 지역 제한이 있는 국가용)",
-    "provider.openai": "OpenAI 호환이면 무엇이든",
-    "provider.openaiInline": "OpenAI 호환이면 무엇이든",
+    "provider.openai": "기타",
     "apiKey.name": "API 키",
     "apiKey.desc": "위에서 선택한 제공자의 키",
     "apiKey.show": "키 보이기",
@@ -3040,7 +3024,7 @@
     "model.name": "모델",
     "model.desc": "제공자의 최신 모델 목록에서 작고 빠른 모델을 고르세요. 번역에는 추론 능력보다 속도가 중요합니다",
     "baseUrl.name": "기본 주소",
-    "baseUrl.desc": "제공자 API의 주소입니다. /chat/completions 부분은 빼고 적습니다. 예: https://openrouter.ai/api/v1",
+    "baseUrl.desc": "OpenAI와 호환되는 API라면 무엇이든 됩니다. 주소에서 /chat/completions 부분은 빼고 적습니다. 예: https://openrouter.ai/api/v1, https://api.openai.com/v1",
     "mode.name": "보내는 메시지 자동 번역",
     "mode.desc": "채팅별을 권장합니다. 채팅 입력줄의 번역 버튼을 왼쪽 클릭하면 패널이 열리고, 오른쪽 클릭하면 현재 채팅에서 켜고 끌 수 있습니다",
     "mode.perChannel": "내가 켠 채팅에서만",
@@ -3916,6 +3900,12 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   var RETRY_DELAYS_MS = [400, 1200];
   var isTransient = (result) => TRANSIENT_STATUSES.has(result.status) || result.status === 429 && /"code"\s*:\s*"?1305\b/.test(result.data);
   var sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  var ownTemperature = /* @__PURE__ */ new Set();
+  var temperatureOf = (body) => body.temperature ?? body.generationConfig?.temperature;
+  var withoutTemperature = (body) => {
+    delete body.temperature;
+    delete body.generationConfig?.temperature;
+  };
   async function sendWithRetry(send, body) {
     let result = await send(body);
     for (const delay of RETRY_DELAYS_MS) {
@@ -3985,6 +3975,8 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
         break;
       }
     }
+    const sampled = `${url} ${model}`;
+    if (ownTemperature.has(sampled)) withoutTemperature(body);
     const deadline = timeoutSignal(6e4);
     const send = async (payload2) => {
       const res = await net({
@@ -4009,6 +4001,11 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
       delete body.reasoning_effort;
       delete body.include_reasoning;
       delete body.thinking;
+      result = await sendWithRetry(send, body);
+    }
+    if (result.status === 400 && /temperature/i.test(result.data) && temperatureOf(body) !== void 0) {
+      ownTemperature.add(sampled);
+      withoutTemperature(body);
       result = await sendWithRetry(send, body);
     }
     return result;
@@ -4089,9 +4086,14 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
      * What this copy is, for the one line in the interface that says so. A
      * desktop copy reads it off the disk; a browser copy was stamped at build
      * time, and a copy somebody built themselves has nothing to show.
+     *
+     * A main process from before 0.2.4a, still running after an update until
+     * Discord restarts, has this under its old name and not under this one.
+     * The stamp then answers instead, and says the same: the robot writes it
+     * into the desktop build too, and the files on the disk are that build.
      */
-    aiTranslateBuild() {
-      const native = desktop().aiTranslateBuild;
+    whichBuild() {
+      const native = desktop().whichBuild;
       if (native) return native();
       const published = BROWSER_CHANNEL === "release" || BROWSER_CHANNEL === "testing";
       return Promise.resolve({
@@ -4102,23 +4104,23 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   };
 
   // ai-translate/core/languages.ts
-  var LATIN = { script: ["Latin"], cased: true, closing: {} };
+  var LATIN = { script: ["Latin"], cased: true, closing: {}, spaced: true };
   var CYRILLIC = { ...LATIN, script: ["Cyrillic"] };
-  var GREEK = { script: ["Greek"], cased: true, closing: { ";": "?", ";": "?" } };
-  var ARMENIAN = { script: ["Armenian"], cased: true, closing: { "։": "." } };
-  var GEORGIAN = { script: ["Georgian"], cased: false, closing: {} };
-  var HEBREW = { script: ["Hebrew"], cased: false, closing: {} };
-  var ARABIC = { script: ["Arabic"], cased: false, closing: { "؟": "?" } };
+  var GREEK = { script: ["Greek"], cased: true, closing: { ";": "?", ";": "?" }, spaced: true };
+  var ARMENIAN = { script: ["Armenian"], cased: true, closing: { "։": "." }, spaced: true };
+  var GEORGIAN = { script: ["Georgian"], cased: false, closing: {}, spaced: true };
+  var HEBREW = { script: ["Hebrew"], cased: false, closing: {}, spaced: true };
+  var ARABIC = { script: ["Arabic"], cased: false, closing: { "؟": "?" }, spaced: true };
   var URDU = { ...ARABIC, closing: { "؟": "?", "۔": "." } };
   var DANDA = { "।": ".", "॥": "." };
-  var DEVANAGARI = { script: ["Devanagari"], cased: false, closing: DANDA };
-  var BENGALI = { script: ["Bengali"], cased: false, closing: DANDA };
-  var TAMIL = { script: ["Tamil"], cased: false, closing: {} };
-  var THAI = { script: ["Thai"], cased: false, closing: {} };
-  var HANGUL = { script: ["Hangul"], cased: false, closing: {} };
+  var DEVANAGARI = { script: ["Devanagari"], cased: false, closing: DANDA, spaced: true };
+  var BENGALI = { script: ["Bengali"], cased: false, closing: DANDA, spaced: true };
+  var TAMIL = { script: ["Tamil"], cased: false, closing: {}, spaced: true };
+  var THAI = { script: ["Thai"], cased: false, closing: {}, spaced: true };
+  var HANGUL = { script: ["Hangul"], cased: false, closing: {}, spaced: true };
   var FULLWIDTH = { "。": ".", "｡": ".", "？": "?", "！": "!" };
-  var CHINESE = { script: ["Han"], cased: false, closing: FULLWIDTH };
-  var JAPANESE = { script: ["Han", "Hiragana", "Katakana"], cased: false, closing: FULLWIDTH };
+  var CHINESE = { script: ["Han"], cased: false, closing: FULLWIDTH, spaced: false };
+  var JAPANESE = { script: ["Han", "Hiragana", "Katakana"], cased: false, closing: FULLWIDTH, spaced: false };
   function record2([value, native, code, writing = LATIN]) {
     return { ...writing, value, code, label: value === native ? value : `${value} — ${native}` };
   }
@@ -4255,6 +4257,11 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     const own2 = languageNamed(language)?.closing ?? {};
     return [...run].map((mark) => mark in COMMON || mark in own2 ? mark : PLAIN2.get(mark) ?? mark).join("");
   }
+  function onOneLine(text, language) {
+    const spaced = languageNamed(language)?.spaced ?? LATIN.spaced;
+    const [first = "", ...rest] = text.split("\n").map((line) => line.trim()).filter(Boolean);
+    return rest.reduce((joined, line) => joined + (spaced || !/[\p{P}\p{S}]$/u.test(joined) ? " " : "") + line, first);
+  }
   var whole = /* @__PURE__ */ new Map();
   function wholly(script) {
     let pattern = whole.get(script);
@@ -4267,16 +4274,19 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
 
   // ai-translate/core/slots.ts
   var PROVIDERS = ["groq", "gemini", "glm", "anthropic", "openai"];
+  var OTHER = "openai";
   var NONE2 = "none";
   var withoutAdvice = (label) => label.replace(/\s*\(.*\)\s*$/, "");
   var providerLabel = (id2, first = false) => first ? t(`provider.${id2}`) : withoutAdvice(t(`provider.${id2}`));
-  var providerName = (id2) => id2 === "openai" ? "OpenAI-compatible" : withoutAdvice(t(`provider.${id2}`));
-  var keyHeading = (id2) => `${t("apiKey.name")} — ${id2 === "openai" ? t("provider.openaiInline") : providerName(id2)}`;
+  var hostOf = (address) => /^[a-z][\w+.-]*:\/\/(?:[^/?#@]*@)?(\[[^\]]*\]|[^/?#:]+)/i.exec(cleanAddress(address))?.[1].toLowerCase() ?? "";
+  var providerName = (id2, address = "") => id2 === OTHER && hostOf(address) || withoutAdvice(t(`provider.${id2}`));
+  var keyHeading = (id2) => `${t("apiKey.name")} — ${providerLabel(id2)}`;
   var MOST_SLOTS = 5;
   var canRemove = (count, at) => at > 0 && count > 2;
   var keyOf = (slot) => cleanKey(slot.keys?.[slot.provider]);
   var modelOf = (slot) => slot.models?.[slot.provider] ?? "";
   var baseUrlOf = (slot) => cleanAddress(slot.baseUrls?.[slot.provider]);
+  var slotName = (slot) => providerName(slot.provider, baseUrlOf(slot));
   var cleaned = (values, clean2) => values && Object.fromEntries(Object.entries(values).map(([id2, value]) => [id2, clean2(value)]));
   var cleanSlot = (slot) => ({
     ...slot,
@@ -4827,6 +4837,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     if (!/[\u2010\u2011]/.test(source)) t2 = t2.replace(KEYBOARDLESS_HYPHEN, "$1-");
     if (!(source.match(/[\p{L}\p{M}]+/gu) ?? []).some(inTwoAlphabets)) t2 = oneAlphabet(t2, target);
     if (kind === "explain" || kind === "correct") return t2;
+    if (!source.includes("\n") && t2.includes("\n")) t2 = onOneLine(t2, target);
     t2 = applyGlossary(t2);
     t2 = settleGender(t2, target);
     if (kind === "sent") t2 = keepWritersDash(source, dropAddedDashes(source, t2));
@@ -5093,7 +5104,7 @@ IMPORTANT: your previous answer began with the code of ${target}, as if the mess
     paces.set(slot.id, pace);
   }
   var expectedMs = (slot, chars) => paceOf(slot).base + paceOf(slot).perChar * chars;
-  async function aiTranslate(kind, typed2, context = "", mine = false, signal) {
+  async function translate(kind, typed2, context = "", mine = false, signal) {
     const kept2 = kind === "explain" || kind === "correct" ? void 0 : keepPieces(typed2, kind === "sent", glossaryKeeps());
     const text = kept2?.masked ?? typed2;
     if (kept2?.pieces.length && isNotWorthTranslating(kept2.bare(text)))
@@ -5102,7 +5113,7 @@ IMPORTANT: your previous answer began with the code of ${target}, as if the mess
     const first = slots[0];
     const apiKey = keyOf(first);
     const model = modelOf(first);
-    const firstName = providerName(first.provider);
+    const firstName = slotName(first);
     if (!apiKey) throw fail("error.noKey", { provider: firstName });
     if (!model) throw fail("error.noModel", { provider: firstName });
     const target = kind === "sent" || kind === "correct" ? config().sentLanguage : config().receivedLanguage;
@@ -5177,10 +5188,10 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
       return { slot: id2, provider: slot.provider, model: chosen, status, data, retryMs };
     };
     let waited = 0;
-    const waitOut = async (id2, ms) => {
+    const waitOut = async (name, ms) => {
       if (!(ms > 0) || waited + ms > MAX_WAIT_MS) return false;
       waited += ms;
-      notify(t("message.waiting", { provider: providerName(id2), seconds: Math.ceil(ms / 1e3) }), "message");
+      notify(t("message.waiting", { provider: name, seconds: Math.ceil(ms / 1e3) }), "message");
       await sleep2(ms, signal);
       return true;
     };
@@ -5213,11 +5224,11 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
         if (!answer) throw fail("error.dailyLimit", { provider: firstName, model, wait: humanWait(blocked) });
       }
       if (!answer) {
-        await waitOut(first.provider, waitFor(first.id, model, cost(first)));
+        await waitOut(firstName, waitFor(first.id, model, cost(first)));
         answer = await callProvider(first, system, roomy);
         if (answer.status === 429) {
           const again = Math.max(readLimit(answer.data, answer.retryMs).waitMs ?? 0, waitFor(first.id, model, cost(first)));
-          if (!soonerBackup(again) && await waitOut(first.provider, again))
+          if (!soonerBackup(again) && await waitOut(firstName, again))
             answer = await callProvider(first, system, roomy);
         }
         if (WORTH_A_SECOND_PROVIDER(answer.status, answer.data)) {
@@ -5241,8 +5252,8 @@ The text is written on ${lines2} separate lines. Your answer must be on ${lines2
           notify(refusal(firstRefused, firstName), "message");
         }
       } else if (answer.slot === first.id && answer.status === 200) passedOver.delete(first.id);
-      const { status, data, provider: usedProvider } = answer;
-      if (status !== 200) throw refusal(answer, answer.slot === first.id ? firstName : providerName(usedProvider));
+      const { status, data, provider: usedProvider, slot: usedSlot } = answer;
+      if (status !== 200) throw refusal(answer, slotName(slots.find((slot) => slot.id === usedSlot) ?? first));
       let out = extractText(usedProvider, data);
       if (CUT_OFF.test(data)) {
         if (!roomy) return ask(system, true, "the answer was cut off where the budget ran out");
@@ -5305,7 +5316,7 @@ IMPORTANT: your previous answer still contained words in the original language. 
 
 IMPORTANT: your previous answer was not written on ${lines2} lines. Give the same translation again on ${lines2} lines, broken after the same words as the original. Do not change the wording, only the line breaks.`,
         false,
-        "the writer's line breaks were flattened"
+        lineCount(result.text) < lines2 ? "the writer's line breaks were flattened" : "the answer broke lines the writer did not"
       );
       if (lineCount(rebroken.text) === lines2 && shareOf(rebroken.text) >= 0.3) result = rebroken;
     }
@@ -6040,7 +6051,7 @@ ${sent}`;
       setTimeout(() => asked.delete(key), ASKED_MS);
     }
     try {
-      const { text } = await aiTranslate("correct", sent, collectContext(chatId));
+      const { text } = await translate("correct", sent, collectContext(chatId));
       if (!text) return;
       const { native, why } = splitCorrection(text);
       if (sameMessage(sent, native)) {
@@ -6229,7 +6240,7 @@ ${sent}`;
   var MESSAGE_MS = 6e4;
   function translateInTime(text, context) {
     const stop = new AbortController();
-    const asked2 = aiTranslate("sent", text, context, false, stop.signal);
+    const asked2 = translate("sent", text, context, false, stop.signal);
     let timer;
     const late = new Promise((_, refuse) => {
       timer = setTimeout(() => {
@@ -6306,8 +6317,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${12}`;
-  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${12})`;
+  var SCRIPT_VERSION = `${VERSION}.${13}`;
+  var BUILD_NAME = `${VERSION} (${"81df055"}-${13})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7085,17 +7096,16 @@ ${sent}`;
           block.append(keyRow);
           const refused = hint();
           block.append(refused);
-          if (slot.provider === "openai") {
+          if (slot.provider === OTHER) {
             const urlLabel = document.createElement("label");
             urlLabel.textContent = t("baseUrl.name");
             block.append(urlLabel);
             const url = document.createElement("input");
             url.type = "text";
             url.value = baseUrlOf(slot);
-            url.placeholder = t("baseUrl.desc");
             url.spellcheck = false;
             url.onchange = () => change(at, (s) => ({ ...s, baseUrls: { ...s.baseUrls, [s.provider]: url.value } }));
-            block.append(url);
+            block.append(url, hint(t("baseUrl.desc")));
           }
           const modelLabel = document.createElement("label");
           modelLabel.textContent = t("model.name");
@@ -7143,7 +7153,7 @@ ${sent}`;
   async function offerModels(slot, list, refused, note) {
     if (!keyOf(slot)) return;
     const { verdict, notAKey, models } = await checkKey(slot);
-    const provider = providerName(slot.provider);
+    const provider = slotName(slot);
     if (verdict === "bad" || verdict === "blocked") {
       refused.classList.toggle("bad", verdict === "bad");
       refused.textContent = verdict === "blocked" ? t("apiKey.blocked", { provider }) : notAKey ? t("apiKey.notAKey", { provider }) : t("apiKey.bad", { provider });
@@ -7526,7 +7536,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         return;
       }
       const context = collectContext(shown.chatId, shown.id);
-      const result = explaining ? await aiTranslate("explain", shown.text, context) : await aiTranslate("received", marked.marked, context, shown.mine);
+      const result = explaining ? await translate("explain", shown.text, context) : await translate("received", marked.marked, context, shown.mine);
       const text = explaining ? result.text : marked.back(result.text).text;
       card.show(text, !explaining && result.sourceLanguage ? t("message.translatedFrom", { language: languageName(result.sourceLanguage) }) : void 0);
     } catch (e) {

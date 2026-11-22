@@ -48,7 +48,11 @@ with a reply keyboard, any will do.
    line under the model list says the same; a wrong key gets the red line.
    Pick Z.ai GLM and paste any word as its key: the red line says Z.ai GLM did
    not take this for an API key at all, and to copy the whole Standard API Key
-   from z.ai. Pick Groq again; its key is still there.
+   from z.ai. Pick Other, the last in the list: under its address field a
+   line says it takes any OpenAI-compatible API, with two examples. Give it
+   `https://api.openai.com/v1` and any word as the key: the red line says
+   api.openai.com did not accept this key. Pick Groq again; its key is still
+   there.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
    without the build counter: 0.2.1a, where the manager's dashboard, column
    Version, shows 0.2.1a.2.
@@ -164,7 +168,7 @@ Both clients, in a switched-on chat that translates into English.
    box. Put the right key back and press Enter on that same text at once: it
    goes, translated.
 6. A provider that does not answer holds up its own chat only, and a minute
-   at most. On the settings page choose OpenAI-compatible, with Base URL
+   at most. On the settings page choose Other, with Base URL
    `https://10.255.255.1/v1`, an address that never answers, and any key and
    model; allow the address when the manager asks. Send `ты тут?` in a chat
    that is switched on. While it waits, in a chat that is switched off: send

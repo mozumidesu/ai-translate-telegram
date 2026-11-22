@@ -14,7 +14,7 @@ import { config } from "../ai-translate/core/host";
 import { keepPieces } from "../ai-translate/core/keep";
 import { looksLikeOwnAttempt } from "../ai-translate/core/learn";
 import { t } from "../ai-translate/core/locales";
-import { aiTranslate, collectContext, isJustAName, isNotWorthTranslating, notify, scriptShare } from "../ai-translate/core/translate";
+import { collectContext, isJustAName, isNotWorthTranslating, notify, scriptShare, translate } from "../ai-translate/core/translate";
 import { type Entity, type Formatted, toMarked } from "./formatted";
 import { askForCorrection } from "./learn";
 import { noteUnder } from "./notes";
@@ -49,7 +49,7 @@ const MESSAGE_MS = 60_000;
 /** The translation, or a refusal once the deadline has passed; the core stops asking at once. */
 function translateInTime(text: string, context: string) {
     const stop = new AbortController();
-    const asked = aiTranslate("sent", text, context, false, stop.signal);
+    const asked = translate("sent", text, context, false, stop.signal);
     let timer: ReturnType<typeof setTimeout> | undefined;
     const late = new Promise<never>((_, refuse) => {
         timer = setTimeout(() => {

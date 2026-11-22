@@ -82,7 +82,7 @@ server of its own and never sees anyone else's key.
 | Google Gemini | yes |
 | Z.ai GLM | yes, and reachable where the other two are blocked |
 | Anthropic Claude | no |
-| Any OpenAI-compatible | depends on the provider |
+| Other (any OpenAI-compatible API) | depends on the provider |
 
 Up to four backup providers can stand behind the first one. When the first one
 is overloaded, out of quota or refuses the request, the translation goes

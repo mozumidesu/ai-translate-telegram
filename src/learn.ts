@@ -14,7 +14,7 @@
 
 import { changedWords, type Correction, forgetCorrections, keepCorrection, keptCorrections, sameMessage, splitCorrection } from "../ai-translate/core/learn";
 import { currentLocale, t } from "../ai-translate/core/locales";
-import { aiTranslate, collectContext, notify } from "../ai-translate/core/translate";
+import { collectContext, notify, translate } from "../ai-translate/core/translate";
 import { noteUnder } from "./notes";
 import { button, hint, openSheet } from "./sheet";
 import { addStyle } from "./ui";
@@ -37,7 +37,7 @@ export async function askForCorrection(chatId: string, sent: string, byHand = fa
     }
 
     try {
-        const { text } = await aiTranslate("correct", sent, collectContext(chatId));
+        const { text } = await translate("correct", sent, collectContext(chatId));
         if (!text) return;
 
         const { native, why } = splitCorrection(text);

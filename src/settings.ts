@@ -14,8 +14,8 @@ import { config, set } from "../ai-translate/core/host";
 import { LOCALES, t } from "../ai-translate/core/locales";
 import { FREE_MODELS } from "../ai-translate/core/providers";
 import {
-    baseUrlOf, canRemove, checkKey, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, PROVIDERS, providerLabel, providerName,
-    readSlots, type Slot, writeSlots
+    baseUrlOf, canRemove, checkKey, emptySlot, keyHeading, keyOf, modelOf, MOST_SLOTS, NONE, OTHER, PROVIDERS, providerLabel,
+    readSlots, type Slot, slotName, writeSlots
 } from "../ai-translate/core/slots";
 import { headerLinks } from "./feedback";
 import { correctionsRow } from "./learn";
@@ -281,7 +281,7 @@ function providers() {
                 const refused = hint();
                 block.append(refused);
 
-                if (slot.provider === "openai") {
+                if (slot.provider === OTHER) {
                     const urlLabel = document.createElement("label");
                     urlLabel.textContent = t("baseUrl.name");
                     block.append(urlLabel);
@@ -289,10 +289,10 @@ function providers() {
                     const url = document.createElement("input");
                     url.type = "text";
                     url.value = baseUrlOf(slot);
-                    url.placeholder = t("baseUrl.desc");
                     url.spellcheck = false;
                     url.onchange = () => change(at, s => ({ ...s, baseUrls: { ...s.baseUrls, [s.provider]: url.value } }));
-                    block.append(url);
+                    // Under the field rather than in it, where typing would hide the one line that says what Other takes.
+                    block.append(url, hint(t("baseUrl.desc")));
                 }
 
                 const modelLabel = document.createElement("label");
@@ -359,7 +359,8 @@ async function offerModels(slot: Slot, list: HTMLDataListElement, refused: HTMLE
     if (!keyOf(slot)) return;
 
     const { verdict, notAKey, models } = await checkKey(slot);
-    const provider = providerName(slot.provider);
+    // Other by the host of its address, "openrouter.ai did not accept this key", as the core names it.
+    const provider = slotName(slot);
 
     if (verdict === "bad" || verdict === "blocked") {
         refused.classList.toggle("bad", verdict === "bad");

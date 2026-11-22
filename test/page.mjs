@@ -446,6 +446,30 @@ check("Web K: and the key went out as Bearer and the key, nothing after it",
 
 await panelVerdicts(k, "Web K");
 
+// Other: any OpenAI-compatible address, with what it takes said under the field, and named in a sentence by its host.
+const ADDRESS_FIELD = '.sheet[data-name="settings"] .providers .slot > input[type="text"]:not([list])';
+const ADDRESS_LINE = "Address of any OpenAI-compatible API, without the /chat/completions part, for example https://openrouter.ai/api/v1 or https://api.openai.com/v1";
+const OTHER_MODELS = "https://openrouter.ai/api/v1/models";
+check("Web K: the last provider on the list is Other",
+    (await ours(k, '.sheet[data-name="settings"] .providers .slot select option')).at(-1), "Other");
+await chooseProvider(k, "openai");
+check("Web K: Other asks for an address, and says under the field what it takes, where typing cannot hide it",
+    [await k.evaluate(selector => __ours().querySelector(selector)?.placeholder, ADDRESS_FIELD), (await ours(k, `${ADDRESS_FIELD} + .hint`))[0]],
+    ["", ADDRESS_LINE]);
+await k.evaluate(url => { __gm.routes[url] = () => [401, `{"error":{"message":"No auth credentials found","code":401}}`]; }, OTHER_MODELS);
+await settled(k);
+await k.evaluate(([selector, value]) => {
+    const field = __ours().querySelector(selector);
+    field.value = value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+}, [ADDRESS_FIELD, "https://openrouter.ai/api/v1"]);
+await pasteKey(k, PASTED_KEY);
+check("Web K: a key that address turns down is named by its host, in red",
+    await waitOurs(k, UNDER_KEY, "openrouter.ai did not accept this key.") && await underKey(k), { text: "openrouter.ai did not accept this key.", red: true });
+check("Web K: asked of the address it was given", await k.evaluate(url => __gm.requests.some(r => r.url === url), OTHER_MODELS), true);
+await k.evaluate(url => { delete __gm.routes[url]; }, OTHER_MODELS);
+await chooseProvider(k, "groq");
+
 check("Web K: under Logs, the version: the plugin's, which is the core's, with no build counter",
     await ours(k, ".logs .hint"), [`AI Translate · ${coreVersion()}`]);
 check("Web K: the header's @version is that with the build counter after it, which is what a manager compares",

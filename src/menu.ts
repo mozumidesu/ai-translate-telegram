@@ -14,7 +14,7 @@
 import { config } from "../ai-translate/core/host";
 import { LANGUAGES } from "../ai-translate/core/languages";
 import { currentLocale, shapeLanguageName, t } from "../ai-translate/core/locales";
-import { aiTranslate, collectContext, isJustAName, notify } from "../ai-translate/core/translate";
+import { collectContext, isJustAName, notify, translate } from "../ai-translate/core/translate";
 import type { Shown, TelegramClient } from "./client";
 import { toMarked } from "./formatted";
 import { explainIcon, translateIcon } from "./icons";
@@ -168,8 +168,8 @@ export async function readMessage(shown: Shown, explaining: boolean) {
 
         const context = collectContext(shown.chatId, shown.id);
         const result = explaining
-            ? await aiTranslate("explain", shown.text, context)
-            : await aiTranslate("received", marked.marked, context, shown.mine);
+            ? await translate("explain", shown.text, context)
+            : await translate("received", marked.marked, context, shown.mine);
 
         const text = explaining ? result.text : marked.back(result.text).text;
         card.show(text, !explaining && result.sourceLanguage
