@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.16
+// @version         0.2.3a.17
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -219,7 +219,7 @@
     "error.forbiddenSaid": "{provider} refused the request (403) and said: {details}",
     "error.blocked": "{provider} stopped the request before the model saw it, the way its protection treats VPN and shared addresses. Another VPN server usually gets through, and a backup provider takes over by itself",
     "fallback.name": "Backup provider",
-    "fallback.desc": "If the main provider is overloaded, rate-limited or refuses the request, the translation is quietly retried with this one. It needs its own key and model",
+    "fallback.desc": "Up to four backup providers can stand behind the main one. If it is overloaded, out of quota or refuses the request, the translation goes through the next one by itself. Each needs its own key and model",
     "fallback.none": "None",
     "fallback.numbered": "Backup provider {number}",
     "fallback.add": "Add a backup provider",
@@ -413,7 +413,7 @@
     "error.forbiddenSaid": "{provider} отклонил запрос (403) и ответил: {details}",
     "error.blocked": "{provider} остановил запрос ещё до модели: так его защита относится к VPN и общим адресам. Обычно помогает другой сервер VPN, а запасной провайдер подменит его сам",
     "fallback.name": "Запасной провайдер",
-    "fallback.desc": "Если основной провайдер перегружен, исчерпал лимит или отклонил запрос, перевод незаметно повторяется через этот. Ему нужен свой ключ и своя модель",
+    "fallback.desc": "За основным провайдером может стоять до четырёх запасных. Если основной перегружен, исчерпал лимит или отклонил запрос, перевод сам уходит к следующему. Каждому нужен свой ключ и своя модель",
     "fallback.none": "Нет",
     "fallback.numbered": "Запасной провайдер {number}",
     "fallback.add": "Добавить запасного провайдера",
@@ -606,7 +606,7 @@
     "error.forbiddenSaid": "{provider} відхилив запит (403) і відповів: {details}",
     "error.blocked": "{provider} зупинив запит ще до моделі: так його захист ставиться до VPN і спільних адрес. Зазвичай допомагає інший сервер VPN, а запасний провайдер підмінить його сам",
     "fallback.name": "Запасний провайдер",
-    "fallback.desc": "Якщо основний провайдер перевантажений, вичерпав ліміт або відхилив запит, переклад непомітно повторюється через цей. Йому потрібен власний ключ і власна модель",
+    "fallback.desc": "За основним провайдером може стояти до чотирьох запасних. Якщо основний перевантажений, вичерпав ліміт або відхилив запит, переклад сам іде до наступного. Кожному потрібен власний ключ і власна модель",
     "fallback.none": "Немає",
     "fallback.numbered": "Запасний провайдер {number}",
     "fallback.add": "Додати запасного провайдера",
@@ -799,7 +799,7 @@
     "error.forbiddenSaid": "{provider} a refuzat cererea (403) și a răspuns: {details}",
     "error.blocked": "{provider} a oprit cererea înainte să ajungă la model, așa tratează protecția lui adresele VPN și cele partajate. De obicei ajută alt server VPN, iar un furnizor de rezervă preia singur",
     "fallback.name": "Furnizor de rezervă",
-    "fallback.desc": "Dacă furnizorul principal este supraîncărcat, a atins limita sau refuză cererea, traducerea este reluată discret prin acesta. Are nevoie de cheia și modelul lui",
+    "fallback.desc": "În spatele furnizorului principal pot sta până la patru furnizori de rezervă. Dacă cel principal este supraîncărcat, a atins limita sau refuză cererea, traducerea trece singură la următorul. Fiecare are nevoie de cheia și modelul lui",
     "fallback.none": "Niciunul",
     "fallback.numbered": "Furnizor de rezervă {number}",
     "fallback.add": "Adaugă un provider de rezervă",
@@ -992,7 +992,7 @@
     "error.forbiddenSaid": "{provider} hat die Anfrage abgelehnt (403) und antwortet: {details}",
     "error.blocked": "{provider} hat die Anfrage vor dem Modell gestoppt, so behandelt sein Schutz VPN- und geteilte Adressen. Meist hilft ein anderer VPN-Server, und ein Ersatzanbieter übernimmt von selbst",
     "fallback.name": "Ersatzanbieter",
-    "fallback.desc": "Ist der Hauptanbieter überlastet, am Limit oder lehnt die Anfrage ab, wird die Übersetzung still über diesen wiederholt. Er braucht einen eigenen Schlüssel und ein eigenes Modell",
+    "fallback.desc": "Bis zu vier Ersatzanbieter können hinter dem Hauptanbieter stehen. Ist dieser überlastet, am Limit oder lehnt die Anfrage ab, geht die Übersetzung von selbst an den nächsten. Jeder braucht einen eigenen Schlüssel und ein eigenes Modell",
     "fallback.none": "Keiner",
     "fallback.numbered": "Ersatzanbieter {number}",
     "fallback.add": "Ersatzanbieter hinzufügen",
@@ -1185,7 +1185,7 @@
     "error.forbiddenSaid": "{provider} rechazó la petición (403) y responde: {details}",
     "error.blocked": "{provider} detuvo la petición antes de llegar al modelo, así trata su protección a las direcciones VPN y compartidas. Suele funcionar otro servidor VPN, y un proveedor de reserva lo cubre solo",
     "fallback.name": "Proveedor de reserva",
-    "fallback.desc": "Si el proveedor principal está sobrecargado, sin cuota o rechaza la petición, la traducción se reintenta en silencio con este. Necesita su propia clave y su propio modelo",
+    "fallback.desc": "Hasta cuatro proveedores de reserva pueden respaldar al principal. Si este está sobrecargado, sin cuota o rechaza la petición, la traducción pasa sola al siguiente. Cada uno necesita su propia clave y su propio modelo",
     "fallback.none": "Ninguno",
     "fallback.numbered": "Proveedor de reserva {number}",
     "fallback.add": "Añadir un proveedor de reserva",
@@ -1378,7 +1378,7 @@
     "error.forbiddenSaid": "{provider} a refusé la requête (403) et répond : {details}",
     "error.blocked": "{provider} a bloqué la requête avant le modèle, c'est ainsi que sa protection traite les adresses VPN et partagées. Un autre serveur VPN passe en général, et un fournisseur de secours prend le relais tout seul",
     "fallback.name": "Fournisseur de secours",
-    "fallback.desc": "Si le fournisseur principal est surchargé, à court de quota ou refuse la requête, la traduction est relancée discrètement avec celui-ci. Il lui faut sa propre clé et son propre modèle",
+    "fallback.desc": "Jusqu'à quatre fournisseurs de secours peuvent se placer derrière le principal. S'il est surchargé, à court de quota ou refuse la requête, la traduction passe d'elle-même au suivant. Chacun a besoin de sa propre clé et de son propre modèle",
     "fallback.none": "Aucun",
     "fallback.numbered": "Fournisseur de secours {number}",
     "fallback.add": "Ajouter un fournisseur de secours",
@@ -1571,7 +1571,7 @@
     "error.forbiddenSaid": "{provider} recusou o pedido (403) e respondeu: {details}",
     "error.blocked": "{provider} parou o pedido antes do modelo, é assim que a proteção dele trata endereços de VPN e compartilhados. Outro servidor de VPN costuma passar, e um provedor reserva assume sozinho",
     "fallback.name": "Provedor reserva",
-    "fallback.desc": "Se o provedor principal estiver sobrecarregado, sem cota ou recusar o pedido, a tradução é refeita discretamente por este. Ele precisa da própria chave e do próprio modelo",
+    "fallback.desc": "Até quatro provedores reserva podem ficar atrás do principal. Se ele estiver sobrecarregado, sem cota ou recusar o pedido, a tradução passa sozinha para o próximo. Cada um precisa da própria chave e do próprio modelo",
     "fallback.none": "Nenhum",
     "fallback.numbered": "Provedor reserva {number}",
     "fallback.add": "Adicionar um provedor reserva",
@@ -1764,7 +1764,7 @@
     "error.forbiddenSaid": "{provider} がリクエストを拒否しました（403）。返答は次のとおりです: {details}",
     "error.blocked": "{provider} の保護が、モデルに届く前にリクエストを止めました。VPN や共有アドレスではよくあることです。別の VPN サーバーなら通ることが多く、予備のプロバイダーがあれば自動で引き継ぎます",
     "fallback.name": "予備のプロバイダー",
-    "fallback.desc": "主プロバイダーが混雑している、上限に達した、リクエストを拒否した場合に、こちらで静かに翻訳をやり直します。専用のキーとモデルが必要です",
+    "fallback.desc": "主プロバイダーの後ろに、予備のプロバイダーを最大4つまで置けます。主プロバイダーが混雑している、上限に達した、リクエストを拒否した場合は、翻訳が自動で次のプロバイダーに回ります。それぞれ専用のキーとモデルが必要です",
     "fallback.none": "なし",
     "fallback.numbered": "予備のプロバイダー {number}",
     "fallback.add": "予備のプロバイダーを追加",
@@ -1957,7 +1957,7 @@
     "error.forbiddenSaid": "{provider} 拒绝了该请求（403），回复：{details}",
     "error.blocked": "{provider} 的防护在模型看到之前就拦下了请求，VPN 和共享地址常会这样。换一个 VPN 服务器通常就能通过，备用服务商也会自动接手",
     "fallback.name": "备用服务商",
-    "fallback.desc": "当主服务商过载、额度用尽或拒绝请求时，会悄悄改用它重新翻译。它需要自己的密钥和模型",
+    "fallback.desc": "主服务商后面最多可以设置四个备用服务商。当主服务商过载、额度用尽或拒绝请求时，翻译会自动交给下一个。每个都需要自己的密钥和模型",
     "fallback.none": "不使用",
     "fallback.numbered": "备用服务商 {number}",
     "fallback.add": "添加备用提供商",
@@ -2150,7 +2150,7 @@
     "error.truncated": "คำตอบถูกตัดก่อนจะเริ่ม แบ่งข้อความให้สั้นลง",
     "error.untranslated": "โมเดลส่งข้อความกลับมาโดยไม่แปล ลองอีกครั้งหรือเปลี่ยนโมเดลหรือผู้ให้บริการ",
     "fallback.name": "ผู้ให้บริการสำรอง",
-    "fallback.desc": "หากผู้ให้บริการหลักมีผู้ใช้หนาแน่น โควตาหมด หรือปฏิเสธคำขอ ระบบจะลองแปลใหม่ผ่านรายนี้อย่างเงียบ ๆ ต้องมีคีย์และโมเดลของตัวเอง",
+    "fallback.desc": "ผู้ให้บริการสำรองตั้งไว้ต่อจากผู้ให้บริการหลักได้สูงสุดสี่ราย หากผู้ให้บริการหลักมีผู้ใช้หนาแน่น โควตาหมด หรือปฏิเสธคำขอ ระบบจะส่งงานแปลต่อให้รายถัดไปเอง แต่ละรายต้องมีคีย์และโมเดลของตัวเอง",
     "fallback.none": "ไม่ใช้",
     "fallback.numbered": "ผู้ให้บริการสำรอง {number}",
     "fallback.add": "เพิ่มผู้ให้บริการสำรอง",
@@ -2343,7 +2343,7 @@
     "error.truncated": "Câu trả lời bị cắt trước khi bắt đầu. Hãy chia văn bản thành tin nhắn ngắn hơn",
     "error.untranslated": "Mô hình trả lại nguyên văn chưa dịch. Thử lại hoặc đổi mô hình hay nhà cung cấp",
     "fallback.name": "Nhà cung cấp dự phòng",
-    "fallback.desc": "Nếu nhà cung cấp chính quá tải, hết hạn mức hoặc từ chối yêu cầu, bản dịch sẽ được thử lại lặng lẽ qua nhà cung cấp này. Nó cần khoá và mô hình riêng",
+    "fallback.desc": "Có thể đặt tối đa bốn nhà cung cấp dự phòng sau nhà cung cấp chính. Nếu nhà cung cấp chính quá tải, hết hạn mức hoặc từ chối yêu cầu, bản dịch sẽ tự chuyển sang nhà cung cấp kế tiếp. Mỗi nhà cung cấp cần khoá và mô hình riêng",
     "fallback.none": "Không dùng",
     "fallback.numbered": "Nhà cung cấp dự phòng {number}",
     "fallback.add": "Thêm nhà cung cấp dự phòng",
@@ -2536,7 +2536,7 @@
     "error.truncated": "Yanıt daha başlamadan kesildi. Metni daha kısa mesajlara bölün",
     "error.untranslated": "Model metni çevirmeden geri döndürdü. Tekrar deneyin ya da modeli veya sağlayıcıyı değiştirin",
     "fallback.name": "Yedek sağlayıcı",
-    "fallback.desc": "Ana sağlayıcı yoğunsa, kotası dolmuşsa ya da isteği reddediyorsa çeviri sessizce bununla yeniden denenir. Kendi anahtarı ve modeli gerekir",
+    "fallback.desc": "Ana sağlayıcının arkasında en fazla dört yedek sağlayıcı durabilir. Ana sağlayıcı yoğunsa, kotası dolmuşsa ya da isteği reddediyorsa çeviri kendiliğinden sıradakine geçer. Her birinin kendi anahtarı ve modeli gerekir",
     "fallback.none": "Yok",
     "fallback.numbered": "Yedek sağlayıcı {number}",
     "fallback.add": "Yedek sağlayıcı ekle",
@@ -2729,7 +2729,7 @@
     "error.forbiddenSaid": "{provider} menolak permintaan (403) dan menjawab: {details}",
     "error.blocked": "{provider} menghentikan permintaan sebelum sampai ke model, begitulah proteksinya memperlakukan alamat VPN dan alamat bersama. Server VPN lain biasanya lolos, dan penyedia cadangan akan mengambil alih sendiri",
     "fallback.name": "Penyedia cadangan",
-    "fallback.desc": "Jika penyedia utama kelebihan beban, terkena batas, atau menolak permintaan, terjemahan diulang diam-diam lewat penyedia ini. Perlu kunci dan model sendiri",
+    "fallback.desc": "Hingga empat penyedia cadangan dapat disiapkan di belakang penyedia utama. Jika penyedia utama kelebihan beban, terkena batas, atau menolak permintaan, terjemahan beralih sendiri ke penyedia berikutnya. Masing-masing perlu kunci dan model sendiri",
     "fallback.none": "Tidak ada",
     "fallback.numbered": "Penyedia cadangan {number}",
     "fallback.add": "Tambah penyedia cadangan",
@@ -2922,7 +2922,7 @@
     "error.forbiddenSaid": "رفض {provider} الطلب (403) وردّ: {details}",
     "error.blocked": "أوقف {provider} الطلب قبل أن يصل إلى النموذج، فهكذا تتعامل حمايته مع عناوين VPN والعناوين المشتركة. عادةً ينجح خادم VPN آخر، والمزوّد الاحتياطي يتولى الأمر وحده",
     "fallback.name": "المزوّد الاحتياطي",
-    "fallback.desc": "إذا كان المزوّد الرئيسي مثقلًا أو بلغ حد الطلبات أو رفض الطلب، تُعاد الترجمة بهدوء عبر هذا المزوّد. يحتاج إلى مفتاح ونموذج خاصين به",
+    "fallback.desc": "يمكن وضع ما يصل إلى أربعة مزوّدين احتياطيين خلف المزوّد الرئيسي. إذا كان المزوّد الرئيسي مثقلًا أو بلغ حد الطلبات أو رفض الطلب، تنتقل الترجمة تلقائيًا إلى المزوّد التالي. يحتاج كل منهم إلى مفتاح ونموذج خاصين به",
     "fallback.none": "لا شيء",
     "fallback.numbered": "المزوّد الاحتياطي {number}",
     "fallback.add": "إضافة مزود احتياطي",
@@ -3115,7 +3115,7 @@
     "error.forbiddenSaid": "{provider}가 요청을 거부했습니다 (403). 응답: {details}",
     "error.blocked": "{provider}의 보호 장치가 모델에 닿기 전에 요청을 막았습니다. VPN이나 공용 주소에서 흔히 있는 일입니다. 다른 VPN 서버로 바꾸면 대개 통하고, 예비 제공자가 있으면 알아서 대신합니다",
     "fallback.name": "예비 제공자",
-    "fallback.desc": "주 제공자가 혼잡하거나 한도에 걸리거나 요청을 거부하면 번역을 조용히 이쪽으로 다시 보냅니다. 자체 키와 모델이 필요합니다",
+    "fallback.desc": "주 제공자 뒤에 예비 제공자를 최대 네 개까지 둘 수 있습니다. 주 제공자가 혼잡하거나 한도에 걸리거나 요청을 거부하면 번역이 알아서 다음 제공자로 넘어갑니다. 각각 자체 키와 모델이 필요합니다",
     "fallback.none": "없음",
     "fallback.numbered": "예비 제공자 {number}",
     "fallback.add": "예비 제공자 추가",
@@ -4919,7 +4919,10 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   function readable(text, names2) {
     return oneLine(dialect().readIds(text, names2).replace(/https?:\/\/\S+|www\.\S+/g, "(link)"));
   }
-  function collectContext(channelId, beforeId) {
+  var writtenBy = (author2) => `
+
+The message below was written by ${author2}.`;
+  function collectContext(channelId, beforeId, author2) {
     const protectedWords = new Set(
       config().glossary.split(",").map((e) => e.split("=")[0].trim()).filter(Boolean)
     );
@@ -4952,7 +4955,8 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
     const names2 = protectedWords.size ? `
 
 These are names of people, not words. Never translate them or any affectionate form built from them: ${[...protectedWords].join(", ")}.` : "";
-    return names2 + conversation;
+    const writer = asName(author2);
+    return names2 + conversation + (writer ? writtenBy(writer) : "");
   }
   var lineCount = (text) => text.split("\n").length;
   function isSameLanguage(reported, language) {
@@ -6330,8 +6334,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${16}`;
-  var BUILD_NAME = `${VERSION} (${"81df055"}-${16})`;
+  var SCRIPT_VERSION = `${VERSION}.${17}`;
+  var BUILD_NAME = `${VERSION} (${"7db017b"}-${17})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
