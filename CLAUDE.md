@@ -36,9 +36,13 @@ the chats switched on, and incoming ones from a message's menu.
   `dist/` on `main`. The build is deterministic; `test/dist.mjs` fails
   when `npm run build` was forgotten. Whether a change reaches installed
   copies is the counter's doing, below.
-- **The README is English only for now.** The 15 translations
-  (`docs/README.<code>.md`, as in ai-translate) follow once the owner has
-  approved the English wording, and are not written before.
+- **The README exists in 16 languages**: `README.md` plus
+  `docs/README.<code>.md`, as in ai-translate. All sixteen change together and
+  keep the same headings, paragraphs, table rows and links. A UI word they name
+  is the script's own string in that language, from `ai-translate/core/locales.ts`.
+  `tools header --root .`, the core's Rust tool in `ai-translate/tools`,
+  writes the row of language links at the top, and `--check` says which file
+  disagrees.
 
 ## The version
 
@@ -103,6 +107,7 @@ a dash, the counter.
 | `build.mjs`, `build-counter.json` | The build: header, bundle and counter; the counter and the VERSION it was raised for |
 | `dist/` | The built script and its header on their own, which is what a manager reads to decide whether there is an update |
 | `test/` | The checks; `fixtures/` are pages shaped like both clients |
+| `docs/README.<code>.md` | The README in the other 15 languages |
 | `docs/test-plan.md` | What a person with a real account tries, since a cloud session cannot sign in |
 
 ## Where the hooks are

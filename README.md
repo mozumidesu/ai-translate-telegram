@@ -1,3 +1,22 @@
+<p align="center">
+  <a href="docs/README.de.md">🇩🇪&nbsp;Deutsch</a> ·
+  <b>🇬🇧&nbsp;English</b> ·
+  <a href="docs/README.es.md">🇪🇸&nbsp;Español</a> ·
+  <a href="docs/README.fr.md">🇫🇷&nbsp;Français</a> ·
+  <a href="docs/README.id.md">🇮🇩&nbsp;Bahasa Indonesia</a> ·
+  <a href="docs/README.pt.md">🇧🇷&nbsp;Português</a> ·
+  <a href="docs/README.ro.md">🇷🇴&nbsp;Română</a> ·
+  <a href="docs/README.ru.md">🇷🇺&nbsp;Русский</a> ·
+  <a href="docs/README.uk.md">🇺🇦&nbsp;Українська</a> ·
+  <a href="docs/README.tr.md">🇹🇷&nbsp;Türkçe</a> ·
+  <a href="docs/README.vi.md">🇻🇳&nbsp;Tiếng Việt</a> ·
+  <a href="docs/README.ar.md">🇸🇦&nbsp;العربية</a> ·
+  <a href="docs/README.th.md">🇹🇭&nbsp;ไทย</a> ·
+  <a href="docs/README.ja.md">🇯🇵&nbsp;日本語</a> ·
+  <a href="docs/README.ko.md">🇰🇷&nbsp;한국어</a> ·
+  <a href="docs/README.zh.md">🇨🇳&nbsp;中文</a>
+</p>
+
 # AI Translate for Telegram
 
 A userscript for Telegram that translates your messages with an AI model of
