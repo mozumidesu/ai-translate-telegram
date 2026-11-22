@@ -95,14 +95,18 @@ export function ui(): HTMLElement {
     shadow.append(style, box);
     (document.body ?? document.documentElement).append(mount);
 
-    const follow = () => {
-        box!.classList.toggle("dark", isDark());
-        box!.dir = isRightToLeft() ? "rtl" : "ltr";
-    };
     follow();
-    new MutationObserver(follow).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    // The theme is a class on <html>, and the client's language, which ours may follow, its lang.
+    new MutationObserver(follow).observe(document.documentElement, { attributes: true, attributeFilter: ["class", "lang"] });
 
     return box;
+}
+
+/** The root takes the client's theme, and the direction of the language the interface speaks now. */
+export function follow() {
+    if (!box) return;
+    box.classList.toggle("dark", isDark());
+    box.dir = isRightToLeft() ? "rtl" : "ltr";
 }
 
 /** Rules of a part of ours, added once, in the same root. */

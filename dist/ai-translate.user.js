@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.15
+// @version         0.2.3a.16
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -5792,13 +5792,14 @@ ${text.replace(/\s+/g, "")}`;
     box.className = "root";
     shadow.append(style, box);
     (document.body ?? document.documentElement).append(mount);
-    const follow = () => {
-      box.classList.toggle("dark", isDark());
-      box.dir = isRightToLeft() ? "rtl" : "ltr";
-    };
     follow();
-    new MutationObserver(follow).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    new MutationObserver(follow).observe(document.documentElement, { attributes: true, attributeFilter: ["class", "lang"] });
     return box;
+  }
+  function follow() {
+    if (!box) return;
+    box.classList.toggle("dark", isDark());
+    box.dir = isRightToLeft() ? "rtl" : "ltr";
   }
   var added = /* @__PURE__ */ new Set();
   function addStyle(css) {
@@ -6329,8 +6330,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${15}`;
-  var BUILD_NAME = `${VERSION} (${"81df055"}-${15})`;
+  var SCRIPT_VERSION = `${VERSION}.${16}`;
+  var BUILD_NAME = `${VERSION} (${"81df055"}-${16})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7012,7 +7013,10 @@ ${sent}`;
       select.value = String(value ?? "");
       select.onchange = () => {
         set(name, select.value);
-        if (name === "locale") sheet.redraw();
+        if (name === "locale") {
+          follow();
+          sheet.redraw();
+        }
         if (name === "mode") changed();
       };
       box2.append(select);
@@ -7625,6 +7629,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   function typingElsewhere(isBox) {
     const active = typeof document === "undefined" ? void 0 : document.activeElement;
     if (!active || active === document.body || isBox(active)) return false;
+    if (active.id === UI_ID) return true;
     return active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
   }
   function whichClient(path = location.pathname) {

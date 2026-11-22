@@ -347,6 +347,16 @@ check("Web K: in the plugin's order, under its section titles", await settingsOr
 ]);
 check("Web K: the language setting names Telegram, not Discord",
     (await ours(k, '.sheet[data-name="settings"] select option')).includes("Same as Telegram"), true);
+const chooseLocale = (page, value) => page.evaluate(value => {
+    const field = __ours().querySelector('.sheet[data-name="settings"] [data-setting="locale"] select');
+    field.value = value;
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+}, value);
+await chooseLocale(k, "ar");
+check("Web K: an interface in Arabic puts the notices and cards right to left at once, not after a reload",
+    await k.evaluate(() => __ours().querySelector(".root").dir), "rtl");
+await chooseLocale(k, "auto");
+check("Web K: and back with the client's own language", await k.evaluate(() => __ours().querySelector(".root").dir), "ltr");
 check("Web K: the backslashes explained, with their examples",
     await ours(k, ".keep .example"), ["\\carpe diem\\", "\\This line stays as it is"]);
 
@@ -1037,6 +1047,34 @@ check("Web A: and goes back into its own topic's box once that one is open", awa
 await a.evaluate(() => {
     location.hash = "#-1001234567890";
     document.getElementById("editable-message-text").textContent = "";
+});
+
+// Typing in a window of ours, a key into the settings, say: a message held back meanwhile waits, and the keyboard stays there.
+await k.evaluate(() => {
+    __k.restored.length = 0;
+    __k.appImManager.chat.input.messageInputField.input.value = "занято";
+});
+await a.evaluate(() => __gm.menu.run());
+await settled(a);
+await a.evaluate(() => __ours().querySelector('.sheet[data-name="settings"] [data-setting="glossary"] input').focus());
+await a.evaluate(async () => {
+    __gm.reply = () => 401;
+    __a.worker.postMessage({
+        payloads: [{ messageId: "f1", type: "callMethod", name: "sendMessage", args: [{ chat: { id: "-1001234567890" }, text: "пока пишу в настройках", wasDrafted: false }] }]
+    });
+    while (!__a.answers.some(d => d.payloads?.[0]?.messageId === "f1")) await new Promise(done => setTimeout(done, 5));
+});
+await a.waitForTimeout(1500);
+check("Web A: a message held back while a field of ours is typed in waits, and the field keeps the keyboard",
+    [await box(), await a.evaluate(() => __ours().activeElement?.closest?.("[data-setting]")?.dataset.setting)], ["", "glossary"]);
+await a.keyboard.press("Escape");
+await boxFilled();
+check("Web A: and goes back into the box once the window is shut", await box(), "пока пишу в настройках");
+await a.evaluate(() => {
+    document.getElementById("editable-message-text").textContent = "";
+});
+await k.evaluate(() => {
+    __k.appImManager.chat.input.messageInputField.input.value = "";
 });
 
 // The other way round: what Web K holds back is Web K's own first, with Web A open on the same chat and its box empty.

@@ -21,7 +21,7 @@ import { headerLinks } from "./feedback";
 import { correctionsRow } from "./learn";
 import { logsRow } from "./logs";
 import { changed, hint, openSheet, sectionTitle, type Sheet } from "./sheet";
-import { addStyle } from "./ui";
+import { addStyle, follow } from "./ui";
 import { updateRow } from "./update";
 
 type Option = { value: string; label: string; };
@@ -159,8 +159,11 @@ function row(field: Field, sheet: Sheet): HTMLElement {
         select.value = String(value ?? "");
         select.onchange = () => {
             set(name, select.value);
-            // The interface language decides every word here; the mode, what the chat bar button shows.
-            if (name === "locale") sheet.redraw();
+            // The interface language decides every word here, and the side notices and cards read from; the mode, what the chat bar button shows.
+            if (name === "locale") {
+                follow();
+                sheet.redraw();
+            }
             if (name === "mode") changed();
         };
         box.append(select);

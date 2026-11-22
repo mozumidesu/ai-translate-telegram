@@ -8,6 +8,8 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { UI_ID } from "./ui";
+
 declare const unsafeWindow: Window | undefined;
 
 /** What the client's own code sees as its window. */
@@ -17,6 +19,8 @@ export const page: any = typeof unsafeWindow !== "undefined" && unsafeWindow ? u
 export function typingElsewhere(isBox: (element: Element) => boolean) {
     const active = typeof document === "undefined" ? undefined : document.activeElement as HTMLElement | null | undefined;
     if (!active || active === document.body || isBox(active)) return false;
+    // A window of ours: its fields are in a closed root, and the page sees only the root's host.
+    if (active.id === UI_ID) return true;
     return active.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName);
 }
 
