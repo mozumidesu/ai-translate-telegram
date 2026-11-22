@@ -1,3 +1,6 @@
 {
-  "effortLevel": "xhigh"
+  "effortLevel": "high",
+  "permissions": {
+    "allow": ["mcp__claude-code-remote__create_session"]
+  }
 }
