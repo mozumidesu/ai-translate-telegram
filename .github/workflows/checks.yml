@@ -49,6 +49,9 @@ jobs:
       - name: Web K's manager line, against its calls
         run: node test/webk.mjs
 
+      - name: Where the settings are kept, and the move from the old key
+        run: node test/storage.mjs
+
       - name: Whether the defaults still match the plugin's
         run: node test/defaults.mjs
 

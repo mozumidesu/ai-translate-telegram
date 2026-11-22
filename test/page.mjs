@@ -48,7 +48,7 @@ const SETTINGS = {
  */
 const manager = saved => `
 window.__gm = {
-    store: { aiTranslateSettings: ${JSON.stringify(saved)} },
+    store: { "ai-translate-settings": ${JSON.stringify(saved)} },
     asked: [],
     requests: [],
     routes: {},
@@ -57,8 +57,8 @@ window.__gm = {
     toasts: [],
     reply: () => "[ru] translated",
     change(name, value) {
-        this.store.aiTranslateSettings[name] = value;
-        for (const listener of this.listeners) listener("aiTranslateSettings", null, null, true);
+        this.store["ai-translate-settings"][name] = value;
+        for (const listener of this.listeners) listener("ai-translate-settings", null, null, true);
     }
 };
 var unsafeWindow = window;
@@ -438,7 +438,7 @@ await pasteKey(k, PASTED_KEY + " \u200b\r\n");
 check("Web K: a key pasted with a space, a zero-width space and a line break is shown clean",
     await k.evaluate(selector => __ours().querySelector(selector).value, KEY_FIELD), PASTED_KEY);
 check("Web K: and saved clean in the manager's storage",
-    await k.evaluate(() => JSON.parse(__gm.store.aiTranslateSettings.providerSlots)[0].keys.groq), PASTED_KEY);
+    await k.evaluate(() => JSON.parse(__gm.store["ai-translate-settings"].providerSlots)[0].keys.groq), PASTED_KEY);
 check("Web K: Groq's answer to a wrong key is a red line under it",
     await waitOurs(k, UNDER_KEY, WRONG_KEY) && await underKey(k), { text: WRONG_KEY, red: true });
 check("Web K: and the key went out as Bearer and the key, nothing after it",
@@ -603,14 +603,14 @@ await k.keyboard.press("Escape");
 check("Web K: with nothing of ours open, Escape is Web K's own again", await chatShut(k) - shutBeforeLogs, 1);
 
 await k.click(".ai-translate-button", { modifiers: ["Shift"] });
-check("Web K: a shift-click switches the open chat off, as in Discord", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "");
+check("Web K: a shift-click switches the open chat off, as in Discord", await k.evaluate(() => __gm.store["ai-translate-settings"].enabledChannels), "");
 check("Web K: and opens nothing", await ours(k, ".sheet"), []);
 await k.click(".ai-translate-button", { modifiers: ["Shift"] });
 
 await k.click(".ai-translate-button", { button: "right" });
-check("Web K: a right click switches the open chat off", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "");
+check("Web K: a right click switches the open chat off", await k.evaluate(() => __gm.store["ai-translate-settings"].enabledChannels), "");
 await k.click(".ai-translate-button", { button: "right" });
-check("Web K: and on again", await k.evaluate(() => __gm.store.aiTranslateSettings.enabledChannels), "-1001234567890");
+check("Web K: and on again", await k.evaluate(() => __gm.store["ai-translate-settings"].enabledChannels), "-1001234567890");
 
 check("Web K: the userscript manager's menu offers the settings too", await k.evaluate(() => __gm.menu?.name), "All plugin settings");
 await k.evaluate(() => __gm.menu.run());
@@ -723,7 +723,7 @@ await animationLevels(k, []);
 
 await k.evaluate(() => __gm.menu.run());
 await clickOurs(k, '[data-setting="showOriginal"] input');
-check("Web K: Show the original is switched on from Appearance", await k.evaluate(() => __gm.store.aiTranslateSettings.showOriginal), true);
+check("Web K: Show the original is switched on from Appearance", await k.evaluate(() => __gm.store["ai-translate-settings"].showOriginal), true);
 await k.keyboard.press("Escape");
 
 await k.evaluate(() => {

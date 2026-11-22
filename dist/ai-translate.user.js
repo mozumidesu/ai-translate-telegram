@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.11
+// @version         0.2.3a.12
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -6133,7 +6133,8 @@ ${sent}`;
   }
 
   // src/storage.ts
-  var KEY = "aiTranslateSettings";
+  var KEY = "ai-translate-settings";
+  var OLD_KEY = "aiTranslateSettings";
   var DEFAULTS = {
     locale: "auto",
     providerSlots: "",
@@ -6167,10 +6168,22 @@ ${sent}`;
     extraInstructions: ""
   };
   var held;
+  function stored() {
+    if (typeof GM_getValue !== "function") return {};
+    const saved = GM_getValue(KEY, null);
+    if (saved) return saved;
+    const before = GM_getValue(OLD_KEY, null);
+    if (!before) return {};
+    try {
+      GM_setValue?.(KEY, before);
+    } catch {
+    }
+    return before;
+  }
   function read() {
     let saved = {};
     try {
-      saved = (typeof GM_getValue === "function" ? GM_getValue(KEY, {}) : {}) ?? {};
+      saved = stored();
     } catch {
     }
     return clean({ ...DEFAULTS, ...saved });
@@ -6293,8 +6306,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${11}`;
-  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${11})`;
+  var SCRIPT_VERSION = `${VERSION}.${12}`;
+  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${12})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7975,6 +7988,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     return peer.title ?? ([peer.first_name, peer.last_name].filter(Boolean).join(" ") || void 0);
   }
   var TYPED = Symbol("ai-translate typed");
+  var OURS2 = "ai-translate";
   function typedIn2(payload) {
     if (payload?.name !== "appMessagesManager" || payload.method !== "sendText") return void 0;
     const options = payload.args?.[0];
@@ -7998,8 +8012,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   }
   function wrapInvoke(proxy, restore, onCall) {
     const invoke = proxy?.invoke;
-    if (invoke?.aiTranslate) invoked = true;
-    if (typeof invoke !== "function" || invoke.aiTranslate) return;
+    if (invoke?.[OURS2]) invoked = true;
+    if (typeof invoke !== "function" || invoke[OURS2]) return;
     const queues = /* @__PURE__ */ new Map();
     const later = (chatId, run) => {
       const queue = queues.get(chatId) ?? { tail: Promise.resolve(), count: 0 };
@@ -8044,14 +8058,14 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       if (chatId !== void 0 && queues.has(chatId)) return later(chatId, () => invoke.call(this, type, plain, ...rest));
       return invoke.call(this, type, plain, ...rest);
     };
-    wrapped.aiTranslate = true;
+    wrapped[OURS2] = true;
     proxy.invoke = wrapped;
     invoked = true;
   }
   var invoked = false;
   function patchChatInput(ChatInput) {
-    if (!ChatInput || ChatInput.aiTranslate) return;
-    ChatInput.aiTranslate = true;
+    if (!ChatInput || ChatInput[OURS2]) return;
+    ChatInput[OURS2] = true;
     const send = ChatInput.sendMessageWithForward;
     if (typeof send === "function")
       ChatInput.sendMessageWithForward = function(options, ...rest) {
@@ -8124,9 +8138,9 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     chatTitle: (chatId) => nameOfPeer(peerIdOf(chatId)),
     recent(chatId) {
       const peerId = peerIdOf(chatId);
-      const stored = page.apiManagerProxy?.mirrors?.messages?.[`${peerId}_history`] ?? {};
+      const stored2 = page.apiManagerProxy?.mirrors?.messages?.[`${peerId}_history`] ?? {};
       const me2 = webK.meId();
-      return Object.values(stored).filter((m) => m?._ === "message" && typeof m.message === "string" && m.message).sort((a, b) => a.mid - b.mid).map((m) => {
+      return Object.values(stored2).filter((m) => m?._ === "message" && typeof m.message === "string" && m.message).sort((a, b) => a.mid - b.mid).map((m) => {
         const from = m.fromId ?? peerId;
         const authorId = m.pFlags?.out ? me2 ?? "me" : chatIdOf(from);
         return { id: String(m.mid), authorId, authorName: nameOfPeer(Number(from)), content: m.message };

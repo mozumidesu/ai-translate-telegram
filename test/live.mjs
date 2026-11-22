@@ -89,7 +89,7 @@ await k.goto("https://web.telegram.org/k/", { waitUntil: "domcontentloaded" });
 await k.waitForTimeout(15000);
 
 check("Web K: apiManagerProxy is on the window, and its invoke is the script's",
-    await k.evaluate(() => window.apiManagerProxy?.invoke?.aiTranslate === true), true);
+    await k.evaluate(() => window.apiManagerProxy?.invoke?.["ai-translate"] === true), true);
 const managerCalls = await k.evaluate(async () => {
     const proxy = window.apiManagerProxy;
     const invoke = proxy.invoke;

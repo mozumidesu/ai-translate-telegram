@@ -21,7 +21,10 @@ declare const GM_setValue: ((name: string, value: unknown) => void) | undefined;
 declare const GM_addValueChangeListener:
     ((name: string, listener: (name: string, before: unknown, after: unknown, remote: boolean) => void) => unknown) | undefined;
 
-const KEY = "aiTranslateSettings";
+/** Where the settings are kept: under the name the project goes by, ai-translate. */
+export const KEY = "ai-translate-settings";
+/** Where earlier builds kept them, before the name was ai-translate everywhere. */
+export const OLD_KEY = "aiTranslateSettings";
 
 export const DEFAULTS: Config = {
     locale: "auto",
@@ -59,10 +62,30 @@ export const DEFAULTS: Config = {
 /** Read once, then kept: the core asks for settings many times a translation. */
 let held: Config | undefined;
 
+/**
+ * The settings as saved. The first time this build reads them they are
+ * copied over from the old key, keys and all, and the old key is left as it
+ * was, so an older build put back still finds what it had.
+ */
+function stored(): Partial<Config> {
+    if (typeof GM_getValue !== "function") return {};
+    const saved = GM_getValue<Partial<Config> | null>(KEY, null);
+    if (saved) return saved;
+
+    const before = GM_getValue<Partial<Config> | null>(OLD_KEY, null);
+    if (!before) return {};
+    try {
+        GM_setValue?.(KEY, before);
+    } catch {
+        // Read from the old key again next time.
+    }
+    return before;
+}
+
 function read(): Config {
     let saved: Partial<Config> = {};
     try {
-        saved = (typeof GM_getValue === "function" ? GM_getValue<Partial<Config>>(KEY, {}) : {}) ?? {};
+        saved = stored();
     } catch {
         // A manager without storage, or storage refused: defaults it is.
     }

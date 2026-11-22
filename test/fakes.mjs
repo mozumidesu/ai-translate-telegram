@@ -16,7 +16,7 @@ export const SETTINGS = {
 };
 
 export function fakeManager(saved = SETTINGS) {
-    const store = { aiTranslateSettings: structuredClone(saved) };
+    const store = { "ai-translate-settings": structuredClone(saved) };
     globalThis.GM_getValue = (name, fallback) => (name in store ? structuredClone(store[name]) : fallback);
     globalThis.GM_setValue = (name, value) => {
         store[name] = structuredClone(value);

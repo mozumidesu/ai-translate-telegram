@@ -40,8 +40,8 @@ webK.install();
 check("the script waits for the proxy rather than missing it", typeof globalThis.apiManagerProxy, "undefined");
 check("and says until then that it is not in front of the sending", webK.unhooked(), "Web K: apiManagerProxy.invoke has not been reached");
 globalThis.apiManagerProxy = K.apiManagerProxy;
-check("and wraps its invoke the moment it is mounted", K.apiManagerProxy.invoke.aiTranslate, true);
-check("the chat bar's class is marked once it can be reached", K.ChatInput.aiTranslate, true);
+check("and wraps its invoke the moment it is mounted", K.apiManagerProxy.invoke["ai-translate"], true);
+check("the chat bar's class is marked once it can be reached", K.ChatInput["ai-translate"], true);
 check("and then the hooks are in", webK.unhooked(), undefined);
 
 const sent = () => K.calls.filter(c => c.payload.name === "appMessagesManager").map(c => c.payload);
@@ -191,17 +191,17 @@ check("is asked about again when it is sent again, and goes once the provider an
     [provider.asked.length, sent()[0]?.args[0].text], [1, "hi, how are you today"]);
 
 reset();
-store.aiTranslateSettings.onError = "sendAsTyped";
+store["ai-translate-settings"].onError = "sendAsTyped";
 provider.reply = () => 401;
 await K.type("отправь как есть");
 await settle();
 check("with sendAsTyped the original goes", sent()[0]?.args[0].text, "отправь как есть");
-store.aiTranslateSettings.onError = "hold";
+store["ai-translate-settings"].onError = "hold";
 
 // --- AI Learn
 
 reset();
-store.aiTranslateSettings.aiLearn = true;
+store["ai-translate-settings"].aiLearn = true;
 provider.reply = () => "Shall we meet tomorrow at noon?\nwhy: \"at noon\", not \"in noon\"";
 await K.type("shall we meet tomorrow in noon?");
 // Before the provider could have answered: the chat waits on nothing.
@@ -211,7 +211,7 @@ check("AI Learn: without the script's own mark", Object.getOwnPropertySymbols(se
 await settle();
 check("AI Learn: and a native speaker's version is asked for on the side", provider.lastMessage, "shall we meet tomorrow in noon?");
 check("AI Learn: with the prompt that asks for one", provider.asked.at(-1)?.messages[0].content.includes("Give the version a native speaker of English would have written"), true);
-check("AI Learn: the correction is kept, for Corrections", JSON.parse(store.aiTranslateSettings.learnHistory)
+check("AI Learn: the correction is kept, for Corrections", JSON.parse(store["ai-translate-settings"].learnHistory)
     .map(c => [c.typed, c.native, c.why]), [["shall we meet tomorrow in noon?", "Shall we meet tomorrow at noon?", "\"at noon\", not \"in noon\""]]);
 
 reset();
@@ -240,8 +240,8 @@ provider.reply = () => "[ru] I am on my way";
 await K.type("я уже в пути, скоро буду");
 await settle();
 check("AI Learn: a message in another alphabet is still translated", sent()[0]?.args[0].text, "I am on my way");
-store.aiTranslateSettings.aiLearn = false;
-store.aiTranslateSettings.learnHistory = "";
+store["ai-translate-settings"].aiLearn = false;
+store["ai-translate-settings"].learnHistory = "";
 
 // --- what is shown
 

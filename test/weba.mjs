@@ -190,13 +190,13 @@ reset();
 provider.reply = () => "[ru] see you tomorrow";
 worker.postMessage({ payloads: [A.typed("до завтра")] });
 await settle();
-store.aiTranslateSettings.sentLanguage = "Japanese";
+store["ai-translate-settings"].sentLanguage = "Japanese";
 provider.reply = () => "[ru] また明日";
 worker.postMessage({ payloads: [A.typed("до завтра")] });
 await settle();
 check("the same text after the language is changed is asked about again, in the new language",
     [provider.asked.length, worker.sent.map(m => m.payloads[0].args[0].text)], [2, ["see you tomorrow", "また明日"]]);
-store.aiTranslateSettings.sentLanguage = SETTINGS.sentLanguage;
+store["ai-translate-settings"].sentLanguage = SETTINGS.sentLanguage;
 
 reset();
 provider.reply = text => `[ru] here is [the article](${/\((.*)\)/.exec(text)[1]})`;
@@ -251,17 +251,17 @@ check("is asked about again when it is sent again, and goes once the provider an
     [provider.asked.length, worker.sent[0]?.payloads[0].args[0].text], [1, "hi, how are you today"]);
 
 reset();
-store.aiTranslateSettings.onError = "sendAsTyped";
+store["ai-translate-settings"].onError = "sendAsTyped";
 provider.reply = () => 401;
 worker.postMessage({ payloads: [A.typed("отправь как есть")] });
 await settle();
 check("with sendAsTyped the original goes instead", worker.sent[0]?.payloads[0].args[0].text, "отправь как есть");
-store.aiTranslateSettings.onError = SETTINGS.onError;
+store["ai-translate-settings"].onError = SETTINGS.onError;
 
 // --- AI Learn
 
 reset();
-store.aiTranslateSettings.aiLearn = true;
+store["ai-translate-settings"].aiLearn = true;
 provider.reply = () => "See you on Saturday then.";
 worker.postMessage({ payloads: [A.typed("see you at saturday then"), A.markRead()] });
 check("AI Learn: a message written in English goes at once, as typed, with what came with it",
@@ -279,8 +279,8 @@ worker.postMessage({ payloads: [A.edit("see you on \\saturday\\ then")] });
 await settle();
 check("AI Learn: an edit is not looked at, and goes as typed, its backslashes too",
     [worker.sent[0]?.payloads[0].args[0].text, provider.asked.length], ["see you on \\saturday\\ then", 0]);
-store.aiTranslateSettings.aiLearn = false;
-store.aiTranslateSettings.learnHistory = "";
+store["ai-translate-settings"].aiLearn = false;
+store["ai-translate-settings"].learnHistory = "";
 
 // --- what the worker answers
 

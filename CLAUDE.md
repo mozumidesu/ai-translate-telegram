@@ -23,7 +23,10 @@ the chats switched on, and incoming ones from a message's menu.
   and nowhere else: the README carries no disclaimer. The script's `@namespace`
   is this repository, so a manager never takes it for the Discord userscript.
   GPL-3.0-or-later.
-- **Keys and settings stay in the userscript manager's storage.** No server of
+- **Keys and settings stay in the userscript manager's storage**, under
+  `ai-translate-settings`. Builds before the rename kept them under
+  `aiTranslateSettings`: the first read copies them over and leaves the old
+  key as it was, so an older build put back still finds them. No server of
   ours; requests go from the browser to the provider through
   `GM_xmlhttpRequest`.
 - **Conversation context is off by default**: it sends other people's
@@ -157,7 +160,7 @@ waits for `settled` before it reads or clicks. Their widths are Discord's.
 ```
 npm install
 npm run build
-npm test             # formatted, weba, webk, defaults, strings, version, dist, page
+npm test             # formatted, weba, webk, storage, defaults, strings, version, dist, page
 node test/live.mjs   # needs the internet
 tsc --noEmit --strict --target es2022 --module esnext --moduleResolution bundler \
     --lib es2022,dom,dom.iterable --skipLibCheck src/main.ts

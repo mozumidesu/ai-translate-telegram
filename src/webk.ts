@@ -104,6 +104,9 @@ function nameOfPeer(peerId: number) {
 /** What a field marks on the parameters it sends with, carried by the spread into sendText. */
 export const TYPED = Symbol("ai-translate typed");
 
+/** The property that says a function or a class is the script's already, so nothing is wrapped twice. */
+export const OURS = "ai-translate";
+
 interface Found {
     chatId: string;
     text: string;
@@ -151,8 +154,8 @@ type Restore = (chatId: string, text: string, entities: Entity[]) => void;
  */
 export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
     const invoke = proxy?.invoke;
-    if (invoke?.aiTranslate) invoked = true;
-    if (typeof invoke !== "function" || invoke.aiTranslate) return;
+    if (invoke?.[OURS]) invoked = true;
+    if (typeof invoke !== "function" || invoke[OURS]) return;
 
     // One line per chat: a slow translation in one holds up nothing in another.
     const queues = new Map<string, { tail: Promise<unknown>; count: number; }>();
@@ -210,7 +213,7 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
         return invoke.call(this, type, plain, ...rest);
     };
 
-    wrapped.aiTranslate = true;
+    wrapped[OURS] = true;
     proxy.invoke = wrapped;
     invoked = true;
 }
@@ -220,8 +223,8 @@ let invoked = false;
 
 /** Marks what a field sends. Once per page: the class is shared. */
 export function patchChatInput(ChatInput: any) {
-    if (!ChatInput || ChatInput.aiTranslate) return;
-    ChatInput.aiTranslate = true;
+    if (!ChatInput || ChatInput[OURS]) return;
+    ChatInput[OURS] = true;
 
     const send = ChatInput.sendMessageWithForward;
     if (typeof send === "function")
