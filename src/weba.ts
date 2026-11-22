@@ -70,8 +70,8 @@ const entitiesOf = (list: unknown) => (Array.isArray(list) ? list : []).map(from
 
 // --- what the worker is asked
 
-/** The calls that carry a message someone typed. */
-const CARRIES_TEXT = new Set(["sendMessage", "sendMessageLocal", "editMessage"]);
+/** The calls that carry a new message someone typed. An edit, editMessage, goes as typed: editing is how a translation is put right. */
+const CARRIES_TEXT = new Set(["sendMessage", "sendMessageLocal"]);
 
 /** Calls that make or change messages wait behind one being translated in their chat, so messages keep their order. */
 const ORDERED = /^(send|forward|edit)/;
@@ -88,7 +88,6 @@ interface Found {
     chatId: string;
     text: string;
     entities: Entity[];
-    edit: boolean;
 }
 
 /** The text a call carries, when it is one somebody typed. */
@@ -100,13 +99,12 @@ export function typedIn(payload: any): Found | undefined {
 
     // The chat bar's own sends say whether there was a draft; a bot's button, a
     // bot command from a menu and an invite link are sent without that.
-    const edit = payload.name === "editMessage";
-    if (!edit && !("wasDrafted" in params)) return undefined;
+    if (!("wasDrafted" in params)) return undefined;
 
     const chatId = params.chat?.id;
     if (chatId === undefined) return undefined;
 
-    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities), edit };
+    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities) };
 }
 
 /** The call again, carrying the translation. */
@@ -168,8 +166,8 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
                 return payload;
             }
 
-            // An edit that did not go leaves the message as it was; a new one goes back into the box, a paid one drawn first too.
-            if (!found.edit) restore(found.chatId, found.text, found.entities);
+            // It goes back into the box, a paid one drawn first too.
+            restore(found.chatId, found.text, found.entities);
             return undefined;
         }
     };

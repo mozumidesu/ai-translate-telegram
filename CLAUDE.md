@@ -111,15 +111,18 @@ Both clients change often. Read again before relying on any of this:
   worker, created with `new Worker(...)` after the script has wrapped it; a
   worker made before the script landed is caught on its next call, through
   `Worker.prototype.postMessage`. The local message is built inside the
-  worker, so holding `sendMessage` holds everything. The chat bar's sends carry `wasDrafted`; a bot's button does
-  not. Other tabs reach the worker through the tab that runs it.
+  worker, so holding `sendMessage` holds everything. The chat bar's sends
+  carry `wasDrafted`; a bot's button does not. An edit, `editMessage`, goes
+  as typed: editing is how a translation is put right. Other tabs reach the
+  worker through the tab that runs it.
 - **Web K**: `src/config/debug.ts` mounts objects on the window;
   `apiManagerProxy.invoke("manager", { name, method, args })` is the one call
   every manager proxy makes (`src/lib/getProxiedManagers.ts`). What was typed
   goes through `ChatInput.sendMessageWithForward` with an `inputField`,
   marked by a symbol in `sendTextParams` that the spread carries into
   `sendText`. The AI Editor sends there with text and no field, and goes as
-  written. Edits come from `saveEditedMessage`.
+  written. An edit, from `saveEditedMessage`, goes as typed and is not
+  hooked.
 
 `node test/live.mjs` opens the real sites, without signing in, and says
 whether the hooks still go in front of those lines. In a page where they did

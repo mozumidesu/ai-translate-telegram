@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.9
+// @version         0.2.3a.10
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -6288,8 +6288,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${9}`;
-  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${9})`;
+  var SCRIPT_VERSION = `${VERSION}.${10}`;
+  var BUILD_NAME = `${VERSION} (${"4aa5cb4"}-${10})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7633,7 +7633,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     };
   }
   var entitiesOf = (list) => (Array.isArray(list) ? list : []).map(fromA).filter((e) => !!e);
-  var CARRIES_TEXT = /* @__PURE__ */ new Set(["sendMessage", "sendMessageLocal", "editMessage"]);
+  var CARRIES_TEXT = /* @__PURE__ */ new Set(["sendMessage", "sendMessageLocal"]);
   var ORDERED = /^(send|forward|edit)/;
   var UNORDERED = /* @__PURE__ */ new Set(["sendMessageAction"]);
   function chatOf(payload) {
@@ -7645,11 +7645,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     if (payload?.type !== "callMethod" || !CARRIES_TEXT.has(payload.name)) return void 0;
     const params = payload.args?.[0];
     if (!params || typeof params.text !== "string" || !params.text || params.richMessage) return void 0;
-    const edit = payload.name === "editMessage";
-    if (!edit && !("wasDrafted" in params)) return void 0;
+    if (!("wasDrafted" in params)) return void 0;
     const chatId = params.chat?.id;
     if (chatId === void 0) return void 0;
-    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities), edit };
+    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities) };
   }
   function carrying(payload, text, entities) {
     const [params, ...rest] = payload.args;
@@ -7690,7 +7689,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           console.error("[AI Translate]", e);
           return payload;
         }
-        if (!found.edit) restore(found.chatId, found.text, found.entities);
+        restore(found.chatId, found.text, found.entities);
         return void 0;
       }
     };
@@ -7972,33 +7971,15 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     return peer.title ?? ([peer.first_name, peer.last_name].filter(Boolean).join(" ") || void 0);
   }
   var TYPED = Symbol("ai-translate typed");
-  var editing = 0;
   function typedIn2(payload) {
-    if (payload?.name !== "appMessagesManager") return void 0;
-    const args = payload.args ?? [];
-    if (payload.method === "sendText") {
-      const options = args[0];
-      if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return void 0;
-      return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf2(options.entities), edit: false };
-    }
-    if (payload.method === "editMessage" && editing > 0) {
-      const [message, text, options] = args;
-      if (!message || typeof text !== "string" || !text || options?.richMessage) return void 0;
-      return { chatId: chatIdOf(message.peerId), text, entities: entitiesOf2(options?.entities), edit: true };
-    }
-    return void 0;
+    if (payload?.name !== "appMessagesManager" || payload.method !== "sendText") return void 0;
+    const options = payload.args?.[0];
+    if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return void 0;
+    return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf2(options.entities) };
   }
-  function carrying2(payload, found, text, entities) {
-    const args = [...payload.args];
-    const layer = entities.map(toK);
-    if (found.edit) {
-      args[1] = text;
-      args[2] = { ...args[2], entities: layer };
-    } else {
-      const { [TYPED]: _, ...options } = args[0];
-      args[0] = { ...options, text, entities: layer };
-    }
-    return { ...payload, args };
+  function carrying2(payload, text, entities) {
+    const { [TYPED]: _, ...options } = payload.args[0];
+    return { ...payload, args: [{ ...options, text, entities: entities.map(toK) }, ...payload.args.slice(1)] };
   }
   function unmarked(payload) {
     if (!payload?.args?.[0]?.[TYPED]) return payload;
@@ -8033,13 +8014,13 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
       if (found && plan === "translate") {
         const ready = translateOutgoing(found.chatId, found.text, found.entities).then(
-          (result) => result ? carrying2(payload, found, result.text, result.entities) : unmarked(payload),
+          (result) => result ? carrying2(payload, result.text, result.entities) : unmarked(payload),
           (e) => {
             if (!(e instanceof Held)) {
               console.error("[AI Translate]", e);
               return unmarked(payload);
             }
-            if (!found.edit) restore(found.chatId, found.text, found.entities);
+            restore(found.chatId, found.text, found.entities);
             return void 0;
           }
         );
@@ -8053,7 +8034,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       let plain = unmarked(payload);
       if (found && plan === "learn") {
         const out = asWritten(found.chatId, found.text, found.entities);
-        if (out) plain = carrying2(payload, found, out.text, out.entities);
+        if (out) plain = carrying2(payload, out.text, out.entities);
       }
       const chatId = plain?.name === "appMessagesManager" && ORDERED2.test(plain.method ?? "") ? chatOf2(plain) : void 0;
       if (chatId !== void 0 && queues.has(chatId)) return later(chatId, () => invoke.call(this, type, plain, ...rest));
@@ -8072,16 +8053,6 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       ChatInput.sendMessageWithForward = function(options, ...rest) {
         const marked = options?.inputField ? { ...options, sendTextParams: { ...options.sendTextParams, [TYPED]: true } } : options;
         return send.call(this, marked, ...rest);
-      };
-    const save2 = ChatInput.prototype?.saveEditedMessage;
-    if (typeof save2 === "function")
-      ChatInput.prototype.saveEditedMessage = async function(...args) {
-        editing++;
-        try {
-          return await save2.apply(this, args);
-        } finally {
-          editing--;
-        }
       };
   }
   function textOnScreen2(bubble) {

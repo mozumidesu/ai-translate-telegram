@@ -107,13 +107,16 @@ check("a command to a bot goes as typed", [sent()[0]?.args[0].text, provider.ask
 
 // --- edits
 
+// Editing is how a translation is put right, so an edit goes exactly as typed, in a chat that is on as well.
 reset();
 provider.reply = () => "[ru] fixed it";
 K.appImManager.chat.input.editMsgId = 4403;
 K.appImManager.chat.input.editMessage = K.history[4403];
-await K.type("исправил");
+await K.type("исправил", [{ _: "messageEntityBold", offset: 0, length: 8 }]);
 await settle();
-check("an edit from the chat bar is translated", [sent()[0]?.method, sent()[0]?.args[1]], ["editMessage", "fixed it"]);
+check("an edit from the chat bar goes exactly as typed, in a chat that is on",
+    [sent()[0]?.method, sent()[0]?.args[1], sent()[0]?.args[2].entities, provider.asked.length],
+    ["editMessage", "исправил", [{ _: "messageEntityBold", offset: 0, length: 8 }], 0]);
 K.appImManager.chat.input.editMsgId = undefined;
 
 reset();
@@ -216,6 +219,15 @@ await K.type("please keep \\Book club\\ the way it is");
 await settle();
 check("AI Learn: the writer's own backslashes come off, as they would in a translation",
     [sent()[0]?.args[0].text, provider.lastMessage], ["please keep Book club the way it is", "please keep Book club the way it is"]);
+
+reset();
+K.appImManager.chat.input.editMsgId = 4403;
+K.appImManager.chat.input.editMessage = K.history[4403];
+await K.type("see you on \\saturday\\ then");
+await settle();
+check("AI Learn: an edit is not looked at, and goes as typed, its backslashes too",
+    [sent()[0]?.args[1], provider.asked.length], ["see you on \\saturday\\ then", 0]);
+K.appImManager.chat.input.editMsgId = undefined;
 
 reset();
 provider.reply = () => 401;

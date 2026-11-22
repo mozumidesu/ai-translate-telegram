@@ -71,7 +71,9 @@ with a reply keyboard, any will do.
    custom emoji if the account has Premium, and mention someone without a
    username in a group. All of it is in the right place in the translation;
    the mention notifies that person.
-4. Edit the sent message: the edit goes out translated.
+4. Edit the sent message, changing a word of the translation: the edit
+   goes out exactly as you typed it, not translated again, and the phone
+   shows it so. Edit a message in Russian: it goes in Russian.
 5. In a chat that is not switched on, send something: it goes as typed.
 
 ## 4. What must go as typed
@@ -108,9 +110,11 @@ messages into" English.
    with *at* in bold and underlined with dots, and a line saying why. The
    phone shows nothing of it, and neither does the second account.
 4. Scroll the chat up and back, open another chat and come back: the line
-   is still under the message. Edit the message, react to it: the line
-   stays, the time and the reaction are where they were. After a reload it
-   is gone from under the message, and kept in Corrections.
+   is still under the message. React to it: the line stays, the time and
+   the reaction are where they were. Edit the message as the line says: it
+   goes exactly as you typed it, no new correction is asked for, and the
+   line goes, since it was about the words before. After a reload a line is
+   gone from under its message, and kept in Corrections.
 5. Write a message that is right, such as `see you tomorrow at noon`:
    nothing appears under it, and no notice.
 6. Write `please keep \Book club\ the way it is`: it goes without the

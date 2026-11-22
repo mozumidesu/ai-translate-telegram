@@ -29,12 +29,13 @@ to open the panel; right-click it, or shift-click it, to switch the current
 chat on or off. The button takes the accent colour while the chat is on.
 
 What you type waits until its translation is in, so the other person only ever
-sees the translation. Edits are translated too. Bold, italic, strikethrough,
-spoilers, links, mentions, custom emoji, quotes, code and code blocks stay where
-they belong in the translated message. Underline is the one thing that is
-dropped. If a translation fails, the message is held back, the reason is shown,
-and your text goes back into the chat box; in the settings you can choose to
-send it untranslated instead.
+sees the translation. An edit goes out exactly as you type it, so a translation
+can be put right by hand. Bold, italic, strikethrough, spoilers, links,
+mentions, custom emoji, quotes, code and code blocks stay where they belong in
+the translated message. Underline is the one thing that is dropped. If a
+translation fails, the message is held back, the reason is shown, and your text
+goes back into the chat box; in the settings you can choose to send it
+untranslated instead.
 
 Anything you receive can be translated from the right-click menu on the
 message, and the answer appears in a card beside it. When even a translation

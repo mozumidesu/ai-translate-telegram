@@ -57,7 +57,7 @@ const reset = () => {
 
 check("the chat bar's send carries typed text", typedIn(A.typed("привет", undefined))?.text, "привет");
 check("a bot's button does not: it says nothing about a draft", typedIn(A.botButton("Да")), undefined);
-check("an edit does", typedIn(A.edit("исправил"))?.text, "исправил");
+check("an edit does not: it goes as typed", typedIn(A.edit("исправил")), undefined);
 check("a call with no text does not", typedIn(A.markRead()), undefined);
 check("entities are read in Web A's shape", fromA({ type: "MessageEntityTextUrl", offset: 1, length: 2, url: "https://x.org" }),
     { kind: "link", offset: 1, length: 2, url: "https://x.org" });
@@ -151,11 +151,27 @@ check("and what was waiting behind it in its chat goes then", sentNames(), ["sen
 
 // --- edits and paid messages
 
+// Editing is how a translation is put right, so an edit goes exactly as typed, in a chat that is on as well.
 reset();
 provider.reply = () => "[ru] fixed it";
-worker.postMessage({ payloads: [A.edit("исправил")] });
+worker.postMessage({ payloads: [A.edit("исправил", [{ type: "MessageEntityBold", offset: 0, length: 8 }])] });
+check("an edit goes at once, exactly as typed, in a chat that is on",
+    [worker.sent[0]?.payloads[0].args[0].text, worker.sent[0]?.payloads[0].args[0].entities, provider.asked.length],
+    ["исправил", [{ type: "MessageEntityBold", offset: 0, length: 8 }], 0]);
 await settle();
-check("an edit is translated too, as on Discord", worker.sent[0]?.payloads[0].args[0].text, "fixed it");
+check("and the provider is never asked about it", provider.asked.length, 0);
+
+reset();
+provider.reply = () => null;
+mock.timers.enable({ apis: ["setTimeout"] });
+worker.postMessage({ payloads: [A.typed("ещё одно")] });
+worker.postMessage({ payloads: [A.edit("поправка")] });
+for (let i = 0; i < 20; i++) await new Promise(next => setImmediate(next));
+check("an edit made while a message of its chat is being translated waits behind it, so the two keep their order", sentNames(), []);
+mock.timers.tick(60_000);
+mock.timers.reset();
+await settle();
+check("and goes as typed once that message is settled", worker.sent.map(m => [m.payloads[0].name, m.payloads[0].args[0].text]), [["editMessage", "поправка"]]);
 
 reset();
 provider.reply = () => "[ru] paid hello";
@@ -257,6 +273,12 @@ reset();
 worker.postMessage({ payloads: [A.paidLocal("one more message for the club"), A.paidSend("one more message for the club")] });
 await settle();
 check("AI Learn: a paid message, drawn and then sent, is looked at once", provider.asked.length, 1);
+
+reset();
+worker.postMessage({ payloads: [A.edit("see you on \\saturday\\ then")] });
+await settle();
+check("AI Learn: an edit is not looked at, and goes as typed, its backslashes too",
+    [worker.sent[0]?.payloads[0].args[0].text, provider.asked.length], ["see you on \\saturday\\ then", 0]);
 store.aiTranslateSettings.aiLearn = false;
 store.aiTranslateSettings.learnHistory = "";
 

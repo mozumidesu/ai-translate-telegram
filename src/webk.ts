@@ -14,7 +14,8 @@
  * for translation. Telegram's own AI Editor sends its result there too, with
  * no field; it goes as the editor wrote it, and its request saved for a chat
  * rewrites the chat bar first, which is then translated like anything typed.
- * An edit comes from the chat bar's saveEditedMessage, and is counted there.
+ * An edit, the chat bar's saveEditedMessage, goes as typed: editing is how a
+ * translation is put right.
  *
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
@@ -103,49 +104,25 @@ function nameOfPeer(peerId: number) {
 /** What a field marks on the parameters it sends with, carried by the spread into sendText. */
 export const TYPED = Symbol("ai-translate typed");
 
-let editing = 0;
-
 interface Found {
     chatId: string;
     text: string;
     entities: Entity[];
-    edit: boolean;
 }
 
-/** The text a manager call carries, when somebody typed it. */
+/** The text a manager call carries, when somebody typed it into a field. */
 export function typedIn(payload: any): Found | undefined {
-    if (payload?.name !== "appMessagesManager") return undefined;
-    const args = payload.args ?? [];
+    if (payload?.name !== "appMessagesManager" || payload.method !== "sendText") return undefined;
 
-    if (payload.method === "sendText") {
-        const options = args[0];
-        if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return undefined;
-        return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf(options.entities), edit: false };
-    }
-
-    if (payload.method === "editMessage" && editing > 0) {
-        const [message, text, options] = args;
-        if (!message || typeof text !== "string" || !text || options?.richMessage) return undefined;
-        return { chatId: chatIdOf(message.peerId), text, entities: entitiesOf(options?.entities), edit: true };
-    }
-
-    return undefined;
+    const options = payload.args?.[0];
+    if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return undefined;
+    return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf(options.entities) };
 }
 
 /** The same call, carrying the translation, and without the mark, which is ours. */
-function carrying(payload: any, found: Found, text: string, entities: Entity[]) {
-    const args = [...payload.args];
-    const layer = entities.map(toK);
-
-    if (found.edit) {
-        args[1] = text;
-        args[2] = { ...args[2], entities: layer };
-    } else {
-        const { [TYPED]: _, ...options } = args[0];
-        args[0] = { ...options, text, entities: layer };
-    }
-
-    return { ...payload, args };
+function carrying(payload: any, text: string, entities: Entity[]) {
+    const { [TYPED]: _, ...options } = payload.args[0];
+    return { ...payload, args: [{ ...options, text, entities: entities.map(toK) }, ...payload.args.slice(1)] };
 }
 
 function unmarked(payload: any) {
@@ -199,15 +176,14 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
         const plan = found ? planFor(found.chatId, found.text, found.entities) : "typed";
         if (found && plan === "translate") {
             const ready = translateOutgoing(found.chatId, found.text, found.entities).then(
-                result => result ? carrying(payload, found, result.text, result.entities) : unmarked(payload),
+                result => result ? carrying(payload, result.text, result.entities) : unmarked(payload),
                 e => {
                     if (!(e instanceof Held)) {
                         // A bug of ours is not a reason to swallow somebody's message.
                         console.error("[AI Translate]", e);
                         return unmarked(payload);
                     }
-                    // An edit that did not go leaves the message as it was; a new one goes back into the box.
-                    if (!found.edit) restore(found.chatId, found.text, found.entities);
+                    restore(found.chatId, found.text, found.entities);
                     return undefined;
                 }
             );
@@ -225,7 +201,7 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
         if (found && plan === "learn") {
             // AI Learn's: at once, as written, with the writer's own markers off.
             const out = asWritten(found.chatId, found.text, found.entities);
-            if (out) plain = carrying(payload, found, out.text, out.entities);
+            if (out) plain = carrying(payload, out.text, out.entities);
         }
 
         const chatId = plain?.name === "appMessagesManager" && ORDERED.test(plain.method ?? "") ? chatOf(plain) : undefined;
@@ -242,7 +218,7 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
 /** Whether apiManagerProxy.invoke is the script's. */
 let invoked = false;
 
-/** Marks what a field sends, and counts the chat bar's edits. Once per page: the class is shared. */
+/** Marks what a field sends. Once per page: the class is shared. */
 export function patchChatInput(ChatInput: any) {
     if (!ChatInput || ChatInput.aiTranslate) return;
     ChatInput.aiTranslate = true;
@@ -255,17 +231,6 @@ export function patchChatInput(ChatInput: any) {
                 ? { ...options, sendTextParams: { ...options.sendTextParams, [TYPED]: true } }
                 : options;
             return send.call(this, marked, ...rest);
-        };
-
-    const save = ChatInput.prototype?.saveEditedMessage;
-    if (typeof save === "function")
-        ChatInput.prototype.saveEditedMessage = async function (this: any, ...args: any[]) {
-            editing++;
-            try {
-                return await save.apply(this, args);
-            } finally {
-                editing--;
-            }
         };
 }
 
