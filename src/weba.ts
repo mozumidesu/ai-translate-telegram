@@ -19,7 +19,7 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
-import { giveBack } from "./held";
+import { giveBack, type Typed } from "./held";
 import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
 import { page, typingElsewhere } from "./page";
 
@@ -84,14 +84,8 @@ export function chatOf(payload: any): string | undefined {
     return id === undefined || id === null ? undefined : String(id);
 }
 
-interface Found {
-    chatId: string;
-    text: string;
-    entities: Entity[];
-}
-
 /** The text a call carries, when it is one somebody typed. */
-export function typedIn(payload: any): Found | undefined {
+export function typedIn(payload: any): Typed | undefined {
     if (payload?.type !== "callMethod" || !CARRIES_TEXT.has(payload.name)) return undefined;
 
     const params = payload.args?.[0];
@@ -104,7 +98,9 @@ export function typedIn(payload: any): Found | undefined {
     const chatId = params.chat?.id;
     if (chatId === undefined) return undefined;
 
-    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities) };
+    // A forum's topic is the top a message in it replies to (prepareMessageReplyInfo); the main thread has none.
+    const top = params.replyInfo?.replyToTopId;
+    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities), thread: top ? String(top) : undefined };
 }
 
 /** The call again, carrying the translation. */
@@ -116,7 +112,7 @@ function carrying(payload: any, text: string, entities: Entity[]) {
     };
 }
 
-type Restore = (chatId: string, text: string, entities: Entity[]) => void;
+type Restore = (typed: Typed) => void;
 
 /**
  * Wraps one worker's postMessage. Every call goes through untouched unless it
@@ -155,7 +151,7 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
             });
     };
 
-    const translated = async (payload: any, found: Found) => {
+    const translated = async (payload: any, found: Typed) => {
         try {
             const result = await translateOutgoing(found.chatId, found.text, found.entities);
             return result ? carrying(payload, result.text, result.entities) : payload;
@@ -167,13 +163,13 @@ export function watchWorker(worker: Worker, restore: Restore, onAnswer?: (data: 
             }
 
             // It goes back into the box, a paid one drawn first too.
-            restore(found.chatId, found.text, found.entities);
+            restore(found);
             return undefined;
         }
     };
 
     /** AI Learn's: at once, as written, with the writer's own markers off. */
-    const learned = (payload: any, found: Found) => {
+    const learned = (payload: any, found: Typed) => {
         const out = asWritten(found.chatId, found.text, found.entities);
         return out ? carrying(payload, out.text, out.entities) : payload;
     };
@@ -308,6 +304,11 @@ export function chatInHash(hash = location.hash) {
     return /^#(-?\d+)(?:_|$)/.exec(hash)?.[1];
 }
 
+/** The forum topic or comment thread that is open, #chatId_thread, or nothing in a chat's main thread (routing.ts). */
+export function threadInHash(hash = location.hash) {
+    return /^#-?\d+_(-?\d+)(?:_|$)/.exec(hash)?.[1];
+}
+
 function storedMe() {
     try {
         const saved = JSON.parse(localStorage.getItem("user_auth") ?? "null");
@@ -331,7 +332,7 @@ export const webA: TelegramClient = {
         const watch = (worker: Worker) => {
             watched.add(worker);
             try {
-                watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
+                watchWorker(worker, typed => giveBack(webA, typed), readAnswer);
             } catch (e) {
                 console.error("[AI Translate]", e);
             }
@@ -447,8 +448,8 @@ export const webA: TelegramClient = {
         return [...document.querySelectorAll(".message-input-wrapper .AttachMenu")];
     },
 
-    restore(chatId, text) {
-        if (chatInHash() !== chatId || document.visibilityState === "hidden") return false;
+    restore(chatId, text, _entities, thread) {
+        if (chatInHash() !== chatId || (threadInHash() ?? "") !== (thread ?? "") || document.visibilityState === "hidden") return false;
 
         const box = document.querySelector<HTMLElement>(".messages-layout .Transition_slide-active #editable-message-text")
             ?? document.querySelector<HTMLElement>("#editable-message-text");

@@ -94,7 +94,7 @@ export function makeWebK() {
             if (this.editMsgId) return this.saveEditedMessage();
             return ChatInput.sendMessageWithForward({
                 inputField: this.messageInputField,
-                sendingParams: { peerId: this.chat.peerId, threadId: undefined },
+                sendingParams: { peerId: this.chat.peerId, threadId: this.chat.threadId },
                 sendTextParams: { noWebPage: undefined, webPageOptions: {}, clearDraft: true }
             });
         }

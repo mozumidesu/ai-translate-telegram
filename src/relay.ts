@@ -19,6 +19,8 @@ export interface Restore {
     client: Client;
     anyClient: boolean;
     chatId: string;
+    /** The forum topic it was typed in, if any. */
+    thread?: string;
     text: string;
     entities: Entity[];
 }

@@ -136,6 +136,23 @@ interface Opening {
 /** Keys typed here are ours: the client would take them for typing into the chat, and Escape for leaving it. */
 const OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
 
+/** What Tab can stop on in a window. */
+const STOPS = "button, input, select, textarea, a[href], [tabindex]";
+
+/** Tab goes round the window on top, as in a modal: on past its last field it would reach the client's page behind, and its chat box. */
+function keepTab(panel: HTMLElement, event: KeyboardEvent) {
+    if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return;
+    const stops = [...panel.querySelectorAll<HTMLElement>(STOPS)]
+        .filter(stop => stop.tabIndex >= 0 && !(stop as HTMLButtonElement).disabled && stop.getClientRects().length > 0);
+    if (!stops.length) return;
+
+    const at = stops.indexOf((panel.getRootNode() as ShadowRoot | Document).activeElement as HTMLElement);
+    const round = event.shiftKey ? at <= 0 : at === -1 || at === stops.length - 1;
+    if (!round) return;
+    event.preventDefault();
+    stops[event.shiftKey ? stops.length - 1 : 0].focus();
+}
+
 export function openSheet(opening: Opening): Sheet {
     const client = theClient()?.windows;
     addStyle(CSS);
@@ -203,6 +220,7 @@ export function openSheet(opening: Opening): Sheet {
         if (event.target === sheet) shut();
     };
     for (const type of OURS) sheet.addEventListener(type, event => event.stopPropagation());
+    sheet.addEventListener("keydown", event => topSheet() === sheet && keepTab(panel, event));
     shutters.set(sheet, shut);
     offEscape = onEscape(shut);
 

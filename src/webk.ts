@@ -23,7 +23,7 @@
 import type { Said } from "../ai-translate/core/host";
 import type { Shown, TelegramClient } from "./client";
 import type { Entity, Kind } from "./formatted";
-import { giveBack } from "./held";
+import { giveBack, type Typed } from "./held";
 import { asWritten, Held, planFor, translateOutgoing } from "./outgoing";
 import { page, typingElsewhere } from "./page";
 
@@ -107,19 +107,17 @@ export const TYPED = Symbol("ai-translate typed");
 /** The property that says a function or a class is the script's already, so nothing is wrapped twice. */
 export const OURS = "ai-translate";
 
-interface Found {
-    chatId: string;
-    text: string;
-    entities: Entity[];
-}
-
 /** The text a manager call carries, when somebody typed it into a field. */
-export function typedIn(payload: any): Found | undefined {
+export function typedIn(payload: any): Typed | undefined {
     if (payload?.name !== "appMessagesManager" || payload.method !== "sendText") return undefined;
 
     const options = payload.args?.[0];
     if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return undefined;
-    return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf(options.entities) };
+    return {
+        chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf(options.entities),
+        // A forum's topic, from the chat's own sending parameters (chat.ts, getMessageSendingParams).
+        thread: options.threadId ? String(options.threadId) : undefined
+    };
 }
 
 /** The same call, carrying the translation, and without the mark, which is ours. */
@@ -144,7 +142,7 @@ export function chatOf(payload: any): string | undefined {
     return typeof peerId === "number" || (typeof peerId === "string" && /^-?\d+$/.test(peerId)) ? chatIdOf(peerId) : undefined;
 }
 
-type Restore = (chatId: string, text: string, entities: Entity[]) => void;
+type Restore = (typed: Typed) => void;
 
 /**
  * Wraps apiManagerProxy.invoke. Everything passes untouched but typed text in a
@@ -186,7 +184,7 @@ export function wrapInvoke(proxy: any, restore: Restore, onCall?: () => void) {
                         console.error("[AI Translate]", e);
                         return unmarked(payload);
                     }
-                    restore(found.chatId, found.text, found.entities);
+                    restore(found);
                     return undefined;
                 }
             );
@@ -298,7 +296,7 @@ export const webK: TelegramClient = {
     name: "k",
 
     install() {
-        whenProxy(proxy => wrapInvoke(proxy, (chatId, text, entities) => giveBack(webK, chatId, text, entities), patchWhenReachable));
+        whenProxy(proxy => wrapInvoke(proxy, typed => giveBack(webK, typed), patchWhenReachable));
 
         if (!patchWhenReachable()) {
             const timer = setInterval(() => patchWhenReachable() && clearInterval(timer), 250);
@@ -427,10 +425,12 @@ export const webK: TelegramClient = {
         return [...document.querySelectorAll(".chat-input .toggle-emoticons")];
     },
 
-    restore(chatId, text, entities) {
+    restore(chatId, text, entities, thread) {
         const chat = page.appImManager?.chat;
         const input = chat?.input;
         if (!input || !chat.peerId || chatIdOf(chat.peerId) !== chatId || document.visibilityState === "hidden") return false;
+        // Another topic of the same forum has a box of its own.
+        if ((chat.threadId ? String(chat.threadId) : "") !== (thread ?? "")) return false;
 
         const editor = input.messageInputEditor;
         if (editor && !editor.isEmpty?.()) return false;

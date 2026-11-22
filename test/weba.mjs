@@ -41,7 +41,7 @@ const restored = [];
 const worker = new FakeWorker();
 const answered = [];
 worker.addEventListener("message", event => answered.push(event.data));
-watchWorker(worker, (chatId, text, entities) => restored.push({ chatId, text, entities }), readAnswer);
+watchWorker(worker, typed => restored.push(typed), readAnswer);
 
 const sentNames = () => worker.sent.flatMap(m => m.payloads.map(p => p.name ?? p.type));
 const reset = () => {
@@ -59,6 +59,9 @@ check("the chat bar's send carries typed text", typedIn(A.typed("привет", 
 check("a bot's button does not: it says nothing about a draft", typedIn(A.botButton("Да")), undefined);
 check("an edit does not: it goes as typed", typedIn(A.edit("исправил")), undefined);
 check("a call with no text does not", typedIn(A.markRead()), undefined);
+check("one typed in a forum's topic says which, by the top it replies to",
+    typedIn(A.typed("в теме", undefined, { replyInfo: { type: "message", replyToMsgId: 45, replyToTopId: 45 } }))?.thread, "45");
+check("and one in a chat's main thread says none", typedIn(A.typed("в чате"))?.thread, undefined);
 check("entities are read in Web A's shape", fromA({ type: "MessageEntityTextUrl", offset: 1, length: 2, url: "https://x.org" }),
     { kind: "link", offset: 1, length: 2, url: "https://x.org" });
 check("and written back in it", toA({ kind: "mention", offset: 0, length: 4, userId: "5001" }),
@@ -229,6 +232,12 @@ await settle();
 check("held back, nothing reaches the worker", sentNames(), []);
 check("the app's own promise is settled with nothing", answered.at(-1)?.payloads?.[0], { type: "methodResponse", messageId: held.messageId });
 check("the text goes back into the chat box", restored, [{ chatId: A.chat.id, text: "не переводится", entities: [] }]);
+
+reset();
+provider.reply = () => 401;
+worker.postMessage({ payloads: [A.typed("в теме не переводится", undefined, { replyInfo: { type: "message", replyToMsgId: 45, replyToTopId: 45 } })] });
+await settle();
+check("one held back in a forum's topic goes back with its topic, for that topic's box", restored.map(r => [r.text, r.thread]), [["в теме не переводится", "45"]]);
 check("and the person is told why", notices.length > 0 && notices[0][0], "failure");
 
 reset();

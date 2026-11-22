@@ -639,6 +639,20 @@ check("Web K: and on again", await k.evaluate(() => __gm.store["ai-translate-set
 check("Web K: the userscript manager's menu offers the settings too", await k.evaluate(() => __gm.menu?.name), "All plugin settings");
 await k.evaluate(() => __gm.menu.run());
 check("Web K: and opens the settings page", (await settingsOrder(k))[0], "providers");
+
+// The keyboard stays in the window, as in a modal: past its last field Tab would reach Telegram's chat box behind it.
+const focused = page => page.evaluate(() => {
+    const at = __ours().activeElement;
+    return at ? at.getAttribute("aria-label") ?? at.textContent : "nothing of ours";
+});
+await k.evaluate(() => __ours().querySelector('.sheet[data-name="settings"] .logs .button').focus());
+await k.keyboard.press("Tab");
+check("Web K: Tab from the last button of the settings goes round to the first, not on into Telegram behind", await focused(k), "Source code");
+await k.keyboard.press("Shift+Tab");
+check("Web K: and Shift+Tab from the first back to the last", (await focused(k))?.startsWith("Logs"), true);
+await k.keyboard.press("Tab");
+await k.keyboard.press("Tab");
+check("Web K: in between, Tab goes on as the browser takes it", await focused(k), "Support");
 await k.keyboard.press("Escape");
 
 // --- AI Learn, in Web K
@@ -978,6 +992,36 @@ await comeBack();
 await a.waitForTimeout(1500);
 check("Web A: and nothing is put into Web A's box afterwards", await box(), "");
 
+// A forum's topics share one chat, and each has a box of its own: a message goes back into the box of the topic it was typed in.
+await k.evaluate(() => {
+    __k.restored.length = 0;
+});
+await a.evaluate(async () => {
+    __gm.reply = () => 401;
+    document.getElementById("editable-message-text").textContent = "";
+    location.hash = "#-1001234567890_45";
+    __a.worker.postMessage({
+        payloads: [{
+            messageId: "t1", type: "callMethod", name: "sendMessage",
+            args: [{ chat: { id: "-1001234567890" }, text: "в теме 45", wasDrafted: false, replyInfo: { type: "message", replyToMsgId: 45, replyToTopId: 45 } }]
+        }]
+    });
+    location.hash = "#-1001234567890_67";
+    while (!__a.answers.some(d => d.payloads?.[0]?.messageId === "t1")) await new Promise(done => setTimeout(done, 5));
+});
+await a.waitForTimeout(2500);
+check("Web A: a message held back in a forum's topic is not put into another topic's box", await box(), "");
+check("Web A: nor into Web K's, open on that chat's main thread", await kRestored(), []);
+await a.evaluate(() => {
+    location.hash = "#-1001234567890_45";
+});
+await boxFilled();
+check("Web A: and goes back into its own topic's box once that one is open", await box(), "в теме 45");
+await a.evaluate(() => {
+    location.hash = "#-1001234567890";
+    document.getElementById("editable-message-text").textContent = "";
+});
+
 // The other way round: what Web K holds back is Web K's own first, with Web A open on the same chat and its box empty.
 await k.evaluate(async () => {
     __gm.reply = () => 401;
@@ -991,6 +1035,26 @@ await k.waitForFunction(() => __k.restored.length > 0, null, { timeout: 5000 }).
 check("Web K: a message held back goes back into Web K's own box once it is empty", await kRestored(), ["сначала в Web K"]);
 await a.waitForTimeout(1500);
 check("Web K: and is never put into Web A's, open on the same chat", await box(), "");
+
+// Web K's topics the same way.
+await k.evaluate(async () => {
+    __gm.reply = () => 401;
+    __k.restored.length = 0;
+    __k.appImManager.chat.threadId = 45;
+    await __k.type("в теме Web K");
+    __k.appImManager.chat.threadId = 67;
+});
+await k.waitForTimeout(2500);
+check("Web K: a message held back in a forum's topic is not put into another topic's box", await kRestored(), []);
+check("Web K: nor into Web A's, open on that chat's main thread", await box(), "");
+await k.evaluate(() => {
+    __k.appImManager.chat.threadId = 45;
+});
+await k.waitForFunction(() => __k.restored.length > 0, null, { timeout: 5000 }).catch(() => { });
+check("Web K: and goes back into its own topic's box once that one is open", await kRestored(), ["в теме Web K"]);
+await k.evaluate(() => {
+    __k.appImManager.chat.threadId = undefined;
+});
 
 // The report from Web A, once the worker has said who the person is.
 await a.evaluate(relay => {

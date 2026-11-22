@@ -58,8 +58,8 @@ export interface TelegramClient {
     };
     /** The button in each chat bar that ours goes in front of. */
     composerAnchors(): Element[];
-    /** The chat box of `chatId` holds `text` again, if it is open here and empty. */
-    restore(chatId: string, text: string, entities: Entity[]): boolean;
+    /** The chat box of `chatId` holds `text` again, if it is open here, on the same topic or both on none, and empty. */
+    restore(chatId: string, text: string, entities: Entity[], thread?: string): boolean;
 }
 
 let current: TelegramClient | undefined;

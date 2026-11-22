@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.13
+// @version         0.2.3a.14
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -3377,19 +3377,19 @@ ${" ".repeat(when2.length + 2)}${e.detail}` : head;
   var waiting = [];
   var tab = Math.random().toString(36).slice(2);
   var next = 0;
-  function giveBack(client2, chatId, text, entities) {
-    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities, since: Date.now() });
+  function giveBack(client2, { chatId, text, entities, thread }) {
+    waiting.push({ id: `${tab}-${next++}`, chatId, text, entities, thread, since: Date.now() });
     offerHeld(client2);
   }
   function offerHeld(client2) {
     for (const { since, ...kept2 } of [...waiting]) {
-      if (client2.restore(kept2.chatId, kept2.text, kept2.entities)) taken(kept2.id);
+      if (client2.restore(kept2.chatId, kept2.text, kept2.entities, kept2.thread)) taken(kept2.id);
       else tellOthers({ type: "restore", ...kept2, client: client2.name, anyClient: Date.now() - since >= OWN_FIRST });
     }
   }
   function offered(client2, word) {
     if (word.client !== client2.name && !word.anyClient) return;
-    if (client2.restore(word.chatId, word.text, word.entities)) tellOthers({ type: "restored", id: word.id });
+    if (client2.restore(word.chatId, word.text, word.entities, word.thread)) tellOthers({ type: "restored", id: word.id });
   }
   function taken(id2) {
     const at = waiting.findIndex((kept2) => kept2.id === id2);
@@ -5940,6 +5940,17 @@ ${text.replace(/\s+/g, "")}`;
 @media (prefers-reduced-motion: reduce) { .panel { transform: none !important; transition: none !important; } }
 `;
   var OURS = ["keydown", "keyup", "keypress", "paste", "copy", "cut"];
+  var STOPS = "button, input, select, textarea, a[href], [tabindex]";
+  function keepTab(panel, event) {
+    if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey) return;
+    const stops = [...panel.querySelectorAll(STOPS)].filter((stop) => stop.tabIndex >= 0 && !stop.disabled && stop.getClientRects().length > 0);
+    if (!stops.length) return;
+    const at = stops.indexOf(panel.getRootNode().activeElement);
+    const round = event.shiftKey ? at <= 0 : at === -1 || at === stops.length - 1;
+    if (!round) return;
+    event.preventDefault();
+    stops[event.shiftKey ? stops.length - 1 : 0].focus();
+  }
   function openSheet(opening) {
     const client2 = theClient()?.windows;
     addStyle(CSS2);
@@ -5996,6 +6007,7 @@ ${text.replace(/\s+/g, "")}`;
       if (event.target === sheet) shut();
     };
     for (const type of OURS) sheet.addEventListener(type, (event) => event.stopPropagation());
+    sheet.addEventListener("keydown", (event) => topSheet() === sheet && keepTab(panel, event));
     shutters.set(sheet, shut);
     offEscape = onEscape(shut);
     ui().append(sheet);
@@ -6317,8 +6329,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${13}`;
-  var BUILD_NAME = `${VERSION} (${"81df055"}-${13})`;
+  var SCRIPT_VERSION = `${VERSION}.${14}`;
+  var BUILD_NAME = `${VERSION} (${"81df055"}-${14})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7675,7 +7687,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     if (!("wasDrafted" in params)) return void 0;
     const chatId = params.chat?.id;
     if (chatId === void 0) return void 0;
-    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities) };
+    const top = params.replyInfo?.replyToTopId;
+    return { chatId: String(chatId), text: params.text, entities: entitiesOf(params.entities), thread: top ? String(top) : void 0 };
   }
   function carrying(payload, text, entities) {
     const [params, ...rest] = payload.args;
@@ -7716,7 +7729,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           console.error("[AI Translate]", e);
           return payload;
         }
-        restore(found.chatId, found.text, found.entities);
+        restore(found);
         return void 0;
       }
     };
@@ -7821,6 +7834,9 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   function chatInHash(hash = location.hash) {
     return /^#(-?\d+)(?:_|$)/.exec(hash)?.[1];
   }
+  function threadInHash(hash = location.hash) {
+    return /^#-?\d+_(-?\d+)(?:_|$)/.exec(hash)?.[1];
+  }
   function storedMe() {
     try {
       const saved = JSON.parse(localStorage.getItem("user_auth") ?? "null");
@@ -7841,7 +7857,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       const watch = (worker) => {
         watched.add(worker);
         try {
-          watchWorker(worker, (chatId, text, entities) => giveBack(webA, chatId, text, entities), readAnswer);
+          watchWorker(worker, (typed2) => giveBack(webA, typed2), readAnswer);
         } catch (e) {
           console.error("[AI Translate]", e);
         }
@@ -7931,8 +7947,8 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     composerAnchors() {
       return [...document.querySelectorAll(".message-input-wrapper .AttachMenu")];
     },
-    restore(chatId, text) {
-      if (chatInHash() !== chatId || document.visibilityState === "hidden") return false;
+    restore(chatId, text, _entities, thread) {
+      if (chatInHash() !== chatId || (threadInHash() ?? "") !== (thread ?? "") || document.visibilityState === "hidden") return false;
       const box2 = document.querySelector(".messages-layout .Transition_slide-active #editable-message-text") ?? document.querySelector("#editable-message-text");
       if (!box2 || (box2.textContent ?? "").trim() || typingElsewhere((element) => element === box2)) return false;
       box2.focus();
@@ -8003,7 +8019,13 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     if (payload?.name !== "appMessagesManager" || payload.method !== "sendText") return void 0;
     const options = payload.args?.[0];
     if (!options?.[TYPED] || options.richMessage || typeof options.text !== "string" || !options.text) return void 0;
-    return { chatId: chatIdOf(options.peerId), text: options.text, entities: entitiesOf2(options.entities) };
+    return {
+      chatId: chatIdOf(options.peerId),
+      text: options.text,
+      entities: entitiesOf2(options.entities),
+      // A forum's topic, from the chat's own sending parameters (chat.ts, getMessageSendingParams).
+      thread: options.threadId ? String(options.threadId) : void 0
+    };
   }
   function carrying2(payload, text, entities) {
     const { [TYPED]: _, ...options } = payload.args[0];
@@ -8048,7 +8070,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
               console.error("[AI Translate]", e);
               return unmarked(payload);
             }
-            restore(found.chatId, found.text, found.entities);
+            restore(found);
             return void 0;
           }
         );
@@ -8131,7 +8153,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
   var webK = {
     name: "k",
     install() {
-      whenProxy((proxy) => wrapInvoke(proxy, (chatId, text, entities) => giveBack(webK, chatId, text, entities), patchWhenReachable));
+      whenProxy((proxy) => wrapInvoke(proxy, (typed2) => giveBack(webK, typed2), patchWhenReachable));
       if (!patchWhenReachable()) {
         const timer = setInterval(() => patchWhenReachable() && clearInterval(timer), 250);
       }
@@ -8231,10 +8253,11 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     composerAnchors() {
       return [...document.querySelectorAll(".chat-input .toggle-emoticons")];
     },
-    restore(chatId, text, entities) {
+    restore(chatId, text, entities, thread) {
       const chat = page.appImManager?.chat;
       const input = chat?.input;
       if (!input || !chat.peerId || chatIdOf(chat.peerId) !== chatId || document.visibilityState === "hidden") return false;
+      if ((chat.threadId ? String(chat.threadId) : "") !== (thread ?? "")) return false;
       const editor = input.messageInputEditor;
       if (editor && !editor.isEmpty?.()) return false;
       if (typingElsewhere((element) => !!element.closest(".chat-input"))) return false;

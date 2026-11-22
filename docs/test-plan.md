@@ -182,8 +182,11 @@ Both clients, in a switched-on chat that translates into English.
    comes, nothing is added to the box. Delete `второе`: within a second
    `первое` is in the box. Again, but open another chat right after Enter and
    wait there for the notice: that chat's box stays empty. Go back to the
-   first chat: `первое` is in its box within a second. Put Groq and its key
-   back.
+   first chat: `первое` is in its box within a second. Then in a group with
+   topics: send `в теме` in one topic, and open another topic of the same
+   group right after Enter. When the notice comes, that topic's box stays
+   empty; go back to the first topic: `в теме` is in its box within a
+   second. Put Groq and its key back.
 8. Web A, Tampermonkey: a script that lands too late. In the script's
    Settings tab in the manager, set Run at to document-idle, save, and reload
    `/a/` with a switched-on chat open. The button is not blue, though the
@@ -282,7 +285,11 @@ a chat in the chat list, *Delete*, then *Cancel*.
    Visual effects, *Animation effects* off; macOS: System Settings,
    Accessibility, Display, *Reduce motion*) and reload the page: in both
    clients ours fade and do not move. Turn it back.
-7. The widths, against Discord. With the browser's developer tools (F12,
+7. The keyboard. Open the settings and press Tab again and again: the
+   focus goes down the page and, after Logs, back up to the GitHub button
+   beside the title, never into Telegram behind the window. Shift+Tab goes
+   the other way round. The same in Support and feedback.
+8. The widths, against Discord. With the browser's developer tools (F12,
    then the element picker on a window of ours), the panel, *Support and
    feedback*, Logs and Corrections are 480 pixels wide, and the settings
    page 680: the same windows in Discord with Vencord (Ctrl+Shift+I there)
