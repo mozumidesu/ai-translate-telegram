@@ -20,6 +20,12 @@ with a reply keyboard, any will do.
    from before the counter, which says 0.2.3a, was offered nothing before
    0.2.3a.9, and Tampermonkey may still offer it nothing. If so, delete that
    script in the manager and open the link again, once.
+   A copy from before 0.2.3a.12 kept its settings under another name in the
+   manager's storage. Update it rather than reinstall it, reload Telegram and
+   open the settings: the provider, its key, the backups and the chats
+   switched on are all still there. In Tampermonkey, the script's Storage
+   tab now has `ai-translate-settings` beside the old `aiTranslateSettings`,
+   which is left as it was.
 2. Open `https://web.telegram.org/k/`, sign in. No notice appears, not
    while signing in and not after: wait a minute on the chat list, then
    reload the page and wait again. Nothing is said until you do something.
