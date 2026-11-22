@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.14
+// @version         0.2.3a.15
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -6329,8 +6329,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${14}`;
-  var BUILD_NAME = `${VERSION} (${"81df055"}-${14})`;
+  var SCRIPT_VERSION = `${VERSION}.${15}`;
+  var BUILD_NAME = `${VERSION} (${"81df055"}-${15})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7510,6 +7510,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     const onPress = (e) => e.target?.id !== UI_ID && shut();
     function shut() {
       card.remove();
+      clearInterval(watching2);
       document.removeEventListener("scroll", place, true);
       removeEventListener("resize", place);
       offEscape();
@@ -7520,6 +7521,9 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
     document.addEventListener("scroll", place, true);
     addEventListener("resize", place);
     const offEscape = onEscape(shut);
+    const watching2 = setInterval(() => {
+      if (!shown.element.isConnected || theClient()?.openChat() !== shown.chatId) shut();
+    }, 500);
     setTimeout(() => document.addEventListener("mousedown", onPress, true), 0);
     place();
     open = { card, shut };

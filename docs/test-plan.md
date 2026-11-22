@@ -13,8 +13,8 @@ with a reply keyboard, any will do.
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description,
-   the plugin's version with the build counter after it (0.2.1a.1 for the
-   first build), and offers to install. Install. With an earlier build
+   the plugin's version with the build counter after it (0.2.3a.14, say),
+   and offers to install. Install. With an earlier build
    already installed, the manager's own update check (Tampermonkey:
    Utilities, Check for userscript updates) offers this one instead. A copy
    from before the counter, which says 0.2.3a, was offered nothing before
@@ -54,8 +54,8 @@ with a reply keyboard, any will do.
    api.openai.com did not accept this key. Pick Groq again; its key is still
    there.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
-   without the build counter: 0.2.1a, where the manager's dashboard, column
-   Version, shows 0.2.1a.2.
+   without the build counter: 0.2.3a, where the manager's dashboard, column
+   Version, shows 0.2.3a.14.
    Press Logs: a window opens over the settings with Copy, Save .txt and
    Clear. Escape shuts it and leaves the settings; Escape again shuts them,
    and the chat stays open.
@@ -96,7 +96,9 @@ with a reply keyboard, any will do.
    translation with the mouse and copy them: the card stays open. A click
    anywhere outside it shuts it. Open it again and press Escape: the card
    shuts, and the chat stays open behind it. Escape once more, with nothing
-   of ours open, does what it does in Telegram.
+   of ours open, does what it does in Telegram. Open the card again and
+   switch to another chat from the keyboard, Alt+Down in both clients: the
+   card goes with the chat it was in.
 2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
    menu now has **AI Explain** too, which names the language and explains it.
 
@@ -244,7 +246,7 @@ Both clients, in a switched-on chat that translates into English.
    do. Its Telegram field is two lines: the name and id, then the client,
    "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is the plugin's
    version and, in brackets, the core it was built with and the build
-   counter, "0.2.1a (606d8f3-2)" for example: the first seven characters of
+   counter, "0.2.3a (81df055-14)" for example: the first seven characters of
    the commit that `git submodule status` shows for `ai-translate`, a dash,
    and the counter of `build-counter.json`.
 6. *Write on Discord* opens the support server's invite in a new tab.

@@ -283,7 +283,16 @@ await k.waitForSelector("#bubble-contextmenu .ai-translate-item", { timeout: 500
 check("Web K: AI Explain is there once it is switched on",
     await k.evaluate(() => [...document.querySelectorAll("#bubble-contextmenu .ai-translate-item .btn-menu-item-text")].map(e => e.textContent)),
     ["AI Translate", "AI Explain"]);
-await k.mouse.click(5, 5);
+await k.click("#bubble-contextmenu .ai-translate-item");
+await waitOurs(k, ".card .text", "look at this");
+await k.evaluate(() => {
+    __k.appImManager.chat.peerId = -55;
+});
+check("Web K: a card goes when another chat is opened, though nothing was pressed",
+    await k.waitForFunction(() => !__ours().querySelector(".card"), null, { timeout: 3000 }).then(() => true, () => false), true);
+await k.evaluate(() => {
+    __k.appImManager.chat.peerId = -1234567890;
+});
 
 await k.evaluate(() => {
     __gm.reply = () => 401;
@@ -860,6 +869,14 @@ await a.click("#portals .ai-translate-item");
 await waitOurs(a, ".card .text");
 check("Web A: a message from the client's own cache is read off the screen, without its time",
     await a.evaluate(() => __gm.asked.at(-1)), "из кэша самого клиента");
+await a.evaluate(() => {
+    location.hash = "#777000";
+});
+check("Web A: a card goes when another chat is opened, though nothing was pressed",
+    await a.waitForFunction(() => !__ours().querySelector(".card"), null, { timeout: 3000 }).then(() => true, () => false), true);
+await a.evaluate(() => {
+    location.hash = "#-1001234567890";
+});
 
 // AI Learn, in Web A: the message goes as typed, and the line is under it once the client draws it.
 await a.evaluate(() => {
@@ -1055,6 +1072,15 @@ check("Web K: and goes back into its own topic's box once that one is open", awa
 await k.evaluate(() => {
     __k.appImManager.chat.threadId = undefined;
 });
+
+// A card left open under the windows that come next: Escape takes the windows first, the one opened last first, then the card.
+await a.evaluate(() => {
+    __gm.reply = () => "[ru] who is coming on saturday?";
+});
+await a.click(".Message[data-message-id='4401']", { button: "right" });
+await a.waitForSelector("#portals .ai-translate-item", { timeout: 5000 });
+await a.click("#portals .ai-translate-item");
+await waitOurs(a, ".card .text", "who is coming on saturday?");
 
 // The report from Web A, once the worker has said who the person is.
 await a.evaluate(relay => {

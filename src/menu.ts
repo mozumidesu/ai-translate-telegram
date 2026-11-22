@@ -15,7 +15,7 @@ import { config } from "../ai-translate/core/host";
 import { LANGUAGES } from "../ai-translate/core/languages";
 import { currentLocale, shapeLanguageName, t } from "../ai-translate/core/locales";
 import { collectContext, isJustAName, notify, translate } from "../ai-translate/core/translate";
-import type { Shown, TelegramClient } from "./client";
+import { type Shown, type TelegramClient, theClient } from "./client";
 import { toMarked } from "./formatted";
 import { explainIcon, translateIcon } from "./icons";
 import { askForCorrection } from "./learn";
@@ -117,6 +117,7 @@ function cardFor(shown: Shown, explaining: boolean) {
 
     function shut() {
         card.remove();
+        clearInterval(watching);
         document.removeEventListener("scroll", place, true);
         removeEventListener("resize", place);
         offEscape();
@@ -129,6 +130,10 @@ function cardFor(shown: Shown, explaining: boolean) {
     addEventListener("resize", place);
     // Escape shuts the card and nothing else: the chat behind it stays open.
     const offEscape = onEscape(shut);
+    // Another chat opened with no press anywhere, from the keyboard or a notice, or the message drawn away: the card goes with them.
+    const watching = setInterval(() => {
+        if (!shown.element.isConnected || theClient()?.openChat() !== shown.chatId) shut();
+    }, 500);
     // After the press that opened the menu has finished, or it would shut at once.
     setTimeout(() => document.addEventListener("mousedown", onPress, true), 0);
 
