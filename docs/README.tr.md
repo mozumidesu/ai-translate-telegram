@@ -100,7 +100,7 @@ yoktur ve kimsenin anahtarını görmez.
 
 İlkinin arkasına dört yedek sağlayıcıya kadar konabilir. İlki yoğun olduğunda,
 kotası bittiğinde ya da isteği geri çevirdiğinde çeviri kendiliğinden sıradakine
-geçer ve kısa bir bildirim ilkinin neden atlandığını söyler, her mesajda değil,
+geçer. İlki reddettiyse kısa bir bildirim nedenini söyler, her mesajda değil,
 bir kez.
 
 Anahtarınız userscript yöneticinizin depolama alanında kalır ve istekler

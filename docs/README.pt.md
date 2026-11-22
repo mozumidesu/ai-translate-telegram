@@ -104,8 +104,8 @@ próprio e nunca vê a chave de ninguém.
 
 Até quatro provedores de reserva podem ficar atrás do primeiro. Quando o
 primeiro está sobrecarregado, sem cota ou recusa o pedido, a tradução passa pelo
-seguinte por conta própria, e uma notificação curta diz por que o primeiro foi
-deixado de lado, uma vez e não a cada mensagem.
+seguinte por conta própria. Se o primeiro recusou, uma notificação curta diz por
+quê, uma vez e não a cada mensagem.
 
 Sua chave fica no armazenamento do seu gerenciador de userscripts, e os pedidos
 saem pelo gerenciador, não pela página. As mensagens de outras pessoas só chegam

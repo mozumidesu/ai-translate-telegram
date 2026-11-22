@@ -112,8 +112,8 @@ d'autre.
 
 Jusqu'à quatre fournisseurs de secours peuvent se placer derrière le premier.
 Quand le premier est saturé, à court de quota ou refuse la requête, la
-traduction passe d'elle-même par le suivant, et une courte notification dit
-pourquoi le premier a été écarté, une fois et non à chaque message.
+traduction passe d'elle-même par le suivant. Si le premier a refusé, une courte
+notification dit pourquoi, une fois et non à chaque message.
 
 Votre clé reste dans le stockage de votre gestionnaire de userscripts, et les
 requêtes passent par le gestionnaire, pas par la page. Les messages des autres

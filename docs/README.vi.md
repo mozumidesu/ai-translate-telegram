@@ -102,7 +102,7 @@ riêng và không bao giờ nhìn thấy khóa của ai.
 
 Có thể đặt tới bốn nhà cung cấp dự phòng đứng sau nhà cung cấp đầu tiên. Khi cái
 thứ nhất quá tải, hết hạn mức hoặc từ chối yêu cầu, bản dịch tự đi qua cái kế
-tiếp, và một thông báo ngắn nói vì sao cái thứ nhất bị bỏ qua, chỉ một lần chứ
+tiếp. Nếu cái thứ nhất từ chối, một thông báo ngắn nói vì sao, chỉ một lần chứ
 không phải mỗi tin nhắn.
 
 Khóa của bạn nằm trong bộ nhớ của trình quản lý userscript, và các yêu cầu đi ra

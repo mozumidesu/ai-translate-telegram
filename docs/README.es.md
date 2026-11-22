@@ -105,8 +105,8 @@ traducción propio y nunca ve la clave de nadie.
 
 Hasta cuatro proveedores de reserva pueden ir detrás del primero. Cuando el
 primero está saturado, sin cuota o rechaza la petición, la traducción pasa por
-el siguiente por sí sola, y un aviso breve dice por qué se saltó el primero, una
-vez y no con cada mensaje.
+el siguiente por sí sola. Si el primero la rechazó, un aviso breve dice por qué,
+una vez y no con cada mensaje.
 
 Tu clave se queda en el almacenamiento de tu gestor de userscripts, y las
 peticiones salen a través del gestor, no desde la página. Los mensajes de otras

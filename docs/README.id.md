@@ -103,8 +103,8 @@ penerjemahan sendiri dan tidak pernah melihat kunci milik orang lain.
 
 Hingga empat penyedia cadangan bisa berdiri di belakang yang pertama. Kalau yang
 pertama sedang penuh, kuotanya habis, atau menolak permintaan, terjemahan lewat
-yang berikutnya dengan sendirinya, dan sebuah pemberitahuan singkat menyebut
-kenapa yang pertama dilewati, sekali saja dan tidak di setiap pesan.
+yang berikutnya dengan sendirinya. Kalau yang pertama menolak, sebuah
+pemberitahuan singkat menyebut kenapa, sekali saja dan tidak di setiap pesan.
 
 Kunci Anda tetap di penyimpanan pengelola userscript Anda, dan permintaan keluar
 lewat pengelola, bukan dari halamannya. Pesan orang lain hanya sampai ke

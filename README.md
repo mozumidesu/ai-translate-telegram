@@ -105,8 +105,8 @@ server of its own and never sees anyone else's key.
 
 Up to four backup providers can stand behind the first one. When the first one
 is overloaded, out of quota or refuses the request, the translation goes
-through the next one by itself, and a short notice says why the first one was
-passed over, once rather than with every message.
+through the next one by itself. If the first one refused, a short notice says
+why, once and not with every message.
 
 Your key stays in your userscript manager's storage, and requests go out
 through the manager, not from the page. Other people's messages reach your

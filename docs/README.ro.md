@@ -106,7 +106,7 @@ propriu și nu vede niciodată cheia nimănui.
 
 Până la patru furnizori de rezervă pot sta în spatele primului. Când primul e
 aglomerat, a rămas fără cotă sau refuză cererea, traducerea trece de la sine
-prin următorul, iar o notificare scurtă spune de ce a fost sărit primul, o
+prin următorul. Dacă primul a refuzat, o notificare scurtă spune de ce, o
 singură dată și nu la fiecare mesaj.
 
 Cheia ta rămâne în spațiul de stocare al managerului de userscripturi, iar

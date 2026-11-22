@@ -109,9 +109,9 @@ anderem.
 
 Bis zu vier Anbieter lassen sich als Reserve hinter dem ersten eintragen. Wenn
 der erste überlastet ist, sein Kontingent aufgebraucht hat oder die Anfrage
-ablehnt, läuft die Übersetzung von selbst über den nächsten, und eine kurze
-Benachrichtigung sagt, warum der erste übergangen wurde, einmal und nicht bei
-jeder Nachricht.
+ablehnt, läuft die Übersetzung von selbst über den nächsten. Hat der erste
+abgelehnt, sagt eine kurze Benachrichtigung, warum, einmal und nicht bei jeder
+Nachricht.
 
 Dein Schlüssel bleibt im Speicher deines Userscript-Managers, und die Anfragen
 laufen über den Manager, nicht von der Seite aus. Die Nachrichten anderer Leute
