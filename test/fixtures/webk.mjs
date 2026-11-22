@@ -1,7 +1,9 @@
 /*
  * Web K as the script meets it, reduced to the calls it makes.
  *
- * From morethanwords/tweb aa74832 (8 November 2026): apiManagerProxy.invoke(
+ * From morethanwords/tweb aa74832 (8 November 2026), read again at 2e4bbb5
+ * (11 November 2026), where a topic's threadId comes with the chat's sending
+ * parameters (chat.ts): apiManagerProxy.invoke(
  * "manager", { name, method, args, accountNumber }, withAck) is what every
  * manager proxy calls (src/lib/getProxiedManagers.ts); ChatInput's
  * sendMessageWithForward reads a field, or text it is handed, and calls

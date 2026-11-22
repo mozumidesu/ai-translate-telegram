@@ -7,7 +7,9 @@
  * src/global/actions/api/messages.ts, keys left undefined included, because
  * the action writes them that way. A bot command is what sendBotCommand in
  * bots.ts sends: no wasDrafted. Read from the sources on 2026-11-08 at
- * Ajaxy/telegram-tt 6002824; a cloud session cannot log in to record them
+ * Ajaxy/telegram-tt 6002824, and again on 2026-11-22 at 4566a14, where a
+ * message in a forum's topic replies to the topic as its replyToTopId
+ * (prepareMessageReplyInfo); a cloud session cannot log in to record them
  * from a running client, so test/live.mjs checks the batches themselves
  * against the live site instead.
  *
