@@ -13,13 +13,14 @@ with a reply keyboard, any will do.
 1. Install Tampermonkey, then open
    `https://github.com/mozumidesu/ai-translate-telegram/raw/main/dist/ai-translate.user.js`.
    The manager shows **AI Translate**, "Unofficial." in the description,
-   the plugin's version with the build counter after it (0.2.3a.14, say),
+   the plugin's version with the build counter after it (0.2.4a.18, say),
    and offers to install. Install. With an earlier build
    already installed, the manager's own update check (Tampermonkey:
    Utilities, Check for userscript updates) offers this one instead. A copy
    from before the counter, which says 0.2.3a, was offered nothing before
-   0.2.3a.9, and Tampermonkey may still offer it nothing. If so, delete that
-   script in the manager and open the link again, once.
+   0.2.3a.9, and Tampermonkey nothing before 0.2.4a.18, whose third number is
+   ahead of it. If a manager still offers nothing, delete that script in the
+   manager and open the link again, once.
    A copy from before 0.2.3a.12 kept its settings under another name in the
    manager's storage. Update it rather than reinstall it, reload Telegram and
    open the settings: the provider, its key, the backups and the chats
@@ -60,8 +61,8 @@ with a reply keyboard, any will do.
    api.openai.com did not accept this key. Pick Groq again; its key is still
    there.
 4. Under Logs, one quiet line: "AI Translate · " and the plugin's version,
-   without the build counter: 0.2.3a, where the manager's dashboard, column
-   Version, shows 0.2.3a.14.
+   without the build counter: 0.2.4a, where the manager's dashboard, column
+   Version, shows 0.2.4a.18.
    Press Logs: a window opens over the settings with Copy, Save .txt and
    Clear. Escape shuts it and leaves the settings; Escape again shuts them,
    and the chat stays open.
@@ -255,7 +256,7 @@ Both clients, in a switched-on chat that translates into English.
    do. Its Telegram field is two lines: the name and id, then the client,
    "Mozumi (123456789)" and "Web K" (or "Web A"). Its Build is the plugin's
    version and, in brackets, the core it was built with and the build
-   counter, "0.2.3a (81df055-14)" for example: the first seven characters of
+   counter, "0.2.4a (314e772-18)" for example: the first seven characters of
    the commit that `git submodule status` shows for `ai-translate`, a dash,
    and the counter of `build-counter.json`.
 6. *Write on Discord* opens the support server's invite in a new tab.

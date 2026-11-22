@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.3a.17
+// @version         0.2.4a.18
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -722,7 +722,7 @@
     "showOriginal.name": "Arată textul original sub mesajele trimise",
     "showOriginal.desc": "Adaugă sub mesajele tale un rând discret cu ce ai scris de fapt. Vizibil doar pentru tine",
     "explain.name": "Adaugă «Explică» în meniul de clic dreapta",
-    "explain.desc": "Pentru mesajele pe care nici traducerea nu le lămurește: prescurtări, cuvinte regionale, glume interne. îți spune în ce limbă e, desface prescurtările și zice ce s-a vrut spus",
+    "explain.desc": "Pentru mesajele pe care nici traducerea nu le lămurește: prescurtări, cuvinte regionale, glume interne. Îți spune în ce limbă e, desface prescurtările și zice ce s-a vrut spus",
     "learn.name": "AI Learn: corectează ce scriu eu însumi",
     "learn.desc": "Tot ce scrii cu alfabetul limbii în care traduci pleacă așa cum l-ai scris și nu se traduce, iar sub el apare varianta pe care ar fi scris-o un vorbitor nativ. O vezi doar tu. O cerere pe mesaj și numai în conversațiile unde traducerea e pornită",
     "message.native": "un vorbitor nativ ar scrie:",
@@ -4012,7 +4012,7 @@ IMPORTANT: your previous answer did not contain each placeholder (${tokens.join(
   }
 
   // ai-translate/core/version.ts
-  var VERSION = "0.2.3a";
+  var VERSION = "0.2.4a";
 
   // ai-translate/core/bridge.ts
   function desktop() {
@@ -6334,8 +6334,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${17}`;
-  var BUILD_NAME = `${VERSION} (${"7db017b"}-${17})`;
+  var SCRIPT_VERSION = `${VERSION}.${18}`;
+  var BUILD_NAME = `${VERSION} (${"314e772"}-${18})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
