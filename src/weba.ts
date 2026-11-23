@@ -387,7 +387,11 @@ export const webA: TelegramClient = {
 
         const id = element.getAttribute("data-message-id")!;
         const kept = messages.get(chatId)?.get(Number(id));
-        if (kept) return { chatId, id, text: kept.text, entities: kept.entities, mine: kept.mine, element };
+        if (kept) {
+            // The sender as recent() takes them: a private chat's messages carry no sender but the chat's own id.
+            const sender = kept.mine ? webA.meId() : kept.senderId ?? chatId;
+            return { chatId, id, text: kept.text, entities: kept.entities, mine: kept.mine, author: sender ? names.get(sender) : undefined, element };
+        }
 
         const text = textOnScreen(element);
         return text ? { chatId, id, text, entities: [], mine: element.classList.contains("own"), element } : undefined;

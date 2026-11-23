@@ -50,6 +50,8 @@ const manager = saved => `
 window.__gm = {
     store: { "ai-translate-settings": ${JSON.stringify(saved)} },
     asked: [],
+    // The system message of each chat request: where the core puts the context and who wrote the message.
+    systems: [],
     requests: [],
     routes: {},
     opened: [],
@@ -75,6 +77,7 @@ function GM_xmlhttpRequest(options) {
     else if (options.data && options.url.endsWith("/chat/completions")) {
         const body = JSON.parse(options.data);
         __gm.asked.push(body.messages.at(-1).content);
+        __gm.systems.push(body.messages.find(m => m.role === "system")?.content ?? "");
         const answer = __gm.reply(body.messages.at(-1).content);
         [status, text] = typeof answer === "number" ? [answer, "{}"]
             : [200, JSON.stringify({ choices: [{ message: { content: answer }, finish_reason: "stop" }] })];
@@ -263,8 +266,28 @@ const onCard = await k.evaluate(() => {
 });
 await k.mouse.click(...onCard);
 check("Web K: a press on the card's own text leaves it open, so the translation can be selected", await ours(k, ".card .text"), ["look at this"]);
+check("Web K: with context off, the system message still says who wrote the message",
+    await k.evaluate(() => {
+        const system = __gm.systems.at(-1);
+        return [system.includes("The message below was written by Hoshi."), system.includes("Recent messages in this conversation")];
+    }), [true, false]);
 await k.mouse.click(600, 700);
 check("Web K: a press outside it shuts it", await ours(k, ".card"), []);
+
+// With context on, the author line comes with the recent messages, not instead of them.
+await k.evaluate(() => __gm.change("useContext", true));
+await k.click(".bubble[data-mid='4404']", { button: "right" });
+await k.waitForSelector("#bubble-contextmenu .ai-translate-item", { timeout: 5000 });
+await k.click("#bubble-contextmenu .ai-translate-item");
+await waitOurs(k, ".card .text", "look at this");
+check("Web K: with context on, the system message has the recent messages and who wrote the message",
+    await k.evaluate(() => {
+        const system = __gm.systems.at(-1);
+        return [system.includes("Recent messages in this conversation"), system.includes("The message below was written by Hoshi.")];
+    }), [true, true]);
+await k.evaluate(() => __gm.change("useContext", false));
+await k.mouse.click(600, 700);
+await ours(k, ".card");
 
 await k.keyboard.press("Escape");
 await k.click(".bubble[data-mid='4999']", { button: "right" });
@@ -853,7 +876,13 @@ await a.evaluate(() => __a.worker.postMessage({
     feed: {
         payloads: [{
             type: "methodResponse", messageId: "h1",
-            response: { messages: [{ id: 4401, chatId: "-1001234567890", senderId: "5001", isOutgoing: false, content: { text: { text: "кто идёт в субботу?" } } }] }
+            response: {
+                messages: [
+                    { id: 4400, chatId: "-1001234567890", senderId: "5001", isOutgoing: false, content: { text: { text: "всем привет" } } },
+                    { id: 4401, chatId: "-1001234567890", senderId: "5001", isOutgoing: false, content: { text: { text: "кто идёт в субботу?" } } }
+                ],
+                users: [{ id: "5001", firstName: "Hoshi", type: "userTypeRegular" }]
+            }
         }]
     }
 }));
@@ -868,11 +897,29 @@ await a.click("#portals .ai-translate-item");
 check("Web A: choosing it shuts the menu", await a.evaluate(() => !document.querySelector("#portals .MessageContextMenu")), true);
 check("Web A: the translation is shown beside the message", await waitOurs(a, ".card .text", "who is coming on saturday?"), true);
 check("Web A: the text came from what the worker said", await a.evaluate(() => __gm.asked.at(-1)), "кто идёт в субботу?");
+check("Web A: with context off, the system message still says who wrote the message",
+    await a.evaluate(() => {
+        const system = __gm.systems.at(-1);
+        return [system.includes("The message below was written by Hoshi."), system.includes("Recent messages in this conversation")];
+    }), [true, false]);
 
 const shutBeforeCardA = await chatShut(a);
 await a.keyboard.press("Escape");
 check("Web A: Escape shuts the card, and only the card: the chat behind it stays open",
     [await ours(a, ".card"), await chatShut(a) - shutBeforeCardA], [[], 0]);
+// With context on, the author line comes with the recent messages, not instead of them.
+await a.evaluate(() => __gm.change("useContext", true));
+await a.click(".Message[data-message-id='4401']", { button: "right" });
+await a.waitForSelector("#portals .ai-translate-item", { timeout: 5000 });
+await a.click("#portals .ai-translate-item");
+await waitOurs(a, ".card .text", "who is coming on saturday?");
+check("Web A: with context on, the system message has the recent messages and who wrote the message",
+    await a.evaluate(() => {
+        const system = __gm.systems.at(-1);
+        return [system.includes("Recent messages in this conversation"), system.includes("The message below was written by Hoshi.")];
+    }), [true, true]);
+await a.evaluate(() => __gm.change("useContext", false));
+await a.keyboard.press("Escape");
 await a.click(".Message[data-message-id='4998']", { button: "right" });
 await a.waitForSelector("#portals .ai-translate-item", { timeout: 5000 });
 await a.click("#portals .ai-translate-item");

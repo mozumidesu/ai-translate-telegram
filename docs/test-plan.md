@@ -106,7 +106,14 @@ with a reply keyboard, any will do.
    of ours open, does what it does in Telegram. Open the card again and
    switch to another chat from the keyboard, Alt+Down in both clients: the
    card goes with the chat it was in.
-2. Turn on *Add AI Explain to the right-click menu* on the settings page; the
+2. Who wrote it, in both clients, with *Use recent messages as context* off, its
+   default: have the second account write a short message in a language with
+   gendered verbs, in Russian, say "Я сегодня устала" (a woman writing) or
+   "Я сегодня устал" (a man writing). With "Translate incoming messages
+   into" set to Spanish, translate it: the translation agrees with the
+   writer, "Hoy estoy cansada" for the first and "Hoy estoy cansado" for the
+   second. Then turn context on and repeat: the same.
+3. Turn on *Add AI Explain to the right-click menu* on the settings page; the
    menu now has **AI Explain** too, which names the language and explains it.
 
 ## 6. AI Learn ★

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name            AI Translate
 // @description     Unofficial. Translates your messages on Telegram Web before they are sent, and other people's when you ask, with an AI provider and your own API key
-// @version         0.2.4a.18
+// @version         0.2.4a.19
 // @author          mozumidesu
 // @namespace       https://github.com/mozumidesu/ai-translate-telegram
 // @homepageURL     https://github.com/mozumidesu/ai-translate-telegram
@@ -6334,8 +6334,8 @@ ${sent}`;
   }
 
   // src/version.ts
-  var SCRIPT_VERSION = `${VERSION}.${18}`;
-  var BUILD_NAME = `${VERSION} (${"314e772"}-${18})`;
+  var SCRIPT_VERSION = `${VERSION}.${19}`;
+  var BUILD_NAME = `${VERSION} (${"314e772"}-${19})`;
 
   // src/feedback.ts
   var PROJECT_PAGE = "https://github.com/mozumidesu/ai-translate-telegram";
@@ -7559,7 +7559,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
         card.show(shown.text);
         return;
       }
-      const context = collectContext(shown.chatId, shown.id);
+      const context = collectContext(shown.chatId, shown.id, shown.author);
       const result = explaining ? await translate("explain", shown.text, context) : await translate("received", marked.marked, context, shown.mine);
       const text = explaining ? result.text : marked.back(result.text).text;
       card.show(text, !explaining && result.sourceLanguage ? t("message.translatedFrom", { language: languageName(result.sourceLanguage) }) : void 0);
@@ -7910,7 +7910,10 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
       if (!element || !chatId) return void 0;
       const id2 = element.getAttribute("data-message-id");
       const kept2 = messages.get(chatId)?.get(Number(id2));
-      if (kept2) return { chatId, id: id2, text: kept2.text, entities: kept2.entities, mine: kept2.mine, element };
+      if (kept2) {
+        const sender = kept2.mine ? webA.meId() : kept2.senderId ?? chatId;
+        return { chatId, id: id2, text: kept2.text, entities: kept2.entities, mine: kept2.mine, author: sender ? names.get(sender) : void 0, element };
+      }
       const text = textOnScreen(element);
       return text ? { chatId, id: id2, text, entities: [], mine: element.classList.contains("own"), element } : void 0;
     },
@@ -8209,6 +8212,7 @@ button.busy svg { animation: pulse 1s infinite ease-in-out; }
           text: message.message,
           entities: entitiesOf2(message.totalEntities ?? message.entities),
           mine: !!message.pFlags?.out,
+          author: nameOfPeer(Number(message.fromId ?? peerId)),
           element: bubble
         };
       const text = textOnScreen2(bubble);

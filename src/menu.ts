@@ -171,7 +171,7 @@ export async function readMessage(shown: Shown, explaining: boolean) {
             return;
         }
 
-        const context = collectContext(shown.chatId, shown.id);
+        const context = collectContext(shown.chatId, shown.id, shown.author);
         const result = explaining
             ? await translate("explain", shown.text, context)
             : await translate("received", marked.marked, context, shown.mine);

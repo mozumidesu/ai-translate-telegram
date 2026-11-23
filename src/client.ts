@@ -19,6 +19,8 @@ export interface Shown {
     entities: Entity[];
     /** Written by the person using the script. */
     mine: boolean;
+    /** Who wrote it, as the client names them, when the client knows: the core tells the model, so verbs and adjectives agree with the writer. */
+    author?: string;
     /** The message on the screen, where the answer is put beside it. */
     element: Element;
 }

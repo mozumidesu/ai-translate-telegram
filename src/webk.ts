@@ -353,6 +353,7 @@ export const webK: TelegramClient = {
                 text: message.message,
                 entities: entitiesOf(message.totalEntities ?? message.entities),
                 mine: !!message.pFlags?.out,
+                author: nameOfPeer(Number(message.fromId ?? peerId)),
                 element: bubble
             };
 
